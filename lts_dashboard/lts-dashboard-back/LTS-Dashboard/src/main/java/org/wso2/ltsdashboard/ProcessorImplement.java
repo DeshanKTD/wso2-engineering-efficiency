@@ -218,7 +218,7 @@ public class ProcessorImplement implements Processor {
                         object.addProperty("feature", this.trimJsonElementString(feature));
                         object.addProperty("html_url", this.trimJsonElementString(issueObject.get("html_url")));
                         object.addProperty("title", this.trimJsonElementString(issueObject.get("title")));
-                        if(featureArray.size()>0) {
+                        if (featureArray.size() > 0) {
                             featureList.add(object);
                         }
                     }
@@ -289,8 +289,8 @@ public class ProcessorImplement implements Processor {
         Matcher m = r.matcher(labelName);
         if (m.find()) {
             productVersion = labelName.split(" ")[0]
-                                        .split("-")[0]
-                                        .replace("\"", "");
+                    .split("-")[0]
+                    .replace("\"", "");
         }
 
         return productVersion;

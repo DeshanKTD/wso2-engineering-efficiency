@@ -20,13 +20,11 @@
 
 import React from 'react';
 import Typography from 'material-ui/Typography';
-import Modal from 'material-ui/Modal';
 import AppBar from "material-ui/es/AppBar/AppBar";
 import Toolbar from "material-ui/es/Toolbar/Toolbar";
 import Paper from "material-ui/es/Paper/Paper";
 import PropTypes from "prop-types";
 import {withStyles} from "material-ui/styles/index";
-import axios from "axios/index";
 import CircularProgress from "material-ui/es/Progress/CircularProgress";
 import ExpansionSummary from './milestones/ExpansionSummary.js';
 import Dialog from "material-ui/es/Dialog/Dialog";
@@ -59,19 +57,6 @@ const styles = theme => ({
     }
 });
 
-function getModalStyle() {
-
-    return {
-        position: 'absolute',
-        width: `80%`,
-        top: `10%`,
-        left: `10%`,
-        border: '1px solid #e5e5e5',
-        backgroundColor: '#fff',
-        boxShadow: '0 5px 15px rgba(0, 0, 0, .5)',
-
-    };
-}
 
 function transition(props) {
     return <Slide direction="up" {...props} />;
@@ -89,7 +74,7 @@ class FeatureModal extends React.Component {
         super(props);
         this.state = {
             open: false,
-            data: {},
+            data: [],
             featureData: [],
             progressState: false
         };
@@ -97,14 +82,10 @@ class FeatureModal extends React.Component {
     }
 
     componentWillUpdate(nextProps, nextState) {
-        if (nextProps.versionData !== this.props.versionData) {
+        if (nextProps.issueList !== this.props.issueList) {
             this.setState({
-                    data: nextProps.data,
-                    featureData: [],
-                },
-                () => (
-                    this.fetchMilestoneFeatures(this.createIssueListofMilestone())
-                ))
+                data: nextProps.issueList,
+            });
         }
         if (nextProps.open !== this.state.open) {
             this.setState({
@@ -113,53 +94,12 @@ class FeatureModal extends React.Component {
         }
     }
 
-    // fetch milestone features
-    fetchMilestoneFeatures(data) {
-        this.setState({
-                progressState: true
-            }, () => (
-                axios.post('http://10.100.5.173:8080/lts/features',
-                    data
-                ).then(
-                    (response) => {
-                        let datat = response.data;
-                        this.setState({
-                            featureData: datat,
-                            progressState: false
-                        })
-                    }
-                )
-            )
-        );
-    }
-
-
-
-
-    // create issue url list belong to the milestone
-    createIssueListofMilestone() {
-        let milestoneIssues = [];
-        this.props.issueList.forEach(function (issue) {
-
-            let object = {
-                url: issue["url"],
-                html_url: issue["html_url"],
-                title: issue["issue_title"],
-            };
-            milestoneIssues.push(object)
-
-        });
-
-        return milestoneIssues;
-    }
-
 
     generate(array) {
         return array.map((value, index) =>
             <ExpansionSummary key={index} data={value}/>
         );
     }
-
 
 
     render() {
@@ -179,7 +119,7 @@ class FeatureModal extends React.Component {
                             <AppBar position="static" color="primary">
                                 <Toolbar>
                                     <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
-                                        <CloseIcon />
+                                        <CloseIcon/>
                                     </IconButton>
                                     <Typography type="title" color="inherit">
                                         {this.props.versionData["product"] + " : " + this.props.versionData["version"]}
@@ -188,16 +128,16 @@ class FeatureModal extends React.Component {
                                         Marketing Messages
                                     </Typography>
                                     {this.state.progressState && <CircularProgress
-                                        style={{ color: purple[500] }}
+                                        style={{color: purple[500]}}
                                         className={classes.progress}/>}
                                 </Toolbar>
                             </AppBar>
 
                             {/*feature List*/}
                             <Paper className={classes.paper} elevation={4}>
-                               <div>
-                                   {this.generate(this.state.featureData)}
-                               </div>
+                                <div>
+                                    {this.generate(this.state.data)}
+                                </div>
                             </Paper>
                         </div>
 

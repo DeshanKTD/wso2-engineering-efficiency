@@ -19,11 +19,8 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
-import ExpansionPanel, {
-    ExpansionPanelDetails,
-    ExpansionPanelSummary,
-} from 'material-ui/ExpansionPanel';
+import {withStyles} from 'material-ui/styles';
+import ExpansionPanel, {ExpansionPanelDetails, ExpansionPanelSummary,} from 'material-ui/ExpansionPanel';
 import Typography from 'material-ui/Typography';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 import Divider from "material-ui/es/Divider/Divider";
@@ -33,6 +30,8 @@ import ListItemIcon from "material-ui/es/List/ListItemIcon";
 import ListItemText from "material-ui/es/List/ListItemText";
 import StarIcon from 'material-ui-icons/Star';
 import Button from "material-ui/es/Button/Button";
+import axios from "axios/index";
+import LinearProgress from "material-ui/es/Progress/LinearProgress";
 
 const styles = theme => ({
     root: {
@@ -57,12 +56,18 @@ const styles = theme => ({
 
 class ExpansionSummary extends React.Component {
     state = {
-        expanded: true,
+        expanded: false,
+        features: []
     };
 
     handleChange = () => {
         this.setState({
             expanded: !this.state.expanded,
+            features: []
+        },()=>{
+            if(this.state.expanded){
+                this.fetchMilestoneFeatures(this.createIssueObject())
+            }
         });
     };
     
@@ -78,6 +83,53 @@ class ExpansionSummary extends React.Component {
         );
     }
 
+
+
+    // fetch milestone features
+    fetchMilestoneFeatures(data) {
+        this.setState({
+                progressState: true
+            }, () => (
+                axios.post('http://10.100.5.173:8080/lts/milestone',
+                    data
+                ).then(
+                    (response) => {
+                        let datat = response.data;
+                        this.setState({
+                            features: this.extractFeatures(datat),
+                            progressState: false
+                        })
+                    }
+                )
+            )
+        );
+    }
+
+
+    extractFeatures(array){
+        let featureList = [];
+        array.forEach(function (issueFeature) {
+            featureList.push(issueFeature["feature"])
+        });
+
+        return featureList;
+    }
+
+    // create issue url list belong to the milestone
+    createIssueObject() {
+        let milestoneIssues = [];
+        let object = {
+            url: this.props.data["url"],
+            html_url: this.props.data["html_url"],
+            title: this.props.data["issue_title"],
+        };
+
+        milestoneIssues.push(object);
+
+        return milestoneIssues;
+    }
+
+
     render() {
         const { classes } = this.props;
         const { expanded } = this.state;
@@ -85,12 +137,13 @@ class ExpansionSummary extends React.Component {
         return (
                 <ExpansionPanel expanded={expanded} >
                     <ExpansionPanelSummary onClick={this.handleChange} expandIcon={<ExpandMoreIcon />}>
-                        <Typography className={classes.heading}>{this.props.data["title"]}</Typography>
+                        <Typography className={classes.heading}>{this.props.data["issue_title"]}</Typography>
                         <Typography className={classes.secondaryHeading}>{this.props.data["html_url"]}</Typography>
                     </ExpansionPanelSummary>
+                    {this.state.progressState && <LinearProgress color="secondary" />}
                     <ExpansionPanelDetails>
                         <List className={classes.root} dense={true}>
-                            {this.generateFeatures(this.props.data["features"])}
+                            {this.generateFeatures(this.state.features)}
                         </List>
                     </ExpansionPanelDetails>
                     <Divider />
