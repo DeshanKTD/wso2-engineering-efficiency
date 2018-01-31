@@ -32,6 +32,7 @@ import StarIcon from 'material-ui-icons/Star';
 import Button from "material-ui/es/Button/Button";
 import axios from "axios/index";
 import LinearProgress from "material-ui/es/Progress/LinearProgress";
+import {getServer} from "../../support/util"
 
 const styles = theme => ({
     root: {
@@ -90,7 +91,7 @@ class ExpansionSummary extends React.Component {
         this.setState({
                 progressState: true
             }, () => (
-                axios.post('http://10.100.5.173:8080/lts/milestone',
+                axios.post('http://'+getServer()+'/lts/milestone',
                     data
                 ).then(
                     (response) => {

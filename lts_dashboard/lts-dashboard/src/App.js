@@ -28,6 +28,7 @@ import axios from "axios/index";
 import MilestoneModal from "./maincomponents/MilestoneModal.js"
 import LinearProgress from "material-ui/es/Progress/LinearProgress";
 import FeatureModal from "./maincomponents/FeatureModal.js";
+import {getServer} from "./support/util.js"
 
 
 const styles = {
@@ -91,7 +92,7 @@ class App extends Component {
                     issueList: [],
                     openFeatureModal: false
                 }, () => (
-                    axios.post('http://10.100.5.173:8080/lts/issues',
+                    axios.post('http://'+getServer()+'/lts/issues',
                         productObject
                     ).then(
                         (response) => {
