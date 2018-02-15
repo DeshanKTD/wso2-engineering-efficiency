@@ -20,6 +20,8 @@
 import React from 'react';
 
 
+let HOST = "10.100.5.173:8080";
+
 export function getServer() {
-    return "10.100.5.173:8080";
+   return HOST;
 }

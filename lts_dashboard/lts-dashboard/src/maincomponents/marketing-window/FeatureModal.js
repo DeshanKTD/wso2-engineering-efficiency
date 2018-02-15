@@ -33,7 +33,7 @@ import Slide from "material-ui/es/transitions/Slide";
 import IconButton from "material-ui/es/IconButton/IconButton";
 import CloseIcon from 'material-ui-icons/Close';
 import purple from 'material-ui/colors/purple';
-import {getServer} from "../resources/util";
+import {getServer} from "../../resources/util";
 
 
 const styles = theme => ({

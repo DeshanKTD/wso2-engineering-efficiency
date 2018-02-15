@@ -25,8 +25,7 @@ import {MenuItem} from 'material-ui/Menu';
 import {FormControl} from 'material-ui/Form';
 import Select from 'material-ui/Select';
 import axios from "axios/index";
-import CircularProgress from "material-ui/es/Progress/CircularProgress";
-import {getServer} from "../resources/util";
+import {getServer} from "../../resources/util";
 
 const styles = theme => ({
     container: {
@@ -40,61 +39,42 @@ const styles = theme => ({
     selectEmpty: {
         marginTop: theme.spacing.unit * 2,
     },
-    progress: {
-        margin: `0 ${theme.spacing.unit * 2}px`,
-        paddingTop: 10
-    },
 });
 
-class VersionNavigator extends React.Component {
+class ProductNavigator extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            product: '',
+            productList: []
+        };
+
+        this.fetchVersions();
+
+    }
 
     handleChange = event => {
         this.setState({[event.target.name]: event.target.value},
             () => {
-                this.props.setVersion(this.state.version);
+                this.props.setProduct(this.state.product)
             });
-
 
     };
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            version: '',
-            versionList: [],
-            issueLoading: false
-        };
-    }
-
-    fetchVersions(productName) {
-        let productObject = {};
-        productObject["product"] = productName;
-        if (productName !== '') {
-            this.setState({
-                issueLoading:true
-            },()=>(
-                axios.post('http://'+getServer()+'/lts/versions',
-                    productObject
-                ).then(
-                    (response) => {
-                        let datat = response.data;
-                        this.setState(
-                            {
-                                versionList: datat.sort().reverse(),
-                                issueLoading:false
-                            }
-                        );
+    fetchVersions() {
+        axios.get('http://'+getServer()+'/lts/products'
+        ).then(
+            (response) => {
+                let datat = response.data;
+                this.setState(
+                    {
+                        productList: datat
                     }
-                )
-            ));
-        }
+                );
+            }
+        )
     }
 
-    componentWillUpdate(nextProps, nextState) {
-        if (nextProps.product !== this.props.product) {
-            this.fetchVersions(nextProps.product);
-        }
-    }
 
     render() {
         const {classes} = this.props;
@@ -103,32 +83,27 @@ class VersionNavigator extends React.Component {
             <div>
                 <form className={classes.container} autoComplete="off">
                     <FormControl className={classes.formControl}>
-                        <InputLabel htmlFor="version-simple">Version</InputLabel>
+                        <InputLabel htmlFor="product-simple">Product</InputLabel>
                         <Select
-                            value={this.state.version}
+                            value={this.state.product}
                             onChange={this.handleChange}
-                            input={<Input name="version" id="version-simple"/>}
+                            input={<Input name="product" id="product-simple"/>}
                         >
                             <MenuItem value="">
                                 <em>None</em>
                             </MenuItem>
-                            {
-                                this.state.versionList.map((versionName, index) => (
-                                    <MenuItem key={index} value={versionName}>{versionName}</MenuItem>
-                                ))
-                            }
+                            {this.state.productList.map((productName, index) => (
+                                <MenuItem key={index} value={productName}>{productName}</MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
-                    {this.state.issueLoading && <CircularProgress className={classes.progress} />}
                 </form>
-
             </div>
         );
     }
 }
-
-VersionNavigator.propTypes = {
+ProductNavigator.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(VersionNavigator);
+export default withStyles(styles)(ProductNavigator);

@@ -22,23 +22,37 @@ import logo from './img/WSO2_Software_Logo.png'
 import PropTypes from 'prop-types';
 import {withStyles} from 'material-ui/styles';
 import './App.css';
-import MilestoneList from './maincomponents/IssueList';
-import MenuAppBar from './maincomponents/HeaderAppBar'
-import axios from "axios/index";
-import MilestoneModal from "./maincomponents/MilestoneModal.js"
-import LinearProgress from "material-ui/es/Progress/LinearProgress";
-import FeatureModal from "./maincomponents/FeatureModal.js";
-import {getServer} from "./resources/util";
+import AppBar from "material-ui/es/AppBar/AppBar";
+import Tabs from "material-ui/es/Tabs/Tabs";
+import Tab from "material-ui/es/Tabs/Tab";
+import Typography from "material-ui/es/Typography/Typography";
+import MarketingWindow from "./maincomponents/MarketingWindow.js";
+import ProductVersion from "./maincomponents/ProductVersion";
+import ProductRepository from "./maincomponents/ProductRepository";
 
-const styles = {
-    blocks: {
-        display: 'inline',
-        float: 'left',
-        padding: 20
-    }
+const styles = theme => ({
+    root: {
+        flexGrow: 1,
+        marginTop: theme.spacing.unit * 3,
+        backgroundColor: theme.palette.background.paper,
+    },
+});
 
 
+function TabContainer(props) {
+    return (
+        <Typography component="div" style={{ padding: 8 * 3 }}>
+            {props.children}
+        </Typography>
+    );
+}
+
+
+TabContainer.propTypes = {
+    children: PropTypes.node.isRequired,
 };
+
+
 
 
 class App extends Component {
@@ -63,57 +77,19 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            issueList: [],
-            milestoneData: {},
-            openModal: false,
-            loadIssue: false,
-            openFeatureModal: false,
-            product: "",
-            version: "",
+           value : 0
         };
-
-        this.setIssues = this.setIssues.bind(this);
-        this.modalOpen = this.modalOpen.bind(this);
-        this.featureModalOpen = this.featureModalOpen.bind(this);
-
     }
 
 
-    setIssues(productName, versionName) {
-        if (productName !== null || versionName !== null) {
-            let productObject = {};
-            productObject["product"] = productName;
-            productObject["version"] = versionName;
 
-            if (productName !== '') {
-                this.setState({
-                    loadIssue: true,
-                    openModal: false,
-                    issueList: [],
-                    openFeatureModal: false
-                }, () => (
-                    axios.post('http://'+getServer()+'/lts/issues',
-                        productObject
-                    ).then(
-                        (response) => {
-                            let datat = response.data;
-                            this.setState(
-                                {
-                                    issueList: datat,
-                                    loadIssue: false,
-                                    openModal: false,
-                                }
-                            );
-                        }
-                    )
-                ));
-            }
-        }
-    }
-
+    handleChange = (event, value) => {
+        this.setState({ value });
+    };
 
     render() {
         const {classes} = this.props;
+        const { value } = this.state;
         return (
             <div className="App">
 
@@ -122,41 +98,19 @@ class App extends Component {
                     <h1 className="App-title">LTS Dashboard</h1>
                 </header>
 
-                <MenuAppBar
-                    productUpdate={this.setProduct}
-                    setissues={this.setIssues}
-                    featureModal={this.featureModalOpen}
-                />
-                <div style={{height: 15}}>
-                    {this.state.loadIssue && <LinearProgress/>}
-                </div>
+                <AppBar position="static" color="default">
+                    <Tabs value={value} onChange={this.handleChange}>
+                        <Tab label="Marketing Messages" />
+                        <Tab label="Product Versions" />
+                        <Tab label="Repository/ Branches" href="#basic-tabs" />
+                    </Tabs>
+                </AppBar>
+                {value === 0 && <TabContainer><MarketingWindow/></TabContainer>}
+                {value === 1 && <TabContainer><ProductVersion/></TabContainer>}
+                {value === 2 && <TabContainer><ProductRepository/></TabContainer>}
 
-                <div className={classes.blocks}>
-                    <MilestoneList
-                        issueList={this.state.issueList}
-                        modalLauch={this.modalOpen}
-                    />
-                </div>
+        </div>
 
-                <div>
-                    <MilestoneModal
-                        data={this.state.milestoneData}
-                        open={this.state.openModal}
-                        issueList={this.state.issueList}
-                    />
-                </div>
-                <div>
-                    <FeatureModal
-                        open={this.state.openFeatureModal}
-                        versionData = {{
-                            product: this.state.product,
-                            version: this.state.version
-                        }}
-                        issueList={this.state.issueList}
-                    />
-                </div>
-
-            </div>
         );
     }
 }

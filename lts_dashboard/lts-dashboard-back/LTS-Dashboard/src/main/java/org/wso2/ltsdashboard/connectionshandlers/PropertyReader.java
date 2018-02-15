@@ -17,11 +17,10 @@
  *
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
+package org.wso2.ltsdashboard.connectionshandlers;
 
-it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(<App/>, div);
-});
+/*
+ * TODO - comment class work
+ */
+public class PropertyReader {
+}

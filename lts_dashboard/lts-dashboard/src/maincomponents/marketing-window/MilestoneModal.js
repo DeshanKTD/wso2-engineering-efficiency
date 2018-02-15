@@ -34,7 +34,7 @@ import ListItemIcon from "material-ui/es/List/ListItemIcon";
 import StarIcon from 'material-ui-icons/Star';
 import ListItem from "material-ui/es/List/ListItem";
 import purple from "material-ui/colors/purple";
-import {getServer} from "../resources/util";
+import {getServer} from "../../resources/util";
 
 const styles = theme => ({
     paper: theme.mixins.gutters({
@@ -188,8 +188,9 @@ class MilestoneModal extends React.Component {
                     <StarIcon/>
                 </ListItemIcon>
                 <ListItemText
-                    primary={value["feature"]}
-                    secondary={"From issue :" + value["title"]}
+                    // primary={value["feature"]}
+                    primary={value["title"]}
+                    // secondary={"From issue :" + value["title"]}
                 />
             </ListItem>
         );
@@ -212,7 +213,7 @@ class MilestoneModal extends React.Component {
                             <AppBar position="static" color="primary">
                                 <Toolbar>
                                     <Typography type="title" color="inherit" className={classes.heading}>
-                                        Features of Milestone
+                                        Features released with Milestone
                                     </Typography>
                                     <Typography type="title" color="inherit">
                                         <a onClick={() => window.open(this.props.data["html_url"], '_blank')}>
