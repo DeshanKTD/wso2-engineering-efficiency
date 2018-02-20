@@ -17,11 +17,28 @@
  *
  */
 
-import React from 'react';
+import React, {Component} from 'react';
+import Button from "material-ui/es/Button/Button";
 
 
-let HOST = "localhost:8080";
+class VersionChangeButton extends Component{
+    constructor(props){
+        super(props);
+        this.changeVersionNameOpen = this.changeVersionNameOpen.bind(this);
+    }
 
-export function getServer() {
-   return HOST;
+
+    changeVersionNameOpen(){
+        this.props.openChangeWindow(this.props.id,this.props.name);
+    }
+
+
+
+    render(){
+        return (
+            <Button onClick={this.changeVersionNameOpen}>Change</Button>
+        );
+    }
 }
+
+export default VersionChangeButton;

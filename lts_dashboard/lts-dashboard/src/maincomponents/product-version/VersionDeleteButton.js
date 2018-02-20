@@ -17,11 +17,27 @@
  *
  */
 
-import React from 'react';
+import React, {Component} from 'react';
+import Button from "material-ui/es/Button/Button";
 
 
-let HOST = "localhost:8080";
+class VersionDeleteButton extends Component{
+    constructor(props){
+        super(props);
+        this.deleteVersion = this.deleteVersion.bind(this);
+    }
 
-export function getServer() {
-   return HOST;
+
+    deleteVersion(){
+        this.props.openDeleteDialog(this.props.id,this.props.name);
+    }
+
+
+    render(){
+        return (
+            <Button onClick={this.deleteVersion}>Delete</Button>
+        );
+    }
 }
+
+export default VersionDeleteButton;

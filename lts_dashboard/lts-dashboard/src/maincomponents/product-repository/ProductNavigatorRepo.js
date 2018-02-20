@@ -49,20 +49,22 @@ class ProductNavigatorRepo extends React.Component {
             productList: []
         };
 
-        this.fetchVersions();
+        this.fetchProducts();
 
     }
 
     handleChange = event => {
         this.setState({[event.target.name]: event.target.value},
             () => {
-                // this.props.setProduct(this.state.product)
+                this.props.setRepoList(event.target.value);
+
             });
 
     };
 
-    fetchVersions() {
-        axios.get('http://'+getServer()+'/lts/products'
+
+    fetchProducts() {
+        axios.get('http://'+getServer()+'/lts/products/names'
         ).then(
             (response) => {
                 let datat = response.data;
@@ -92,8 +94,8 @@ class ProductNavigatorRepo extends React.Component {
                             <MenuItem value="">
                                 <em>None</em>
                             </MenuItem>
-                            {this.state.productList.map((productName, index) => (
-                                <MenuItem key={index} value={productName}>{productName}</MenuItem>
+                            {this.state.productList.map((product, index) => (
+                                <MenuItem key={index} value={product.productId}>{product.productName}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>
@@ -102,6 +104,7 @@ class ProductNavigatorRepo extends React.Component {
         );
     }
 }
+
 ProductNavigatorRepo.propTypes = {
     classes: PropTypes.object.isRequired,
 };

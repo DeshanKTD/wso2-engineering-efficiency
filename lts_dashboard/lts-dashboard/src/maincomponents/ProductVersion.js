@@ -25,15 +25,17 @@ import '../App.css';
 import Grid from "material-ui/es/Grid/Grid";
 import Paper from "material-ui/es/Paper/Paper";
 import List from "material-ui/es/List/List";
-import ListItem from "material-ui/es/List/ListItem";
-import ListItemIcon from "material-ui/es/List/ListItemIcon";
-import ListItemText from "material-ui/es/List/ListItemText";
-import StarIcon from 'material-ui-icons/Star';
 import AppBar from "material-ui/es/AppBar/AppBar";
 import Typography from "material-ui/es/Typography/Typography";
 import Toolbar from "material-ui/es/Toolbar/Toolbar";
 import VersionTable from "./product-version/VersionTable.js";
 import Button from "material-ui/es/Button/Button";
+import axios from "axios/index";
+import {getServer} from "../resources/util";
+import ProductNameItem from "./product-version/ProductNameItem";
+import VersionAddModal from "./product-version/VersionAddModal";
+import VersionDeleteDialog from "./product-version/VersionDeleteDialog";
+import VersionChangeModal from "./product-version/VersionChangeModal";
 
 
 const styles = theme => ({
@@ -70,13 +72,112 @@ class ProductVersion extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            productList : [],
+            addProductOpen : false,
+            productName : "",
+            productId : "",
+            versionList: [],
+            deleteData: {},
+            deleteProductOpen: false,
+            changeVersionOpen: false
         };
+        this.fetchProductList();
+        this.fetchVersionList = this.fetchVersionList.bind(this);
+        this.setName = this.setName.bind(this);
+        this.openAddProductWindow = this.openAddProductWindow.bind(this);
+        this.openDeleteWindow = this.openDeleteWindow.bind(this);
+        this.openChangeWindow = this.openChangeWindow.bind(this);
 
     }
 
+    fetchProductList() {
+        axios.get('http://'+getServer()+'/lts/products/names'
+        ).then(
+            (response) => {
+                let datat = response.data;
+                this.setState(
+                    {
+                        productList: datat,
+                        addProductOpen : false,
+                        deleteProductOpen: false,
+                        changeVersionOpen: false,
+                    }
+                );
+            }
+        )
+    }
 
 
+    fetchVersionList(productId){
+        let data = {
+            productId : productId
+        };
+        axios.post('http://'+getServer()+'/lts/products/versions',data
+        ).then(
+            (response) => {
+                let datat = response.data;
+                this.setState(
+                    {
+                        versionList: datat,
+                        addProductOpen : false,
+                        deleteProductOpen : false,
+                        changeVersionOpen:false
+                    },
+                );
+                console.log(datat);
+            }
+        )
+    }
+
+    setName(productName,productId){
+        this.setState({
+            productName : productName,
+            productId : productId,
+            addProductOpen : false,
+            deleteProductOpen: false,
+            changeVersionOpen:false
+        })
+    }
+
+
+    openAddProductWindow(){
+        this.setState({
+            addProductOpen : true,
+            deleteProductOpen: false,
+            changeVersionOpen:false
+        })
+    }
+
+
+    openDeleteWindow(versionId,versionName){
+        let data = {
+            productId: this.state.productId,
+            versionId: versionId,
+            versionName: versionName
+        };
+        this.setState({
+            deleteData: data,
+            deleteProductOpen: true,
+            addProductOpen: false,
+            changeVersionOpen:false
+
+        });
+    }
+
+
+    openChangeWindow(versionId,versionName){
+        let data = {
+            productId: this.state.productId,
+            versionId: versionId,
+            versionName: versionName,
+        };
+        this.setState({
+            changeData: data,
+            deleteProductOpen: false,
+            addProductOpen: false,
+            changeVersionOpen:true
+        });
+    }
 
 
     render() {
@@ -102,18 +203,16 @@ class ProductVersion extends Component {
                             </div>
                             <div className={classes.productButtons}>
                                 <List component="nav">
-                                    <ListItem button>
-                                        <ListItemIcon>
-                                            <StarIcon />
-                                        </ListItemIcon>
-                                        <ListItemText inset primary="Integration" />
-                                    </ListItem>
-                                    <ListItem button>
-                                        <ListItemText inset primary="API Manager" />
-                                    </ListItem>
-                                    <ListItem button>
-                                        <ListItemText inset primary="IAM" />
-                                    </ListItem>
+                                    {
+                                        this.state.productList.map((value,index)=>
+                                                <ProductNameItem
+                                                    productObject={value}
+                                                    key={index}
+                                                    getVersionList ={this.fetchVersionList}
+                                                    setName={this.setName}
+                                                />
+                                        )
+                                    }
                                 </List>
                             </div>
                         </Paper>
@@ -124,23 +223,44 @@ class ProductVersion extends Component {
                                 <AppBar position="static" color="default">
                                     <Toolbar>
                                         <Typography type="title" color="inherit" className={classes.flex}>
-                                           Integration
+                                            {this.state.productName}
                                         </Typography>
-                                        <Button>
+                                        <Button onClick={this.openAddProductWindow}>
                                             Add Version
                                         </Button>
                                     </Toolbar>
                                 </AppBar>
                             </div>
                             <div>
-                                <VersionTable/>
+                                <VersionTable
+                                    tableData = {this.state.versionList}
+                                    openDeleteWindow={this.openDeleteWindow}
+                                    openChangeWindow={this.openChangeWindow}
+                                />
                             </div>
                         </Paper>
                     </Grid>
                 </Grid>
+                <VersionAddModal
+                    open = {this.state.addProductOpen}
+                    productId = {this.state.productId}
+                    versionList = {this.state.versionList}
+                    fetchVersions = {this.fetchVersionList}
+
+                />
+                <VersionDeleteDialog
+                    open = {this.state.deleteProductOpen}
+                    deleteData = {this.state.deleteData}
+                    fetchVersions = {this.fetchVersionList}
+                />
+                <VersionChangeModal
+                    open = {this.state.changeVersionOpen}
+                    productId = {this.state.productId}
+                    versionId = {1}
+                    versionList = {this.state.versionList}
+                    fetchVersions = {this.fetchVersionList}
+                />
             </div>
-
-
 
         );
     }

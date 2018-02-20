@@ -30,7 +30,9 @@ import {
     TableFilterRow,
 } from '@devexpress/dx-react-grid-material-ui';
 import Button from "material-ui/es/Button/Button";
-
+import VersionChangeButton from "./VersionChangeButton";
+import VersionDeleteDialog from "./VersionDeleteDialog";
+import VersionDeleteButton from "./VersionDeleteButton";
 
 
 export default class VersionTable extends React.PureComponent {
@@ -39,28 +41,81 @@ export default class VersionTable extends React.PureComponent {
 
         this.state = {
             columns: [
-                { name: 'version', title: 'Version' },
-                { name: 'button', title: '_' }
+                {name: 'version', title: 'Version'},
+                {name: 'button', title: '_'},
+                {name: 'deleteButton', title: '_'}
             ],
-            rows:[
-                { version : '1.0.0', button : <Button>Change</Button>},
-                { version : '1.1.0', button : <Button>Change</Button>},
+            rows: [
+                {version: '1.0.0', button: <Button>Change</Button>},
+                {version: '1.1.0', button: <Button>Change</Button>},
             ],
         };
+
+        this.openDeleteDialog = this.openDeleteDialog.bind(this);
+        this.openChangeDialog = this.openChangeDialog.bind(this);
+        this.createRows = this.createRows.bind(this);
     }
+
+
+    createRows(versionData) {
+        let row = [];
+        let openDeleteDiag = this.openDeleteDialog;
+        let openChangeDiag = this.openChangeDialog;
+        versionData.forEach(function (version) {
+            let obj = {
+                version: version["versionName"],
+                button: <VersionChangeButton
+                    id={version["versionId"]}
+                    name={version["versionName"]}
+                    openChangeWindow={openChangeDiag}
+                />,
+                deleteButton : <VersionDeleteButton
+                    id={version["versionId"]}
+                    name={version["versionName"]}
+                    openDeleteDialog={openDeleteDiag}
+                />
+            };
+            row.push(obj);
+        });
+
+        return row;
+    }
+
+
+    openDeleteDialog(versionId,versionName){
+        this.props.openDeleteWindow(versionId,versionName);
+    }
+
+    openChangeDialog(versionId,versionName){
+        this.props.openChangeWindow(versionId,versionName);
+    }
+
+
+    componentWillUpdate(nextProps, nextState) {
+        if (nextProps.tableData !== this.state.tableData) {
+            this.setState({
+                tableData: nextProps.tableData,
+                rows: this.createRows(nextProps.tableData)
+            });
+        }
+    }
+
+
     render() {
-        const { rows, columns } = this.state;
+        const {rows, columns} = this.state;
 
         return (
-            <Paper>
-                <Grid
-                    rows={rows}
-                    columns={columns}
-                >
-                    <Table />
-                    <TableHeaderRow />
-                </Grid>
-            </Paper>
+            <div>
+                <Paper>
+                    <Grid
+                        rows={rows}
+                        columns={columns}
+                    >
+                        <Table/>
+                        <TableHeaderRow/>
+                    </Grid>
+                </Paper>
+            </div>
         );
     }
 }

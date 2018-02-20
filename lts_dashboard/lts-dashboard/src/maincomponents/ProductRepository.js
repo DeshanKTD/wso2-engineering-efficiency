@@ -33,7 +33,10 @@ import AppBar from "material-ui/es/AppBar/AppBar";
 import Typography from "material-ui/es/Typography/Typography";
 import Toolbar from "material-ui/es/Toolbar/Toolbar";
 import BranchTable from "./product-repository/BranchTable.js";
-import ProductNavigatorRepo from "./product-version/ProductNavigatorRepo";
+import ProductNavigatorRepo from "./product-repository/ProductNavigatorRepo";
+import {getServer} from "../resources/util";
+import axios from "axios/index";
+import RepoNameItem from "./product-repository/RepoNameItem";
 
 
 const styles = theme => ({
@@ -70,13 +73,51 @@ class ProductRepository extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            currentRepo: "",
+            productId : "",
+            repoList:[],
+            branchList:[],
 
         };
+
+        this.setRepoList = this.setRepoList.bind(this);
 
     }
 
 
 
+    // set repo list for product
+    setRepoList(id){
+        this.setState({
+            repoList: []
+        });
+        if(id!="") {
+            let data = {
+                productId: id
+            };
+            axios.post('http://' + getServer() + '/lts/products/repos', data
+            ).then(
+                (response) => {
+                    let datat = response.data;
+                    this.setState(
+                        {
+                            repoList: datat
+                        },()=>console.log(this.state.repoList)
+                    );
+                }
+            )
+        }else {
+            this.setState({
+                repoList: []
+            })
+        }
+    }
+
+
+    // fetch branches for repo
+    fetchBranches(){
+
+    }
 
 
     render() {
@@ -89,23 +130,16 @@ class ProductRepository extends Component {
                         <Paper className={classes.paper}>
                             <div className={classes.appBar}>
                                 <AppBar position="static" color="default">
-                                    <ProductNavigatorRepo/>
+                                    <ProductNavigatorRepo
+                                        setRepoList={this.setRepoList}
+                                    />
                                 </AppBar>
                             </div>
                             <div className={classes.productButtons}>
                                 <List component="nav">
-                                    <ListItem button>
-                                        <ListItemIcon>
-                                            <StarIcon />
-                                        </ListItemIcon>
-                                        <ListItemText inset primary="product-ei" />
-                                    </ListItem>
-                                    <ListItem button>
-                                        <ListItemText inset primary="carbon-data" />
-                                    </ListItem>
-                                    <ListItem button>
-                                        <ListItemText inset primary="andes" />
-                                    </ListItem>
+                                    {this.state.repoList.map((value,index)=>
+                                        <RepoNameItem repoObject={value} key={index}/>
+                                    )}
                                 </List>
                             </div>
                         </Paper>
@@ -123,7 +157,9 @@ class ProductRepository extends Component {
                                 </AppBar>
                             </div>
                             <div>
-                                <BranchTable/>
+                                <BranchTable
+                                    branchList={this.state.branchList}
+                                />
                             </div>
                         </Paper>
                     </Grid>
