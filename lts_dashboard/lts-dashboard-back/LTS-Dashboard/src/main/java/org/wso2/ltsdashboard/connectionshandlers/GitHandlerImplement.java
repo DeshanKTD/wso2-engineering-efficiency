@@ -37,8 +37,9 @@ public class GitHandlerImplement implements GitHandler {
     private final static Logger logger = Logger.getLogger(GitHandlerImplement.class);
     private String gitToken = null;
 
-    public GitHandlerImplement(String gitToken) {
-        this.gitToken = gitToken;
+    public GitHandlerImplement() {
+        PropertyReader propertyReader = new PropertyReader();
+        this.gitToken = propertyReader.getGitToken();
     }
 
 
@@ -169,6 +170,7 @@ public class GitHandlerImplement implements GitHandler {
 
         return headerDetail;
     }
+
 
 }
 

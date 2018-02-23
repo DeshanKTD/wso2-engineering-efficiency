@@ -30,37 +30,22 @@ import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 import org.wso2.ltsdashboard.connectionshandlers.GitHandlerImplement;
 import org.wso2.ltsdashboard.connectionshandlers.SqlHandler;
-import org.wso2.ltsdashboard.gitobjects.Issue;
-import org.wso2.ltsdashboard.gitobjects.Milestone;
-import org.wso2.ltsdashboard.gitobjects.PullRequest;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
-public class ProcessorImplement implements Processor {
+public class ProcessorImplement {
     private final static Logger logger = Logger.getLogger(ProcessorImplement.class);
-    private static HashMap<String, ArrayList<String>> productRepoMap = new HashMap<>();
-    private static HashMap<String, ArrayList<Milestone>> productMilestoneMap = new HashMap<>();
-    private String baseUrl = "https://api.github.com/";
+    private String gitBaseUrl = "https://api.github.com/";
     private GitHandlerImplement gitHandlerImplement;
     private String org = "wso2";
-    private String databaseUrl;
-    private String databaseUser;
-    private String databasePassword;
+    private SqlHandler sqlHandler = null;
 
 
-    ProcessorImplement(String gitToken, String databaseUrl, String databaseUser, String databasePassword) {
-        this.gitHandlerImplement = new GitHandlerImplement(gitToken);
-        this.databaseUrl = databaseUrl;
-        this.databasePassword = databasePassword;
-        this.databaseUser = databaseUser;
-        if (productRepoMap.isEmpty()) {
-            this.createProductAndRepos();
-        }
+    ProcessorImplement() {
+        this.gitHandlerImplement = new GitHandlerImplement();
+        sqlHandler = new SqlHandler();
+
     }
 
 
@@ -69,346 +54,229 @@ public class ProcessorImplement implements Processor {
      *
      * @return ArrayList of Product names
      */
-    @Override
-    public JsonArray getProductList() {
-        ArrayList<String> productList = new ArrayList<>();
-        if (productRepoMap.isEmpty()) {
-            this.createProductAndRepos();
-        }
-        for (Map.Entry<String, ArrayList<String>> map : productRepoMap.entrySet()) {
-            productList.add(map.getKey());
+
+    JsonArray getProductList() {
+        String url = "/product/names";
+        JsonElement returnElement = this.sqlHandler.get(url);
+        JsonObject productsBasicObject = returnElement.getAsJsonObject();
+        JsonArray productList = new JsonArray();
+
+        if (productsBasicObject.has("products") &&
+                productsBasicObject.get("products").getAsJsonObject().has("product")) {
+            JsonArray productJsonArray = productsBasicObject
+                    .get("products").getAsJsonObject().get("product")
+                    .getAsJsonArray();
+            productList = productJsonArray;
+
         }
 
-        JsonArray productJsonArray = new JsonArray();
-        for (String product : productList) {
-            productJsonArray.add(product);
-        }
-        return productJsonArray;
+        return productList;
     }
+
 
     /**
      * Get the versions for particular product
      *
-     * @param productName - repo name
+     * @param productId - repo name
      * @return - json array of Label names
      */
-    public JsonArray getVersions(String productName) {
-        if (productRepoMap.isEmpty()) {
-            this.createProductAndRepos();
-        }
+    JsonArray getVersions(int productId) {
+        String url = "/product/names";
 
-        ArrayList<String> repos = productRepoMap.get(productName.replace("\"", ""));
-        ArrayList<String> labels = new ArrayList<>();
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("productId", productId);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_product_version", jsonObject);
 
-        for (String repo : repos) {
-            // TODO - uncheck revert
-
-            if (checkValidRepo(repo) || repo.equals("label-test")) {
-                String url;
-                if (repo.equals("label-test")) {
-                    url = this.baseUrl + "repos/wso2-incubator/" + repo + "/milestones";
-                } else {
-                    url = this.baseUrl + "repos/" + this.org + "/" + repo + "/milestones";
-                }
-
-                JsonArray milestoneArray = gitHandlerImplement.getJSONArrayFromGit(url);
-
-                for (JsonElement object : milestoneArray) {
-                    String milestoneName = object.getAsJsonObject().get("title").toString();
-                    // check product version label
-                    String productVersion = this.getProductVersionFromIssue(milestoneName);
-                    if (productVersion != null) {
-                        if (!labels.contains(productVersion)) {
-                            labels.add(productVersion);
-                        } //end if
-                    }// end if
-                }
-            }
-        }
-
+        JsonElement returnElement = this.sqlHandler.post(url, sendObject, true);
+        JsonObject versionBasicObject = returnElement.getAsJsonObject();
         JsonArray versionJsonArray = new JsonArray();
-        for (String versionName : labels) {
-            versionJsonArray.add(versionName);
-        }
 
-        logger.info("Version List created for product :" + productName);
+        if (versionBasicObject.has("versions") &&
+                versionBasicObject.get("versions").getAsJsonObject().has("version")) {
+            JsonArray productJsonArray = versionBasicObject
+                    .get("versions").getAsJsonObject().get("version")
+                    .getAsJsonArray();
+            versionJsonArray = productJsonArray;
+
+        }
 
         return versionJsonArray;
 
     }
 
-    /**
-     * Get issues to give product name and label
-     *
-     * @param productName - Product name that map to database
-     * @param label       - label extracted
-     * @return a json array of issue details
-     */
-    @Override
-    public JsonArray getIssues(String productName, String label) {
-        String productNameFormatted = productName.replace("\"", "");
-        ArrayList<Milestone> milestones;
 
-        //check hashmap has version milestone data
-        if (!productMilestoneMap.containsKey(productNameFormatted)) {
-            milestones = this.getMilestoneForProduct(productNameFormatted);
-            productMilestoneMap.put(productNameFormatted, milestones);
-        } else {
-            milestones = productMilestoneMap.get(productNameFormatted);
-        }
+    void addVersion(int productId, String versionName) {
+        String url = "/version/add";
 
-        String finalLabel = label.replace("\"", "");
-        JsonArray issueArray = new JsonArray();
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("productId", productId);
+        jsonObject.addProperty("versionName", versionName);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_add", jsonObject);
 
-        for (Milestone milestone : milestones) {
-            logger.debug("Milestone name :: " + milestone.getTitle());
-            if (checkVersion(milestone.getTitle(), finalLabel)) {
-                String url = this.baseUrl + "repos/" + milestone.getRepo() + "/issues?milestone=" + milestone.getId() +
-                        "&state=all";
-                JsonArray issues = gitHandlerImplement.getJSONArrayFromGit(url);
-
-                for (JsonElement issue : issues) {
-                    JsonObject issueObject = new Issue(issue.getAsJsonObject()).createJsonObject();
-                    issueArray.add(issueObject);
-                }
-            }
-
-        }
-
-        logger.info(productName + ":" + label + " issues extracted");
-
-        return issueArray;
+        JsonElement returnElement = this.sqlHandler.post(url, sendObject, false);
     }
 
-    /**
-     * Get Milestone features extracted from git
-     *
-     * @param issueUrlList - issue Url list from front end
-     * @return Feature Set as a json array
-     */
-    @Override
-    public JsonArray getMilestoneFeatures(JsonArray issueUrlList) {
-        JsonArray featureList = new JsonArray();
+
+    JsonArray getRepos(int productId) {
+        String url = "/product/repos";
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("productId", productId);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_add", jsonObject);
+
+        JsonElement returnElement = this.sqlHandler.post(url, sendObject, true);
+        JsonObject repoJsonObject = returnElement.getAsJsonObject();
+        JsonArray repoJsonArray = new JsonArray();
+
+        if (repoJsonObject.has("repositories") &&
+                repoJsonObject.get("repositories").getAsJsonObject().has("repository")) {
+            JsonArray productJsonArray = repoJsonObject
+                    .get("repositories").getAsJsonObject().get("repository")
+                    .getAsJsonArray();
+            repoJsonArray = productJsonArray;
+
+        }
+
+        return repoJsonArray;
 
 
-        // getting event lists from issue list
-        for (JsonElement issue : issueUrlList) {
-            JsonObject issueObject = issue.getAsJsonObject();
+    }
 
-            String issueUrl = issueObject.get("url").getAsString() + "/timeline";
-            JsonArray eventTempList = gitHandlerImplement.getJSONArrayFromGit(issueUrl,
-                    "application/vnd.github.mockingbird-preview");
 
-            for (JsonElement event : eventTempList) {
-                // check event is cross referenced
-                if (this.checkCrossReferenced(event)) {
-                    PullRequest featureComponent = new PullRequest(event.getAsJsonObject());
-                    JsonArray featureArray = featureComponent.getFeatures();
-                    for (JsonElement feature : featureArray) {
+    JsonArray getBranchesForRepo(int repoId, String repoName) {
 
-                        // make new json object
-                        JsonObject object = new JsonObject();
-                        object.addProperty("feature", this.trimJsonElementString(feature));
-                        object.addProperty("html_url", this.trimJsonElementString(issueObject.get("html_url")));
-                        object.addProperty("title", this.trimJsonElementString(issueObject.get("title")));
-                        if(featureArray.size()>0) {
-                            featureList.add(object);
-                        }
-                    }
+        // get version labeled branches from db
+        String url = "/repo/branches";
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("repoId", repoId);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_repo_branches", jsonObject);
 
-                } //end if
+        JsonElement returnElement = this.sqlHandler.post(url, sendObject, true);
+        JsonObject branchJsonObject = returnElement.getAsJsonObject();
+        JsonArray branchJsonArray = new JsonArray();
+
+        if (branchJsonObject.has("branches") &&
+                branchJsonObject.get("branches").getAsJsonObject().has("branch")) {
+            branchJsonArray = branchJsonObject
+                    .get("branches").getAsJsonObject().get("branch")
+                    .getAsJsonArray();
+        }
+
+        // get branch names from db
+        ArrayList<String> dbBranchNameArray = new ArrayList<>();
+        for (JsonElement branch : branchJsonArray) {
+            JsonObject branchObject = branch.getAsJsonObject();
+            dbBranchNameArray.add(this.trimJsonElementString(branchObject.get("branchName")));
+        }
+
+        // get branches from git
+        url = gitBaseUrl + "repos/" + this.org + "/" + repoName + "/branches";
+        JsonArray gitBranchArray = this.gitHandlerImplement.getJSONArrayFromGit(url);
+        for (JsonElement branch : gitBranchArray) {
+            JsonObject branchObject = branch.getAsJsonObject();
+            String name = trimJsonElementString(branchObject.get("name"));
+            if (!dbBranchNameArray.contains(name)) {
+                JsonObject tempBranchObject = new JsonObject();
+                tempBranchObject.addProperty("branchId", -1);
+                tempBranchObject.addProperty("branchName", name);
+                tempBranchObject.addProperty("versionId", -1);
+                tempBranchObject.addProperty("versionName", "null");
+                branchJsonArray.add(tempBranchObject);
             }
         }
 
-        return featureList;
-    }
+        return branchJsonArray;
 
+    }
 
     /**
      * Get All features for product version
      *
-     * @param issueUrlList - issue Url list from front end
+     * @param versionId - version id to extract features
      * @return Feature Set as a json array
      */
-    @Override
-    public JsonArray getAllFeatures(JsonArray issueUrlList) {
+    JsonArray getPrsForVersion(int versionId) {
         JsonArray issueList = new JsonArray();
+        // get branch name repo name
+        String url = "/product/repobranches";
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("versionId", versionId);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_product_repobranches", jsonObject);
+        JsonElement returnElement = this.sqlHandler.post(url, sendObject, true);
+        JsonObject repoBranchJsonObject = returnElement.getAsJsonObject();
+        JsonArray repoBranchJsonArray = new JsonArray();
 
+        if (repoBranchJsonObject.has("versionDetails") &&
+                repoBranchJsonObject.get("versionDetails").getAsJsonObject().has("versionDetail")) {
+            JsonArray productJsonArray = repoBranchJsonObject
+                    .get("versionDetails").getAsJsonObject().get("versionDetail")
+                    .getAsJsonArray();
+            repoBranchJsonArray.addAll(productJsonArray);
 
-        // getting event lists from issue list
-        for (JsonElement issue : issueUrlList) {
-            JsonObject issueObject = issue.getAsJsonObject();
-
-            String issueUrl = issueObject.get("url").getAsString() + "/timeline";
-            JsonArray eventTempList = gitHandlerImplement.getJSONArrayFromGit(issueUrl,
-                    "application/vnd.github.mockingbird-preview");
-
-            for (JsonElement event : eventTempList) {
-                // check event is cross referenced
-                if (this.checkCrossReferenced(event)) {
-                    PullRequest featureComponent = new PullRequest(event.getAsJsonObject());
-                    JsonArray featureArray = featureComponent.getFeatures();
-                    JsonObject issueTempObject = new JsonObject();
-                    issueTempObject.addProperty("html_url",
-                            this.trimJsonElementString(issueObject.get("html_url")));
-                    issueTempObject.add("features", featureArray);
-                    issueTempObject.addProperty("title", this.trimJsonElementString(issueObject.get("title")));
-                    if(featureArray.size()>0) {
-                        issueList.add(issueTempObject);
-                    }
-
-                } //end if
-            }
         }
 
+        // getting event lists from issue list
+        for (JsonElement branchData : repoBranchJsonArray) {
+            JsonObject branchObject = branchData.getAsJsonObject();
+            String branchName = this.trimJsonElementString(branchObject.get("branchName"));
+            String repoName = this.trimJsonElementString(branchObject.get("repoName"));
+            // get the last tag date
+
+            // search for prs with branch name and date > tag date
+
+//            JsonArray eventTempList = gitHandlerImplement.getJSONArrayFromGit(issueUrl,
+//                    "application/vnd.github.mockingbird-preview");
+        }
         return issueList;
     }
 
+
+    void addBranchVersion(int versionId, String branchName, int repoId) {
+        String url = "/branch/add";
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("repoId", repoId);
+        jsonObject.addProperty("versionId", versionId);
+        jsonObject.addProperty("branchName", branchName);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_branch_add", jsonObject);
+        JsonElement returnElement = this.sqlHandler.post(url, sendObject, false);
+    }
+
+
+    void changeBranchVersion(int versionId, int branchId) {
+        String url = "/branch/change";
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("versionId", versionId);
+        jsonObject.addProperty("branchId", branchId);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_branch_change", jsonObject);
+        JsonElement returnElement = this.sqlHandler.post(url, sendObject, false);
+    }
+
+
+    void changeVersionName(int versionId, String versionName) {
+        String url = "/version/change";
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("versionId", versionId);
+        jsonObject.addProperty("versionName", versionName);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_change", jsonObject);
+        JsonElement returnElement = this.sqlHandler.post(url, sendObject, false);
+    }
+
+
+    void deleteVersionName(int versionId) {
+        String url = "/version/delete";
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("versionId", versionId);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_delete", jsonObject);
+        JsonElement returnElement = this.sqlHandler.post(url, sendObject, false);
+
+    }
 
     private String trimJsonElementString(JsonElement text) {
         return text.toString().replace("\"", "");
     }
 
-    /**
-     * Get prodcut version from label
-     *
-     * @param labelName - label name
-     * @return product Version
-     */
-    private String getProductVersionFromIssue(String labelName) {
-        String productVersion = null;
-        String pattern = "[0-9]+\\.[0-9]+\\.[0-9]+(.*)";
-        Pattern r = Pattern.compile(pattern);
 
-        //check regex
-        Matcher m = r.matcher(labelName);
-        if (m.find()) {
-            productVersion = labelName.split(" ")[0]
-                                        .split("-")[0]
-                                        .replace("\"", "");
-        }
-
-        return productVersion;
-
-    }
-
-    /**
-     * Check whether the milestone name match with version
-     *
-     * @param milestoneName - milestone name as a string
-     * @param version       - version as a string
-     * @return - checked version
-     */
-    private boolean checkVersion(String milestoneName, String version) {
-        boolean isCheckedVersion = false;
-        if (milestoneName.contains(version)) {
-            isCheckedVersion = true;
-        }
-
-        return isCheckedVersion;
-    }
-
-    /**
-     * Check the repository is a valid repository
-     *
-     * @param repoName - name of the repository
-     * @return - true or false
-     */
-    private boolean checkValidRepo(String repoName) {
-        boolean isValid = false;
-        if (repoName.contains("product")|| repoName.contains("ballerina")) {
-            isValid = true;
-        }
-
-        return isValid;
-    }
-
-    /**
-     * Create Product repository map
-     */
-    private void createProductAndRepos() {
-        SqlHandler sqlHandler =
-                SqlHandler.getHandler(this.databaseUrl, this.databaseUser, this.databasePassword);
-        productRepoMap = sqlHandler.getProductVsRepos();
-
-        if (productRepoMap.isEmpty()) {
-            logger.error("Product vs Repository List is empty");
-        } else {
-            logger.info("Product vs Repository List created");
-        }
-
-        // add test repo
-        this.getLabelTestRepo();
-        logger.info("Test product added");
-
-    }
-
-    /**
-     * Make product list from incubator test repo
-     */
-    private void getLabelTestRepo() {
-        ArrayList<String> repoList = new ArrayList<>();
-        repoList.add("label-test");
-        productRepoMap.put("Integration Test", repoList);
-    }
-
-    /**
-     * Check whether the event is cross referenced
-     *
-     * @param event - event of a issue
-     * @return - if cross-referenced True
-     */
-    private boolean checkCrossReferenced(JsonElement event) {
-        boolean status = false;
-        JsonObject eventObject = event.getAsJsonObject();
-        String cross = eventObject.get("event").getAsString();
-        if (cross.equals("cross-referenced")) {
-            status = true;
-        }
-
-        return status;
-    }
-
-
-    /**
-     * Get the milstones for particular product
-     *
-     * @param productName - repo name
-     * @return - ArrayList of milestone objects
-     */
-    private ArrayList<Milestone> getMilestoneForProduct(String productName) {
-        if (productRepoMap.isEmpty()) {
-            this.createProductAndRepos();
-        }
-
-        ArrayList<String> repos = productRepoMap.get(productName.replace("\"", ""));
-        ArrayList<Milestone> milestones = new ArrayList<>();
-
-        for (String repo : repos) {
-            // TODO - uncheck revert
-            if (checkValidRepo(repo) || repo.equals("label-test")) {
-                String url;
-                if (repo.equals("label-test")) {
-                    url = this.baseUrl + "repos/wso2-incubator/" + repo + "/milestones";
-                } else {
-                    url = this.baseUrl + "repos/" + this.org + "/" + repo + "/milestones";
-                }
-
-                JsonArray milestoneArray = gitHandlerImplement.getJSONArrayFromGit(url);
-
-                for (JsonElement object : milestoneArray) {
-                    String milestoneName = object.getAsJsonObject().get("title").toString();
-                    // check product version label
-                    String productVersion = this.getProductVersionFromIssue(milestoneName);
-                    if (productVersion != null) {
-                        milestones.add(new Milestone(object.getAsJsonObject(), productVersion));
-                    }// end if
-                }
-            }
-        }
-
-
-        return milestones;
-
-    }
 }

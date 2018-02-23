@@ -43,27 +43,62 @@ public interface Processor {
     JsonArray getVersions(String productName);
 
     /**
-     * Get issues to give product name and label
+     * Get the repository list for a product
+     *
+     * @param productName - product name
+     * @return - json array of repolist
+     */
+    JsonArray getReposForProduct(String productName);
+
+    /**
+     * get branches for a product
+     *
+     * @param productName - product name
+     * @return - json array of branches
+     */
+    JsonArray getBranchesForProduct(String productName);
+
+
+    /**
+     * Add product version to the db
+     * @param productName - product name
+     * @param version - version name
+     * @return
+     */
+    boolean addProductVersion(String productName, String version);
+
+    /**
+     * map branch to a version
+     * @param productName - product name
+     * @param version - version name
+     * @param repo - repository
+     * @param branchName - branch name
+     * @return
+     */
+    boolean addBranchToVersion(String productName, String version,String repo, String branchName);
+
+    /**
+     * change the version of the branch
+     *
+     * @param productName - prduct name
+     * @param repo - repo name
+     * @param version - version name
+     * @param branchName - branch name
+     * @return
+     */
+    boolean updateBranchToVersion(String productName,String version,String repo, String branchName);
+
+
+
+    /**
+     * Get PRs for give product name and label
      *
      * @param productName - Product name that map to database
-     * @param label       - label extracted
+     * @param version       - label extracted
      * @return a json array of issue details
      */
-    JsonArray getIssues(String productName, String label);
 
-    /**
-     * Get Milestone features extracted from git
-     *
-     * @param issueUrlList - issue Url list from front end
-     * @return Feature Set as a json array
-     */
-    JsonArray getMilestoneFeatures(JsonArray issueUrlList);
+    // return all features with pr list
+    JsonArray getPrList(String productName, String version);
 
-    /**
-     * Get All features for product version
-     *
-     * @param issueUrlList - issue Url list from front end
-     * @return Feature Set as a json array
-     */
-    JsonArray getAllFeatures(JsonArray issueUrlList);
 }

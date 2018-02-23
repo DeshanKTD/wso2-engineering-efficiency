@@ -19,8 +19,83 @@
 
 package org.wso2.ltsdashboard.connectionshandlers;
 
+import org.apache.log4j.Logger;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 /*
- * TODO - comment class work
+ * Read the properties of the application
  */
 public class PropertyReader {
+
+    private final static Logger logger = Logger.getLogger(PropertyReader.class);
+    private final static String CONFIG_FILE = "config.ini";
+    private static String dssUrl;
+    private static String dssUser;
+    private static String dssPassword;
+    private static String gitToken;
+    private static String gitBaseUrl;
+
+    public PropertyReader() {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE);
+        loadConfigs(inputStream);
+    }
+
+
+    /**
+     * Load configs from the file
+     *
+     * @param input - input stream of the file
+     */
+    private static void loadConfigs(InputStream input) {
+        Properties prop = new Properties();
+        try {
+            prop.load(input);
+            gitToken = prop.getProperty("git_token");
+            dssUser = prop.getProperty("dss_user");
+            dssPassword = prop.getProperty("dss_password");
+            dssUrl = prop.getProperty("dss_url");
+            gitBaseUrl = prop.getProperty("git_base_ur");
+
+        } catch (FileNotFoundException e) {
+            logger.error("The configuration file is not found");
+        } catch (IOException e) {
+            logger.error("The File cannot be read");
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    logger.error("The File InputStream is not closed");
+                }
+            }
+        }
+
+    }
+
+    public String getGitToken(){
+        return gitToken;
+    }
+
+
+    public String getDssUser(){
+        return dssUser;
+    }
+
+    public String getDssPassword(){
+        return dssPassword;
+    }
+
+    public String getDssUrl(){
+        return dssUrl;
+    }
+
+    public String getGitBaseUrl(){
+        return gitBaseUrl;
+    }
+
+
 }

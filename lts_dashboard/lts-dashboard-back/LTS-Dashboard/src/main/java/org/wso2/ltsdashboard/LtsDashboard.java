@@ -26,10 +26,7 @@ import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+
 
 /**
  * This is the Microservice resource class.
@@ -42,56 +39,15 @@ import java.util.Properties;
 @Path("/lts")
 public class LtsDashboard {
     private final static Logger logger = Logger.getLogger(LtsDashboard.class);
-    private final static String CONFIG_FILE = "config.ini";
-    private static String databaseUrl;
-    private static String databaseUser;
-    private static String databasePassword;
-    private static String gitToken;
 
     LtsDashboard() {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE);
-        loadConfigs(inputStream);
     }
-
-    /**
-     * Load configs from the file
-     *
-     * @param input - input stream of the file
-     */
-    private static void loadConfigs(InputStream input) {
-        Properties prop = new Properties();
-        try {
-            prop.load(input);
-            gitToken = prop.getProperty("git_token");
-            databaseUrl = prop.getProperty("db_url");
-            databaseUser = prop.getProperty("db_user");
-            databasePassword = prop.getProperty("db_password");
-
-
-        } catch (FileNotFoundException e) {
-            logger.error("The configuration file is not found");
-        } catch (IOException e) {
-            logger.error("The File cannot be read");
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    logger.error("The File InputStream is not closed");
-                }
-            }
-        }
-
-
-    }
-
 
     @GET
-    @Path("/products")
+    @Path("/products/names")
     public Response getProducts() {
         logger.debug("Request to products");
-        ProcessorImplement processorImplement = new ProcessorImplement(
-                gitToken, databaseUrl, databaseUser, databasePassword);
+        ProcessorImplement processorImplement = new ProcessorImplement();
         JsonArray productList = processorImplement.getProductList();
 
         return makeResponseWithBody(productList);
@@ -99,52 +55,115 @@ public class LtsDashboard {
 
 
     @POST
-    @Path("/versions")
+    @Path("/products/versions")
     public Response getLabels(JsonObject product) {
         logger.debug("Request to versions");
-        ProcessorImplement processorImplement = new ProcessorImplement(
-                gitToken, databaseUrl, databaseUser, databasePassword);
-        String productName = product.get("product").toString();
+        ProcessorImplement processorImplement = new ProcessorImplement();
+        int productName = product.get("productId").getAsInt();
         JsonArray productList = processorImplement.getVersions(productName);
 
         return makeResponseWithBody(productList);
-
     }
+
+
 
     @POST
-    @Path("/issues")
-    @Consumes("application/json")
-    public Response postIssues(JsonObject versionData) {
-        logger.debug("Request to issues");
-        ProcessorImplement processorImplement = new ProcessorImplement(
-                gitToken, databaseUrl, databaseUser, databasePassword);
-        String productName = versionData.get("product").toString();
-        String version = versionData.get("version").toString();
-        JsonArray issueList = processorImplement.getIssues(productName, version);
+    @Path("/products/repos")
+    public Response getRepository(JsonObject product) {
+        logger.debug("Request to versions");
+        ProcessorImplement processorImplement = new ProcessorImplement();
+        int productId = product.get("productId").getAsInt();
+        JsonArray repoList = processorImplement.getRepos(productId);
 
-        return makeResponseWithBody(issueList);
-
+        return makeResponseWithBody(repoList);
     }
+
 
     @POST
-    @Path("/milestone")
-    @Consumes("application/json")
-    public Response postMilestone(JsonArray issueList) {
-        logger.debug("Request to milestone");
-        ProcessorImplement processorImplement = new ProcessorImplement(
-                gitToken, databaseUrl, databaseUser, databasePassword);
-        JsonArray featureList = processorImplement.getMilestoneFeatures(issueList);
+    @Path("/products/repos/branches")
+    public Response getRepositoryBranches(JsonObject repoData) {
+        logger.debug("Request to versions");
+        ProcessorImplement processorImplement = new ProcessorImplement();
+        int repoId = repoData.get("repoId").getAsInt();
+        String repoName = repoData.get("repoName").getAsString();
+        JsonArray branchList = processorImplement.getBranchesForRepo(repoId,repoName);
 
-        return makeResponseWithBody(featureList);
+        return makeResponseWithBody(branchList);
     }
+
+
+    @POST
+    @Path("/products/versions/add")
+    public Response addVersion(JsonObject versionData) {
+        logger.debug("Request to versions");
+        ProcessorImplement processorImplement = new ProcessorImplement();
+        int productId = versionData.get("productId").getAsInt();
+        String versionName = versionData.get("versionName").getAsString();
+        processorImplement.addVersion(productId,versionName);
+
+
+        return makeResponseWithBody(new JsonArray());
+    }
+
+
+    @POST
+    @Path("/products/versionChange")
+    public Response changeVersion(JsonObject versionData) {
+        ProcessorImplement processorImplement = new ProcessorImplement();
+        int versionId = versionData.get("versionId").getAsInt();
+        String versionName = versionData.get("versionName").getAsString();
+        processorImplement.changeVersionName(versionId,versionName);
+
+
+        return makeResponseWithBody(new JsonArray());
+    }
+
+
+    @POST
+    @Path("/products/deleteVersion")
+    public Response deleteVersion(JsonObject versionData) {
+        ProcessorImplement processorImplement = new ProcessorImplement();
+        int versionId = versionData.get("versionId").getAsInt();
+        processorImplement.deleteVersionName(versionId);
+
+
+        return makeResponseWithBody(new JsonArray());
+    }
+
+
+    @POST
+    @Path("/branches/versions/add")
+    public Response addBranchVersion(JsonObject versionData) {
+        logger.debug("Request to versions");
+        ProcessorImplement processorImplement = new ProcessorImplement();
+        int versionId = versionData.get("versionId").getAsInt();
+        String branchName = versionData.get("branchName").getAsString();
+        int repoId = versionData.get("repoId").getAsInt();
+        processorImplement.addBranchVersion(versionId,branchName,repoId);
+
+        return makeResponseWithBody(new JsonArray());
+    }
+
+
+    @POST
+    @Path("/branches/changeVersion")
+    public Response changeBranchVersion(JsonObject versionData) {
+        logger.debug("Request to versions");
+        ProcessorImplement processorImplement = new ProcessorImplement();
+        int versionId = versionData.get("versionId").getAsInt();
+        int branchId = versionData.get("branchId").getAsInt();
+        processorImplement.changeBranchVersion(versionId, branchId);
+
+        return makeResponseWithBody(new JsonArray());
+    }
+
 
     @POST
     @Path("/features")
     @Consumes("application/json")
     public Response postIssues(JsonArray issueList) {
         logger.debug("Request to features");
-        ProcessorImplement processorImplement = new ProcessorImplement(
-                gitToken, databaseUrl, databaseUser, databasePassword);
+        ProcessorImplement processorImplement = new ProcessorImplement();
         JsonArray featureList = processorImplement.getAllFeatures(issueList);
 
         return makeResponseWithBody(featureList);
@@ -152,8 +171,53 @@ public class LtsDashboard {
 
 
     @OPTIONS
-    @Path("/versions")
+    @Path("/products/versions")
     public Response versionOptions() {
+        return makeResponse();
+    }
+
+
+    @OPTIONS
+    @Path("/products/repos")
+    public Response getReposOptions() {
+        return makeResponse();
+    }
+
+    @OPTIONS
+    @Path("/products/repos/branches")
+    public Response getReposBranchesOptions() {
+        return makeResponse();
+    }
+
+
+    @OPTIONS
+    @Path("/products/versions/add")
+    public Response versionAddOptions() {
+        return makeResponse();
+    }
+
+    @OPTIONS
+    @Path("/products/deleteVersion")
+    public Response versionDeleteOptions() {
+        return makeResponse();
+    }
+
+    @OPTIONS
+    @Path("/products/versionChange")
+    public Response versionChangeOptions() {
+        return makeResponse();
+    }
+
+    @OPTIONS
+    @Path("/branches/versions/add")
+    public Response branchVersionAddOptions() {
+        return makeResponse();
+    }
+
+
+    @OPTIONS
+    @Path("/branches/changeVersion")
+    public Response branchVersionChangeOptions() {
         return makeResponse();
     }
 

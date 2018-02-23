@@ -19,86 +19,213 @@
 
 package org.wso2.ltsdashboard.connectionshandlers;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class SqlHandler {
     private final static Logger logger = Logger.getLogger(SqlHandler.class);
+    private String dssUrl;
+    private String dssUserName;
+    private String dssPassword;
+    private String gitBaseUrl;
     // queries
-    private final static String GET_REPOS = "SELECT * from UnifiedDashboards.JNKS_COMPONENTPRODUCT";
-    private static SqlHandler sqlHandler = null;
-    private static BasicDataSource connectionPool = null;
 
 
-    private SqlHandler(String databaseUrl, String databaseUser, String databasePassword) {
-        if (connectionPool == null) {
-            connectionPool = new BasicDataSource();
-            connectionPool.setUsername(databaseUser);
-            connectionPool.setPassword(databasePassword);
-            connectionPool.setUrl(databaseUrl);
-            connectionPool.setInitialSize(4);
-
-            logger.info("Connected to the MySQL database");
-        }
-
+    public SqlHandler() {
+        PropertyReader propertyReader = new PropertyReader();
+        this.dssUserName = propertyReader.getDssUser();
+        this.dssPassword = propertyReader.getDssPassword();
+        this.dssUrl = propertyReader.getDssUrl();
+        this.gitBaseUrl= propertyReader.getGitBaseUrl();
     }
 
-
-    public static SqlHandler getHandler(String databaseUrl, String databaseUser, String databasePassword) {
-        if (sqlHandler == null) {
-            sqlHandler = new SqlHandler(databaseUrl, databaseUser, databasePassword);
-        }
-        return sqlHandler;
+    public static void main(String[] args) {
+        SqlHandler sqlHandler = new SqlHandler();
+//        JsonElement data = sqlHandler.get("/table/products");
+//        JsonObject jsonObject = data.getAsJsonObject();
+//        System.out.println("hi");
+        sqlHandler.createProductNamesAndRepos();
     }
 
+    public JsonElement get(String uri) {
+        String url = this.dssUrl + uri;
+        JsonElement element = null;
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet(url);
+        request.addHeader("Accept", "application/json");
+        request.addHeader("Authorization", dssUserName + ":" + dssPassword);
 
-    /**
-     * Execute sql query and get result set
-     *
-     * @return - query result
-     */
-    public HashMap<String, ArrayList<String>> getProductVsRepos() {
-        ResultSet resultSet;
-        Statement statement = null;
-        HashMap<String, ArrayList<String>> productRepoMap = new HashMap<>();
         try {
-            Connection con = connectionPool.getConnection();
-            statement = con.createStatement();
-            resultSet = statement.executeQuery(GET_REPOS);
 
-            while (resultSet.next()) {
-                String product = resultSet.getString(1);
-                String repo = resultSet.getString(2);
+            HttpResponse response = httpClient.execute(request);
+            logger.debug("Request successful for " + url);
+            String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
+            element = new JsonParser().parse(responseString);
+        } catch (IllegalStateException e) {
+            logger.error("The response is empty ");
+        } catch (NullPointerException e) {
+            logger.error("Bad request to the URL");
+        } catch (IOException e) {
+            logger.error("The request was unsuccessful with dss");
+        }
 
-                ArrayList<String> repoList = productRepoMap.get(product);
-                if (repoList == null) {
-                    repoList = new ArrayList<>();
-                    repoList.add(repo);
-                    productRepoMap.put(product, repoList);
-                } else {
-                    repoList.add(repo);
-                }
+        return element;
+    }
+
+    public JsonElement post(String uri, JsonObject data, boolean isResponse) {
+        String url = this.dssUrl + uri;
+        JsonElement element = null;
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost request = new HttpPost(url);
+        request.addHeader("Accept", "application/json");
+        request.addHeader("Authorization", dssUserName + ":" + dssPassword);
+        request.addHeader("Content-Type", "application/json");
+
+        try {
+            StringEntity entity = new StringEntity(data.toString());
+            request.setEntity(entity);
+            HttpResponse response = httpClient.execute(request);
+            logger.debug("Request successful for " + url);
+            String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
+            if (isResponse) {
+                element = new JsonParser().parse(responseString);
             }
-        } catch (SQLException e) {
-            logger.error("SQL Exception while executing the query");
-        } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-            } catch (SQLException ex) {
-                logger.error("The statement is not closed properly");
+        } catch (IllegalStateException e) {
+            logger.error("The response is empty ");
+        } catch (NullPointerException e) {
+            logger.error("Bad request to the URL");
+        } catch (IOException e) {
+            logger.error("The request was unsuccessful with dss");
+        }
+
+        return element;
+    }
+
+    void createProductNamesAndRepos() {
+
+        // populate product
+        JsonElement productNamesEx = this.get("/table/products");
+        JsonObject productListObject = productNamesEx.getAsJsonObject();
+        if (productListObject.has("products") &&
+                productListObject.get("products").getAsJsonObject().has("product")) {
+            JsonArray productJsonArray = productListObject
+                    .get("products").getAsJsonObject().get("product")
+                    .getAsJsonArray();
+            for (JsonElement productName : productJsonArray) {
+                String pName = productName.getAsJsonObject().get("productName").toString();
+                JsonObject prodNameInsert = new JsonObject();
+                prodNameInsert.addProperty("productName", this.trimString(pName));
+                JsonObject sendObject = createPostDataObject("_post_product_add", prodNameInsert);
+                JsonElement returnElement = this.post("/product/add", sendObject, false);
             }
         }
-        return productRepoMap;
+
+        // populate repos
+        JsonElement productNameObjects = this.get("/product/names");
+        productListObject = productNameObjects.getAsJsonObject();
+
+
+        GitHandler gitHandler = new GitHandlerImplement();
+
+        if (productListObject.has("products") &&
+                productListObject.get("products").getAsJsonObject().has("product")) {
+            JsonArray productJsonArray = productListObject
+                    .get("products").getAsJsonObject().get("product")
+                    .getAsJsonArray();
+            for (JsonElement product : productJsonArray) {
+                // existing repo list
+                ArrayList<String> existintRepoNames = new ArrayList<>();
+
+                // create product repo object
+                int productId = product.getAsJsonObject().get("productId").getAsInt();
+                String productName = this.trimString(product.getAsJsonObject().get("productName").toString());
+
+                // check for duplicates
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("productId", productId);
+                JsonObject sendObject = createPostDataObject("_post_product_repos", jsonObject);
+                JsonElement returnElement = this.post("/product/repos", sendObject, true);
+                JsonObject returnObject = returnElement.getAsJsonObject();
+                if (returnObject.has("repositories") &&
+                        returnObject.get("repositories").getAsJsonObject().has("repository")) {
+                    JsonArray repoArray = returnObject.get("repositories")
+                            .getAsJsonObject()
+                            .get("repository")
+                            .getAsJsonArray();
+
+                    for (JsonElement repo : repoArray) {
+                        existintRepoNames.add(this.trimString(repo.getAsJsonObject().get("repoName").toString()));
+                    }
+                }
+
+                // get repos from jnks_dashboards
+                jsonObject = new JsonObject();
+                jsonObject.addProperty("productName", productName);
+                sendObject = createPostDataObject("_post_table_repos", jsonObject);
+                returnElement = this.post("/table/repos", sendObject, true);
+                returnObject = returnElement.getAsJsonObject();
+
+                if (returnObject.has("repos") &&
+                        returnObject.get("repos").getAsJsonObject().has("repo")) {
+                    JsonArray repoArray = returnObject.get("repos")
+                            .getAsJsonObject()
+                            .get("repo")
+                            .getAsJsonArray();
+
+                    for (JsonElement repo : repoArray) {
+                        String repoName = this.trimString(repo.getAsJsonObject().get("repoName").toString());
+                        JsonArray repoDetail = gitHandler
+                                .getJSONArrayFromGit(gitBaseUrl + "/repos/wso2/" + repoName + "/labels");
+                        if (repoDetail != null && repoDetail.size() > 0) {
+                            if (!existintRepoNames.contains(repoName)) {
+                                // add repo to repo list
+                                jsonObject = new JsonObject();
+                                jsonObject.addProperty("productId", productId);
+                                jsonObject.addProperty("repoName", repoName);
+                                sendObject = createPostDataObject("_post_repo_add", jsonObject);
+                                returnElement = this.post("/repo/add", sendObject, false);
+                            }
+                        }
+
+
+                    }
+                }
+
+            }; // end for loop of product
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+    public JsonObject createPostDataObject(String endpoint, JsonObject data) {
+        JsonObject sendObject = new JsonObject();
+        sendObject.add(endpoint, data);
+        return sendObject;
+    }
+
+    String trimString(String text) {
+        return text.replace("\"", "").replace("\\", "");
     }
 
 
