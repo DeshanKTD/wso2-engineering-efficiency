@@ -30,6 +30,7 @@ import {
     TableFilterRow,
 } from '@devexpress/dx-react-grid-material-ui';
 import Button from "material-ui/es/Button/Button";
+import BranchVersionChangeButton from "./BranchVersionChangeButton";
 
 
 
@@ -43,20 +44,59 @@ export default class BranchTable extends React.PureComponent {
                 { name: 'version', title: 'Version' },
                 { name: 'button', title: '_' },
             ],
-            rows:[
-                { branchName: 'master',version : '1.0.0', button : <Button>Change</Button>},
-                {  branchName: '1,0.0 Update',version : '1.1.0', button : <Button>Change</Button>},
-            ],
+            rows:[],
+            branchList:[]
         };
+        this.openBranchChangeWindow = this.openBranchChangeWindow.bind(this);
     }
+
+
+    openBranchChangeWindow(data){
+        this.props.openBranchVersionAddWindow(data);
+    }
+
+    createBranchTableData = (branchList) => {
+        let newRows = [];
+        let callback = this.openBranchChangeWindow
+        branchList.forEach(function (branch) {
+            let change = true;
+            if(branch["branchId"]==-1){
+                change=false;
+            }
+            let obj = {
+                branchName : branch["branchName"],
+                version : branch["versionName"],
+                button : <BranchVersionChangeButton
+                    change={change}
+                    versionId={branch["versionId"]}
+                    branchId={branch["branchId"]}
+                    branchName={branch["branchName"]}
+                    openBranchChangeWindow={callback}
+                />
+            };
+            newRows.push(obj);
+        });
+
+        return newRows;
+    };
+
+
+    componentWillUpdate(nextProps, nextState) {
+        if (nextProps.branchList !== this.state.branchList) {
+            this.setState({
+                branchList: nextProps.branchList,
+                rows: this.createBranchTableData(nextProps.branchList)
+            });
+        }
+    }
+
     render() {
-        const { rows, columns } = this.state;
 
         return (
             <Paper>
                 <Grid
-                    rows={rows}
-                    columns={columns}
+                    rows={this.state.rows}
+                    columns={this.state.columns}
                 >
                     <Table />
                     <TableHeaderRow />

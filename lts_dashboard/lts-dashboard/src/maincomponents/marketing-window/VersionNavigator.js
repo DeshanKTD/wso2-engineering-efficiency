@@ -51,7 +51,8 @@ class VersionNavigator extends React.Component {
     handleChange = event => {
         this.setState({[event.target.name]: event.target.value},
             () => {
-                this.props.setVersion(this.state.version);
+                let versionName = this.getVersionName(event.target.value);
+                this.props.setVersion(this.state.version,versionName);
             });
 
 
@@ -66,15 +67,16 @@ class VersionNavigator extends React.Component {
         };
     }
 
-    fetchVersions(productName) {
-        let productObject = {};
-        productObject["product"] = productName;
-        if (productName !== '') {
+    fetchVersions(productId) {
+        let data = {
+            productId : productId
+        };
+        if (productId !== '') {
             this.setState({
                 issueLoading:true
             },()=>(
-                axios.post('http://'+getServer()+'/lts/versions',
-                    productObject
+                axios.post('http://'+getServer()+'/lts/products/versions',
+                    data
                 ).then(
                     (response) => {
                         let datat = response.data;
@@ -96,6 +98,16 @@ class VersionNavigator extends React.Component {
         }
     }
 
+    getVersionName(versionId){
+        let versionName= null;
+        this.state.versionList.map(function (versionData) {
+            if(versionId==versionData["versionId"]){
+                versionName = versionData["versionName"]
+            }
+        });
+        return versionName;
+    }
+
     render() {
         const {classes} = this.props;
 
@@ -113,8 +125,8 @@ class VersionNavigator extends React.Component {
                                 <em>None</em>
                             </MenuItem>
                             {
-                                this.state.versionList.map((versionName, index) => (
-                                    <MenuItem key={index} value={versionName}>{versionName}</MenuItem>
+                                this.state.versionList.map((versionData, index) => (
+                                    <MenuItem key={index} value={versionData["versionId"]}>{versionData["versionName"]}</MenuItem>
                                 ))
                             }
                         </Select>

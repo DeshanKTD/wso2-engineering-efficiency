@@ -78,6 +78,7 @@ class ExpansionSummary extends React.Component {
         );
     }
 
+
     render() {
         const {classes} = this.props;
         const {expanded} = this.state;
@@ -86,19 +87,27 @@ class ExpansionSummary extends React.Component {
             <ExpansionPanel expanded={expanded}>
                 <ExpansionPanelSummary onClick={this.handleChange} expandIcon={<ExpandMoreIcon/>}>
                     <Typography className={classes.heading}>{this.props.data["title"]}</Typography>
-                    <Typography className={classes.secondaryHeading}>{this.props.data["html_url"]}</Typography>
+                    {/*<Typography className={classes.secondaryHeading}>{this.props.data["url"]}</Typography>*/}
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                     <div className={classes.column}>
-                        <List className={classes.root} dense={true}>
-                            {this.generateFeatures(this.props.data["features"])}
-                        </List>
+                        {/*{this.generateFeatures(this.props.data["features"])}*/}
+
+                            {this.props.data["features"].map(function (feature,index) {
+                                if(feature!="") {
+                                    return (
+                                        <div key={index}>
+                                            <Typography>
+                                                {feature}
+                                            </Typography>
+                                            <br/>
+                                        </div>
+                                    )
+                                }
+                            })}
+
                     </div>
                 </ExpansionPanelDetails>
-                {/*<Divider />*/}
-                {/*<Button onClick={() => window.open(this.props.data["html_url"], '_blank')} dense color="secondary">*/}
-                {/*Change Version*/}
-                {/*</Button>*/}
             </ExpansionPanel>
 
         );

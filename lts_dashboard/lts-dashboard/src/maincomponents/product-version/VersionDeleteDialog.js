@@ -21,56 +21,75 @@
 import React from 'react';
 import Dialog from "material-ui/es/Dialog/Dialog";
 import DialogTitle from "material-ui/es/Dialog/DialogTitle";
-import DialogContent from "material-ui/es/Dialog/DialogContent";
-import DialogContentText from "material-ui/es/Dialog/DialogContentText";
 import DialogActions from "material-ui/es/Dialog/DialogActions";
 import Button from "material-ui/es/Button/Button";
+import {getServer} from "../../resources/util";
+import axios from "axios/index";
 
 
-class VersionDeleteDialog extends React.Component{
+class VersionDeleteDialog extends React.Component {
 
-    constructor(props){
+    handleClose = () => {
+        this.setState({open: false});
+    };
+
+    deleteVersion = () => {
+        this.deleteData(this.state.versionId);
+    };
+
+    deleteData = (versionId) => {
+        let data = {
+            versionId: versionId
+        };
+        axios.post('http://' + getServer() + '/lts/products/deleteVersion', data
+        ).then(
+            (response) => {
+                this.props.fetchVersions(this.state.productId);
+                this.setState(
+                    {
+                        versionId: "",
+                        versionName: "",
+                        productId: ""
+                    },
+                );
+            }
+        )
+    };
+
+    constructor(props) {
         super(props);
 
         this.state = {
-            open : false
+            open: false,
+            versionName: "",
+            versionId: "",
+            productId: ""
         }
     }
-
-
-    handleClickOpen = () => {
-        this.setState({ open: true });
-    };
-
-    handleClose = () => {
-        this.setState({ open: false });
-    };
-
 
     componentWillUpdate(nextProps, nextState) {
         if (nextProps.open !== this.state.open) {
             this.setState({
-                open : !this.state.open
+                open: !this.state.open,
+                versionName: nextProps.deleteData.versionName,
+                versionId: nextProps.deleteData.versionId,
+                productId: nextProps.productId
             });
         }
     }
 
-
-    deleteVersion= ()=>{
-
-    };
-
-    render(){
-        return(
+    render() {
+        return (
             <Dialog
                 open={this.state.open}
                 onClose={this.handleClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">{"Do you want to delete the version "+this.props.deleteData.versionName+" ?"}</DialogTitle>
+                <DialogTitle
+                    id="alert-dialog-title">{"Do you want to delete the version " + this.state.versionName + " ?"}</DialogTitle>
                 <DialogActions>
-                    <Button onClick={this.handleClose} color="primary" autoFocus>
+                    <Button onClick={this.deleteVersion} color="primary" autoFocus>
                         Yes
                     </Button>
                     <Button onClick={this.handleClose} color="primary">
@@ -83,4 +102,4 @@ class VersionDeleteDialog extends React.Component{
 }
 
 
-export  default  VersionDeleteDialog;
+export default VersionDeleteDialog;

@@ -61,6 +61,9 @@ class VersionChangeModal extends React.Component {
         this.state = {
             open: false,
             versionName: "",
+            versionList:[],
+            versionId:"",
+            productId:""
         };
     }
 
@@ -75,7 +78,10 @@ class VersionChangeModal extends React.Component {
     componentWillUpdate(nextProps, nextState) {
         if (nextProps.open !== this.state.open) {
             this.setState({
-                open : !this.state.open
+                open : !this.state.open,
+                versionList:nextProps.versionList,
+                versionId: nextProps.data.versionId,
+                productId:nextProps.data.productId
             });
         }
     }
@@ -86,25 +92,24 @@ class VersionChangeModal extends React.Component {
 
 
     changeVersion = () => {
-        if(this.validateVersion(this.state.versionName,this.props.versionList)) {
+        if(this.validateVersion(this.state.versionName,this.state.versionList)) {
             let data = {
-                productId: this.props.productId,
-                versionId: this.props.versionId,
-                versionName: this.props.versionName
+                versionId: this.state.versionId,
+                versionName: this.state.versionName
             };
 
-            // axios.post('http://' + getServer() + '/lts/products/versions/add', data
-            // ).then(
-            //     (response) => {
-            //         let datat = response.data;
-            //         console.log(datat);
-            //         this.setState({
-            //             open: false,
-            //             versionName:""
-            //         });
-            //         this.props.fetchVersions(this.props.productId);
-            //     }
-            // )
+            axios.post('http://' + getServer() + '/lts/products/versionChange', data
+            ).then(
+                (response) => {
+                    this.props.fetchVersions(this.state.productId);
+                    this.setState({
+                        open: false,
+                        versionName:"",
+                        versionId:""
+                    });
+
+                }
+            )
         }
     };
 

@@ -124,7 +124,6 @@ class ProductVersion extends Component {
                         changeVersionOpen:false
                     },
                 );
-                console.log(datat);
             }
         )
     }
@@ -252,11 +251,11 @@ class ProductVersion extends Component {
                     open = {this.state.deleteProductOpen}
                     deleteData = {this.state.deleteData}
                     fetchVersions = {this.fetchVersionList}
+                    productId={this.state.productId}
                 />
                 <VersionChangeModal
                     open = {this.state.changeVersionOpen}
-                    productId = {this.state.productId}
-                    versionId = {1}
+                    data = {this.state.changeData}
                     versionList = {this.state.versionList}
                     fetchVersions = {this.fetchVersionList}
                 />

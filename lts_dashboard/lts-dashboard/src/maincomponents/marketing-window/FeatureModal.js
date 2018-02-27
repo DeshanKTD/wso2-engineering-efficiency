@@ -86,12 +86,9 @@ class FeatureModal extends React.Component {
     componentWillUpdate(nextProps, nextState) {
         if (nextProps.versionData !== this.props.versionData) {
             this.setState({
-                    data: nextProps.data,
-                    featureData: [],
-                },
-                () => (
-                    this.fetchMilestoneFeatures(this.createIssueListofMilestone())
-                ))
+                    data: nextProps.prList,
+                    featureData: this.createPrListForFeatures(nextProps.prList),
+                });
         }
         if (nextProps.open !== this.state.open) {
             this.setState({
@@ -100,42 +97,23 @@ class FeatureModal extends React.Component {
         }
     }
 
-    // fetch milestone features
-    fetchMilestoneFeatures(data) {
-        this.setState({
-                progressState: true
-            }, () => (
-                axios.post('http://' + getServer() + '/lts/features',
-                    data
-                ).then(
-                    (response) => {
-                        let datat = response.data;
-                        this.setState({
-                            featureData: datat,
-                            progressState: false
-                        })
-                    }
-                )
-            )
-        );
-    }
-
 
     // create issue url list belong to the milestone
-    createIssueListofMilestone() {
-        let milestoneIssues = [];
-        this.props.issueList.forEach(function (issue) {
-
-            let object = {
-                url: issue["url"],
-                html_url: issue["html_url"],
-                title: issue["issue_title"],
-            };
-            milestoneIssues.push(object)
+    createPrListForFeatures(data) {
+        let prFeatureData = [];
+        data.forEach(function (prData) {
+            if(prData["validMarketing"]) {
+                let object = {
+                    url: prData["url"],
+                    title: prData["title"],
+                    features: prData["features"],
+                };
+                prFeatureData.push(object)
+            }
 
         });
 
-        return milestoneIssues;
+        return prFeatureData;
     }
 
 

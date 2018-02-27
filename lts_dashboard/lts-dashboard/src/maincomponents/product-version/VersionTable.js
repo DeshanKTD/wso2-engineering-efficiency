@@ -45,10 +45,7 @@ export default class VersionTable extends React.PureComponent {
                 {name: 'button', title: '_'},
                 {name: 'deleteButton', title: '_'}
             ],
-            rows: [
-                {version: '1.0.0', button: <Button>Change</Button>},
-                {version: '1.1.0', button: <Button>Change</Button>},
-            ],
+            rows: [],
         };
 
         this.openDeleteDialog = this.openDeleteDialog.bind(this);

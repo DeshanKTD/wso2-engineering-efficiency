@@ -56,25 +56,36 @@ class ProductNavigator extends React.Component {
     handleChange = event => {
         this.setState({[event.target.name]: event.target.value},
             () => {
-                this.props.setProduct(this.state.product)
+                let productName = this.getProductName(event.target.value);
+                this.props.setProduct(this.state.product,productName);
             });
 
     };
 
     fetchVersions() {
-        axios.get('http://'+getServer()+'/lts/products'
+        axios.get('http://'+getServer()+'/lts/products/names'
         ).then(
             (response) => {
                 let datat = response.data;
                 this.setState(
                     {
-                        productList: datat
+                        productList: datat,
                     }
                 );
             }
         )
     }
 
+    getProductName(productId){
+        let productName = null;
+
+        this.state.productList.map(function (product) {
+            if(product["productId"]==productId){
+                productName = product["productName"];
+            }
+        });
+        return productName;
+    }
 
     render() {
         const {classes} = this.props;
@@ -92,8 +103,8 @@ class ProductNavigator extends React.Component {
                             <MenuItem value="">
                                 <em>None</em>
                             </MenuItem>
-                            {this.state.productList.map((productName, index) => (
-                                <MenuItem key={index} value={productName}>{productName}</MenuItem>
+                            {this.state.productList.map((product, index) => (
+                                <MenuItem key={index} value={product.productId}>{product.productName}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>

@@ -51,6 +51,8 @@ class MenuAppBar extends React.Component {
         this.state = {
             product: null,
             version: null,
+            versionName:null,
+            productName:null
         };
 
         this.setProduct = this.setProduct.bind(this);
@@ -58,22 +60,26 @@ class MenuAppBar extends React.Component {
         this.openModal = this.openModal.bind(this);
     }
 
-    setProduct(productName) {
+    setProduct(productId,productName) {
         this.setState({
-                product: productName
+                product: productId,
+                productName: productName,
+                version: ""
             },
             () => {
-                this.props.setissues(this.state.product, this.state.version);
+                this.props.setissues(this.state.version);
             });
     }
 
 
-    setVersion(versionName) {
+    setVersion(versionId,versionName) {
         this.setState({
-                version: versionName
+                version: versionId,
+                versionName: versionName
             },
             () => {
-                this.props.setissues(this.state.product, this.state.version);
+                this.props.setNames(this.state.productName,this.state.versionName);
+                this.props.setissues(this.state.version);
             });
     }
 

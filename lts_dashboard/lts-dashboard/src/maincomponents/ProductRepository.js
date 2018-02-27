@@ -25,10 +25,6 @@ import '../App.css';
 import Grid from "material-ui/es/Grid/Grid";
 import Paper from "material-ui/es/Paper/Paper";
 import List from "material-ui/es/List/List";
-import ListItem from "material-ui/es/List/ListItem";
-import ListItemIcon from "material-ui/es/List/ListItemIcon";
-import ListItemText from "material-ui/es/List/ListItemText";
-import StarIcon from 'material-ui-icons/Star';
 import AppBar from "material-ui/es/AppBar/AppBar";
 import Typography from "material-ui/es/Typography/Typography";
 import Toolbar from "material-ui/es/Toolbar/Toolbar";
@@ -37,6 +33,7 @@ import ProductNavigatorRepo from "./product-repository/ProductNavigatorRepo";
 import {getServer} from "../resources/util";
 import axios from "axios/index";
 import RepoNameItem from "./product-repository/RepoNameItem";
+import ChangeBranchVersionModal from "./product-repository/ChangeBranchVersionModal";
 
 
 const styles = theme => ({
@@ -74,22 +71,37 @@ class ProductRepository extends Component {
         super(props);
         this.state = {
             currentRepo: "",
+            currentRepoId:"",
             productId : "",
             repoList:[],
             branchList:[],
+            branchVersionWindowOpen:false,
+            branchVersionChnageData:{}
 
         };
 
         this.setRepoList = this.setRepoList.bind(this);
+        this.fetchBranches = this.fetchBranches.bind(this);
+        this.openBranchVersionAddWindow = this.openBranchVersionAddWindow.bind(this);
 
     }
 
 
+    // open branch add / change window
+    openBranchVersionAddWindow(data){
+        this.setState({
+            branchVersionWindowOpen:true,
+            branchVersionChnageData:data
+        })
+    }
 
     // set repo list for product
     setRepoList(id){
         this.setState({
-            repoList: []
+            repoList: [],
+            branchList:[],
+            productId:id,
+            branchVersionWindowOpen:false
         });
         if(id!="") {
             let data = {
@@ -101,22 +113,51 @@ class ProductRepository extends Component {
                     let datat = response.data;
                     this.setState(
                         {
-                            repoList: datat
-                        },()=>console.log(this.state.repoList)
+                            repoList: datat,
+                            branchVersionWindowOpen:false
+                        }
                     );
                 }
             )
         }else {
             this.setState({
-                repoList: []
+                repoList: [],
+                branchVersionWindowOpen:false
             })
         }
     }
 
 
     // fetch branches for repo
-    fetchBranches(){
+    fetchBranches(repoId,repoName){
+        console.log(repoId,repoName);
+        this.setState(
+            {
+                branchList: [],
+                currentRepo: repoName,
+                currentRepoId: repoId,
+                branchVersionWindowOpen:false
 
+            }
+        );
+
+        let data = {
+            repoId : repoId,
+            repoName : repoName
+        };
+
+        axios.post('http://' + getServer() + '/lts/products/repos/branches', data
+        ).then(
+            (response) => {
+                let datat = response.data;
+                this.setState(
+                    {
+                        branchList: datat,
+                        branchVersionWindowOpen:false
+                    }
+                );
+            }
+        )
     }
 
 
@@ -138,7 +179,11 @@ class ProductRepository extends Component {
                             <div className={classes.productButtons}>
                                 <List component="nav">
                                     {this.state.repoList.map((value,index)=>
-                                        <RepoNameItem repoObject={value} key={index}/>
+                                        <RepoNameItem
+                                            repoObject={value}
+                                            key={index}
+                                            fetchBranches={this.fetchBranches}
+                                        />
                                     )}
                                 </List>
                             </div>
@@ -151,7 +196,7 @@ class ProductRepository extends Component {
                                 <AppBar position="static" color="default">
                                     <Toolbar>
                                         <Typography type="title" color="inherit" className={classes.flex}>
-                                            product-ei
+                                            {this.state.currentRepo}
                                         </Typography>
                                     </Toolbar>
                                 </AppBar>
@@ -159,11 +204,21 @@ class ProductRepository extends Component {
                             <div>
                                 <BranchTable
                                     branchList={this.state.branchList}
+                                    openBranchVersionAddWindow = {this.openBranchVersionAddWindow}
                                 />
                             </div>
                         </Paper>
                     </Grid>
                 </Grid>
+                <ChangeBranchVersionModal
+                    open={this.state.branchVersionWindowOpen}
+                    data={this.state.branchVersionChnageData}
+                    repoId = {this.state.currentRepoId}
+                    repoName={this.state.currentRepo}
+                    fetchBranches={this.fetchBranches}
+                    productId={this.state.productId}
+                    branchList={this.state.branchList}
+                />
             </div>
 
 

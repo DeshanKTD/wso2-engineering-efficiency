@@ -22,7 +22,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {withStyles} from 'material-ui/styles';
 import '../App.css';
-import MilestoneList from './marketing-window/IssueList';
+import PrList from './marketing-window/PrList';
 import MenuAppBar from './marketing-window/HeaderAppBar'
 import axios from "axios/index";
 import MilestoneModal from "./marketing-window/MilestoneModal.js"
@@ -64,43 +64,50 @@ class MarketingWindow extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            issueList: [],
+            prList: [],
             milestoneData: {},
             openModal: false,
             loadIssue: false,
             openFeatureModal: false,
             product: "",
             version: "",
+            productName: "",
+            versionName: "",
         };
 
         this.setIssues = this.setIssues.bind(this);
         this.modalOpen = this.modalOpen.bind(this);
         this.featureModalOpen = this.featureModalOpen.bind(this);
-
+        this.setProductAndVersionNames = this.setProductAndVersionNames.bind(this);
     }
 
+    setProductAndVersionNames(productName, versionName) {
+        this.setState({
+            productName: productName,
+            versionName: versionName
+        })
+    }
 
-    setIssues(productName, versionName) {
-        if (productName !== null || versionName !== null) {
+    setIssues(versionId) {
+        if (versionId !== null) {
             let productObject = {};
-            productObject["product"] = productName;
-            productObject["version"] = versionName;
+            productObject["versionId"] = versionId;
 
-            if (productName !== '') {
+            if (versionId !== '') {
                 this.setState({
                     loadIssue: true,
                     openModal: false,
-                    issueList: [],
+                    prList: [],
                     openFeatureModal: false
                 }, () => (
-                    axios.post('http://'+getServer()+'/lts/issues',
+                    axios.post('http://' + getServer() + '/lts/features',
                         productObject
                     ).then(
                         (response) => {
                             let datat = response.data;
                             this.setState(
                                 {
-                                    issueList: datat,
+                                    prList: datat,
                                     loadIssue: false,
                                     openModal: false,
                                 }
@@ -108,6 +115,12 @@ class MarketingWindow extends Component {
                         }
                     )
                 ));
+            } else {
+                this.setState({
+                    openModal: false,
+                    prList: [],
+                    openFeatureModal: false
+                })
             }
         }
     }
@@ -121,6 +134,7 @@ class MarketingWindow extends Component {
                 <MenuAppBar
                     productUpdate={this.setProduct}
                     setissues={this.setIssues}
+                    setNames={this.setProductAndVersionNames}
                     featureModal={this.featureModalOpen}
                 />
                 <div style={{height: 5}}>
@@ -128,27 +142,20 @@ class MarketingWindow extends Component {
                 </div>
 
                 <div className={classes.blocks}>
-                    <MilestoneList
-                        issueList={this.state.issueList}
+                    <PrList
+                        prList={this.state.prList}
                         modalLauch={this.modalOpen}
                     />
                 </div>
 
                 <div>
-                    <MilestoneModal
-                        data={this.state.milestoneData}
-                        open={this.state.openModal}
-                        issueList={this.state.issueList}
-                    />
-                </div>
-                <div>
                     <FeatureModal
                         open={this.state.openFeatureModal}
                         versionData={{
-                            product: this.state.product,
-                            version: this.state.version
+                            product: this.state.productName,
+                            version: this.state.versionName
                         }}
-                        issueList={this.state.issueList}
+                        prList={this.state.prList}
                     />
                 </div>
             </div>

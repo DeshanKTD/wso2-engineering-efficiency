@@ -35,6 +35,7 @@ import {
     TableColumnResizing,
     VirtualTable
 } from "@devexpress/dx-react-grid-material-ui/dist/dx-react-grid-material-ui.cjs";
+import Chip from "material-ui/es/Chip/Chip";
 
 const styles = theme => ({
     root: {
@@ -55,16 +56,16 @@ const styles = theme => ({
 });
 
 // formatters
-const IssueLinkFormatter = ({value}) =>
+const PrLinkFormatter = ({value}) =>
     <a href="#" onClick={() => window.open(value["html_url"], '_blank')}>{value["title"]}</a>;
 
-IssueLinkFormatter.propTypes = {
+PrLinkFormatter.propTypes = {
     value: PropTypes.object.isRequired,
 };
 
-const IssueLinkTypeProvider = props => (
+const PrLinkTypeProvider = props => (
     <DataTypeProvider
-        formatterComponent={IssueLinkFormatter}
+        formatterComponent={PrLinkFormatter}
         {...props}
     />
 );
@@ -74,6 +75,8 @@ const MilestoneFormatter = ({value}) =>
         data={value["mObject"]}
         modalLauch={value["method"]}
     />;
+
+
 
 MilestoneFormatter.propTypes = {
     value: PropTypes.object.isRequired,
@@ -86,16 +89,39 @@ const MilestoneTypeProvider = props => (
     />
 );
 
+const LabelFormatter = ({value}) =>
+    <div>{
+        // value.forEach(function (label) {
+        //     return (
+                <Chip label={value}/>
+        //     )
+        // })
+    }
+    </div>;
+
+LabelFormatter.prototype = {
+    value : PropTypes.array.isRequired,
+}
+
+
+const LabelTypeProvider = props => (
+    <DataTypeProvider
+        formatterComponent={LabelFormatter}
+        {...props}
+    />
+);
+
+
 // filters
 const toLowerCase = value => String(value).toLowerCase();
 const milestonePredicate = (value, filter) => toLowerCase(value["mObject"]["title"]).startsWith(toLowerCase(filter.value));
-const issuePredicate = (value, filter) => toLowerCase(value["title"]).startsWith(toLowerCase(filter.value));
+const prPredicate = (value, filter) => toLowerCase(value["title"]).startsWith(toLowerCase(filter.value));
 
 
 // sorting function
 const compareText = (a, b) => {
-    a = a["mObject"]["title"];
-    b = b["mObject"]["title"];
+    a = a["title"];
+    b = b["title"];
 
     if (toLowerCase(a) > toLowerCase(b)) {
         return 1;
@@ -109,28 +135,31 @@ const compareText = (a, b) => {
 function getColumnWidths() {
     let screenWidth = window.innerWidth;
     let divPaperSize = Math.round(screenWidth / 100 * 92);
-    let col1Size = Math.round(divPaperSize / 100 * 60);
+    let col1Size = Math.round(divPaperSize / 100 * 40);
     let col2Size = Math.round(divPaperSize / 100 * 20);
     let col3Size = Math.round(divPaperSize / 100 * 20);
-    return [col1Size, col2Size, col3Size]
+    let col4Size = Math.round(divPaperSize / 100 * 10);
+    let col5Size = Math.round(divPaperSize / 100 * 10);
+    return [col1Size, col2Size, col3Size, col4Size, col5Size]
 }
 
-class MilestoneList extends React.Component {
+class PrList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            issueList: [],
-            displayIssueList: [],
+            prList: [],
+            displayPrList: [],
             integratedFilteringColumnExtensions: [
                 {columnName: 'milestone', predicate: milestonePredicate},
-                {columnName: 'title', predicate: issuePredicate},
+                {columnName: 'title', predicate: prPredicate},
 
             ],
             integratedSortingColumnExtensions: [
-                {columnName: 'milestone', compare: compareText},
+                {columnName: 'title', compare: compareText},
             ],
             milestoneColumn: ["milestone"],
-            issueTitleCol: ["title"]
+            issueTitleCol: ["title"],
+            labelColumn : ["labels"]
         };
 
         this.modalOpen = this.modalOpen.bind(this);
@@ -138,10 +167,10 @@ class MilestoneList extends React.Component {
 
 
     componentWillUpdate(nextProps, nextState) {
-        if (nextProps.issueList !== this.props.issueList) {
+        if (nextProps.prList !== this.state.prList) {
             this.setState({
-                issueList: nextProps.issueList,
-                displayIssueList: this.processIssueList(nextProps.issueList),
+                prList: nextProps.prList,
+                displayPrList: this.processPrList(nextProps.prList),
             })
         }
     }
@@ -151,27 +180,28 @@ class MilestoneList extends React.Component {
         this.props.modalLauch(data);
     };
 
-    processIssueList(issueList) {
+    processPrList(prList) {
+        console.log(prList);
         let displayArray = [];
-        let modalOpenUp = this.modalOpen;
-        issueList.forEach(function (element) {
-                let issueTitle = {"html_url": element["html_url"], "title": element["issue_title"]};
-                let milestoneDueOn = " N/A";
-                let milestoneTitle = " N/A";
-                if (element["milestone"] != null) {
-                    if (element["milestone"]["due_on"] !== "null") {
-                        milestoneDueOn = element["milestone"]["due_on"];
-                    }
-                    milestoneTitle = {"mObject": element["milestone"], "method": modalOpenUp};
+        prList.forEach(function (element) {
+                let prTitle = {"html_url": element["url"], "title": element["title"]};
+                let user = element["user"];
+                let valid = "Invalid";
+                if (element["validMarketing"]) {
+                    valid = "Valid"
                 }
 
-                let issue = {
-                    title: issueTitle,
-                    due_on: milestoneDueOn,
-                    milestone: milestoneTitle,
+                let branchData = element["repoName"]+" : "+element["branch"];
+                let labels = element["labels"];
 
+                let prData = {
+                    title: prTitle,
+                    user: user,
+                    valid: valid,
+                    branchData: branchData,
+                    labels : labels
                 };
-                displayArray.push(issue);
+                displayArray.push(prData);
             }
         );
 
@@ -190,12 +220,14 @@ class MilestoneList extends React.Component {
                 <Divider light/>
                 <div className={classes.root}>
                     <Grid
-                        rows={this.state.displayIssueList}
+                        rows={this.state.displayPrList}
 
                         columns={[
                             {name: 'title', title: 'Feature'},
-                            {name: 'due_on', title: 'Release Date'},
-                            {name: 'milestone', title: 'Feature included milestone'}
+                            {name: 'user', title: 'User'},
+                            {name: 'labels', title: 'Labels'},
+                            {name: 'branchData', title: 'Branch'},
+                            {name: 'valid', title: 'Marketing Message Validity'}
                         ]}>
 
                         <FilteringState defaultFilters={[]}/>
@@ -207,19 +239,27 @@ class MilestoneList extends React.Component {
                         <IntegratedSorting columnExtensions={integratedSortingColumnExtensions}/>
 
                         <VirtualTable height={700}/>
-                        <TableColumnResizing defaultColumnWidths={[
-                            {columnName: 'title', width: columnSizes[0]},
-                            {columnName: 'due_on', width: columnSizes[1]},
-                            {columnName: 'milestone', width: columnSizes[2]},
-                        ]}/>
+                        {/*<TableColumnResizing defaultColumnWidths={[*/}
+                            {/*{columnName: 'title', width: columnSizes[0]},*/}
+                            {/*{columnName: 'user', width: columnSizes[1]},*/}
+                            {/*{columnName: 'labels', width: columnSizes[2]},*/}
+                            {/*{columnName: 'valid', width: columnSizes[5]},*/}
+                            {/*{columnName: 'branchData', width: columnSizes[4]},*/}
 
-                        <IssueLinkTypeProvider
+                        {/*]}/>*/}
+
+                        <PrLinkTypeProvider
                             for={this.state.issueTitleCol}
                         />
 
                         <MilestoneTypeProvider
                             for={this.state.milestoneColumn}
                         />
+
+                        <LabelTypeProvider
+                            for={this.state.labelColumn}
+                        />
+
                         <TableHeaderRow showSortingControls/>
                         <TableFilterRow/>
 
@@ -231,8 +271,8 @@ class MilestoneList extends React.Component {
     }
 }
 
-MilestoneList.propTypes = {
+PrList.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(MilestoneList);
+export default withStyles(styles)(PrList);

@@ -16,3 +16,43 @@
  * under the License.
  *
  */
+
+import React, {Component} from 'react';
+import Button from "material-ui/es/Button/Button";
+
+
+class BranchVersionChangeButton extends Component{
+    constructor(props){
+        super(props);
+        this.changeBranchVersionOpen = this.changeBranchVersionOpen.bind(this);
+        let buttonLabel = "Add Version";
+        if(this.props.change){
+            buttonLabel = "Change"
+        }
+
+        this.state = {
+            buttonLabel : buttonLabel
+        }
+    }
+
+
+    changeBranchVersionOpen(){
+        let data = {
+            change : this.props.change,
+            versionId: this.props.versionId,
+            branchId: this.props.branchId,
+            branchName: this.props.branchName
+        };
+        this.props.openBranchChangeWindow(data);
+    }
+
+
+
+    render(){
+        return (
+            <Button onClick={this.changeBranchVersionOpen}>{this.state.buttonLabel}</Button>
+        );
+    }
+}
+
+export default BranchVersionChangeButton;
