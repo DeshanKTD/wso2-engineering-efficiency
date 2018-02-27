@@ -22,6 +22,7 @@ import PropTypes from 'prop-types';
 import {withStyles} from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import Divider from 'material-ui/Divider';
+import SvgIcon from 'material-ui/SvgIcon';
 import {
     DataTypeProvider,
     FilteringState,
@@ -55,6 +56,20 @@ const styles = theme => ({
     }
 });
 
+// indicators
+const ValidIcon = (props) => (
+    <SvgIcon {...props}>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+    </SvgIcon>
+);
+
+
+const InvalidIcon = (props) => (
+    <SvgIcon {...props}>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+    </SvgIcon>
+);
+
 // formatters
 const PrLinkFormatter = ({value}) =>
     <a href="#" onClick={() => window.open(value["html_url"], '_blank')}>{value["title"]}</a>;
@@ -70,39 +85,18 @@ const PrLinkTypeProvider = props => (
     />
 );
 
-const MilestoneFormatter = ({value}) =>
-    <MilestoneCheckButton
-        data={value["mObject"]}
-        modalLauch={value["method"]}
-    />;
-
-
-
-MilestoneFormatter.propTypes = {
-    value: PropTypes.object.isRequired,
-};
-
-const MilestoneTypeProvider = props => (
-    <DataTypeProvider
-        formatterComponent={MilestoneFormatter}
-        {...props}
-    />
-);
-
 const LabelFormatter = ({value}) =>
-    <div>{
-        // value.forEach(function (label) {
-        //     return (
-                <Chip label={value}/>
-        //     )
-        // })
-    }
+    <div>
+        {
+            value.map(function (label) {
+                return(<Chip label={label}/>);
+            })
+        }
     </div>;
 
-LabelFormatter.prototype = {
-    value : PropTypes.array.isRequired,
-}
-
+LabelFormatter.propTypes = {
+    value: PropTypes.array.isRequired
+};
 
 const LabelTypeProvider = props => (
     <DataTypeProvider
@@ -111,6 +105,29 @@ const LabelTypeProvider = props => (
     />
 );
 
+const ValidFormatter = ({value})=>
+{
+  if(value){
+      return (
+          <ValidIcon color="primary"/>
+      )
+  }  else {
+      return (
+          <InvalidIcon color="error"/>
+      )
+  }
+};
+
+ValidFormatter.prototype = {
+    value : PropTypes.bool.isRequired
+};
+
+const ValidTypeProvider = props => (
+    <DataTypeProvider
+        formatterComponent={ValidFormatter}
+        {...props}
+    />
+);
 
 // filters
 const toLowerCase = value => String(value).toLowerCase();
@@ -150,16 +167,15 @@ class PrList extends React.Component {
             prList: [],
             displayPrList: [],
             integratedFilteringColumnExtensions: [
-                {columnName: 'milestone', predicate: milestonePredicate},
                 {columnName: 'title', predicate: prPredicate},
 
             ],
             integratedSortingColumnExtensions: [
                 {columnName: 'title', compare: compareText},
             ],
-            milestoneColumn: ["milestone"],
             issueTitleCol: ["title"],
-            labelColumn : ["labels"]
+            labelColumn : ["labels"],
+            validColumn: ["valid"]
         };
 
         this.modalOpen = this.modalOpen.bind(this);
@@ -186,11 +202,7 @@ class PrList extends React.Component {
         prList.forEach(function (element) {
                 let prTitle = {"html_url": element["url"], "title": element["title"]};
                 let user = element["user"];
-                let valid = "Invalid";
-                if (element["validMarketing"]) {
-                    valid = "Valid"
-                }
-
+                let valid = element["validMarketing"];
                 let branchData = element["repoName"]+" : "+element["branch"];
                 let labels = element["labels"];
 
@@ -252,14 +264,13 @@ class PrList extends React.Component {
                             for={this.state.issueTitleCol}
                         />
 
-                        <MilestoneTypeProvider
-                            for={this.state.milestoneColumn}
-                        />
-
                         <LabelTypeProvider
                             for={this.state.labelColumn}
                         />
 
+                        <ValidTypeProvider
+                            for={this.state.validColumn}
+                        />
                         <TableHeaderRow showSortingControls/>
                         <TableFilterRow/>
 
