@@ -25,7 +25,6 @@ import '../App.css';
 import PrList from './marketing-window/PrList';
 import MenuAppBar from './marketing-window/HeaderAppBar'
 import axios from "axios/index";
-import MilestoneModal from "./marketing-window/MilestoneModal.js"
 import LinearProgress from "material-ui/es/Progress/LinearProgress";
 import FeatureModal from "./marketing-window/FeatureModal.js";
 import {getServer} from "../resources/util";
@@ -88,12 +87,15 @@ class MarketingWindow extends Component {
         })
     }
 
-    setIssues(versionId) {
+    setIssues(versionId,startDate,endDate) {
+        console.log(startDate+" "+endDate);
         if (versionId !== null) {
             let productObject = {};
             productObject["versionId"] = versionId;
+            productObject["startDate"] = startDate;
+            productObject["endDate"] = endDate;
 
-            if (versionId !== '') {
+            if (versionId !== '' && startDate !== '' && endDate !== '') {
                 this.setState({
                     loadIssue: true,
                     openModal: false,

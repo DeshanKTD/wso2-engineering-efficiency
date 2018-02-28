@@ -23,10 +23,10 @@ import PropTypes from 'prop-types';
 import {withStyles} from 'material-ui/styles';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
-import Typography from 'material-ui/Typography';
 import VersionNavigator from './VersionNavigator.js';
 import ProductNavigator from './ProductNavigator.js';
 import Button from "material-ui/es/Button/Button";
+import QuaterNavigator from "./QuaterNavigator";
 
 const styles = {
     root: {
@@ -52,12 +52,15 @@ class MenuAppBar extends React.Component {
             product: null,
             version: null,
             versionName:null,
-            productName:null
+            productName:null,
+            startDate: null,
+            endDate: null
         };
 
         this.setProduct = this.setProduct.bind(this);
         this.setVersion = this.setVersion.bind(this);
         this.openModal = this.openModal.bind(this);
+        this.setQuarter = this.setQuarter.bind(this);
     }
 
     setProduct(productId,productName) {
@@ -67,20 +70,33 @@ class MenuAppBar extends React.Component {
                 version: ""
             },
             () => {
-                this.props.setissues(this.state.version);
+                this.props.setissues(this.state.version,this.state.startDate,this.state.endDate);
             });
     }
 
 
     setVersion(versionId,versionName) {
+        console.log(this.state.startDate);
         this.setState({
                 version: versionId,
                 versionName: versionName
             },
             () => {
                 this.props.setNames(this.state.productName,this.state.versionName);
-                this.props.setissues(this.state.version);
+                this.props.setissues(this.state.version,this.state.startDate,this.state.endDate);
             });
+    }
+
+
+    setQuarter(startDate,endDate){
+
+        this.setState({
+            startDate: startDate,
+            endDate: endDate,
+        },
+        ()=>{
+            this.props.setissues(this.state.version,this.state.startDate,this.state.endDate);
+        });
     }
 
     openModal() {
@@ -96,24 +112,19 @@ class MenuAppBar extends React.Component {
                 <AppBar position="static" color="default">
                     <Toolbar>
                         <div className={classes.header}>
-                            <Typography type="title" color="inherit">
-                                Product
-                            </Typography>
-                        </div>
-                        <div className={classes.header}>
                             <ProductNavigator
                                 setProduct={this.setProduct}
                             />
                         </div>
                         <div className={classes.header}>
-                            <Typography type="title" color="inherit">
-                                Version
-                            </Typography>
-                        </div>
-                        <div className={classes.header}>
                             <VersionNavigator
                                 product={this.state.product}
                                 setVersion={this.setVersion}
+                            />
+                        </div>
+                        <div className={classes.header}>
+                            <QuaterNavigator
+                                setQuarter={this.setQuarter}
                             />
                         </div>
                         <div className={classes.header}>

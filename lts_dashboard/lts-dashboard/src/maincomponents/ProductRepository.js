@@ -39,16 +39,13 @@ import ChangeBranchVersionModal from "./product-repository/ChangeBranchVersionMo
 const styles = theme => ({
     root: {
         flexGrow: 1,
-        marginTop: 30,
     },
     paper: {
-        padding: 16,
         textAlign: 'center',
         color: theme.palette.text.secondary,
     },
     productButtons: {
         width: `100%`,
-        maxWidth: 360,
         paddingTop: '20px',
         backgroundColor: theme.palette.background.paper,
     },
@@ -60,6 +57,10 @@ const styles = theme => ({
     },
     appBar : {
         paddingBottom : `20px`
+    },
+    repoList : {
+        paddingLeft: `5%`,
+        paddingRight: `5%`
     }
 });
 
@@ -177,7 +178,7 @@ class ProductRepository extends Component {
                                 </AppBar>
                             </div>
                             <div className={classes.productButtons}>
-                                <List component="nav">
+                                <List className={classes.repoList} component="nav">
                                     {this.state.repoList.map((value,index)=>
                                         <RepoNameItem
                                             repoObject={value}

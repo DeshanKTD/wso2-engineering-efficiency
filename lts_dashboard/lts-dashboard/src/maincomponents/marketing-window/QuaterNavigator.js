@@ -46,13 +46,13 @@ const styles = theme => ({
     },
 });
 
-class VersionNavigator extends React.Component {
+class QuarterNavigator extends React.Component {
 
     handleChange = event => {
         this.setState({[event.target.name]: event.target.value},
             () => {
-                let versionName = this.getVersionName(event.target.value);
-                this.props.setVersion(this.state.version,versionName);
+                let obj = event.target.value;
+                this.props.setQuarter(obj["startDate"],obj["endDate"]);
             });
 
 
@@ -61,52 +61,35 @@ class VersionNavigator extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            version: '',
-            versionList: [],
+            quarter: '',
+            quarterList: [],
             issueLoading: false
         };
+        this.fetchQuarters();
     }
 
-    fetchVersions(productId) {
-        let data = {
-            productId : productId
-        };
-        if (productId !== '') {
-            this.setState({
-                issueLoading:true
-            },()=>(
-                axios.post('http://'+getServer()+'/lts/products/versions',
-                    data
-                ).then(
-                    (response) => {
-                        let datat = response.data;
-                        this.setState(
-                            {
-                                versionList: datat.sort().reverse(),
-                                issueLoading:false
-                            }
-                        );
+
+    fetchQuarters() {
+        axios.get('http://'+getServer()+'/lts/release/quarters').then(
+            (response) => {
+                let datat = response.data.sort(this.compareIds).reverse();
+                this.setState(
+                    {
+                        quarterList: datat,
+                        issueLoading:false
                     }
-                )
-            ));
-        }
-    }
-
-    componentWillUpdate(nextProps, nextState) {
-        if (nextProps.product !== this.props.product) {
-            this.fetchVersions(nextProps.product);
-        }
-    }
-
-    getVersionName(versionId){
-        let versionName= null;
-        this.state.versionList.map(function (versionData) {
-            if(versionId==versionData["versionId"]){
-                versionName = versionData["versionName"]
+                );
+                this.props.setQuarter(datat[0]["startDate"],datat[0]["endDate"])
             }
-        });
-        return versionName;
+        )
     }
+
+
+    compareIds(a,b){
+        return a - b;
+    }
+
+
 
     render() {
         const {classes} = this.props;
@@ -115,18 +98,15 @@ class VersionNavigator extends React.Component {
             <div>
                 <form className={classes.container} autoComplete="off">
                     <FormControl className={classes.formControl}>
-                        <InputLabel htmlFor="version-simple">Version</InputLabel>
+                        <InputLabel htmlFor="quarter-simple">Quarter</InputLabel>
                         <Select
-                            value={this.state.version}
+                            value={this.state.quarter}
                             onChange={this.handleChange}
-                            input={<Input name="version" id="version-simple"/>}
+                            input={<Input name="quarter" id="quarter-simple"/>}
                         >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
                             {
-                                this.state.versionList.map((versionData, index) => (
-                                    <MenuItem key={index} value={versionData["versionId"]}>{versionData["versionName"]}</MenuItem>
+                                this.state.quarterList.map((quarterData, index) => (
+                                    <MenuItem key={index} value={quarterData}>{"Quarter "+(quarterData["quarter"]+1)+" - "+quarterData["year"]}</MenuItem>
                                 ))
                             }
                         </Select>
@@ -139,8 +119,8 @@ class VersionNavigator extends React.Component {
     }
 }
 
-VersionNavigator.propTypes = {
+QuarterNavigator.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(VersionNavigator);
+export default withStyles(styles)(QuarterNavigator);

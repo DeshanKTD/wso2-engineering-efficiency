@@ -37,6 +37,9 @@ import {
     VirtualTable
 } from "@devexpress/dx-react-grid-material-ui/dist/dx-react-grid-material-ui.cjs";
 import Chip from "material-ui/es/Chip/Chip";
+import TableCell from "material-ui/es/Table/TableCell";
+import Select from "material-ui/es/Select/Select";
+import MenuItem from "material-ui/es/Menu/MenuItem";
 
 const styles = theme => ({
     root: {
@@ -53,13 +56,17 @@ const styles = theme => ({
     }),
     appBar: {
         paddingBottom: 20
-    }
+    },
+    input: {
+        width: `100%`,
+    },
 });
 
 // indicators
 const ValidIcon = (props) => (
     <SvgIcon {...props}>
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
     </SvgIcon>
 );
 
@@ -88,8 +95,8 @@ const PrLinkTypeProvider = props => (
 const LabelFormatter = ({value}) =>
     <div>
         {
-            value.map(function (label) {
-                return(<Chip label={label}/>);
+            value.map(function (label,index) {
+                return (<Chip key={index} label={label}/>);
             })
         }
     </div>;
@@ -105,21 +112,20 @@ const LabelTypeProvider = props => (
     />
 );
 
-const ValidFormatter = ({value})=>
-{
-  if(value){
-      return (
-          <ValidIcon color="primary"/>
-      )
-  }  else {
-      return (
-          <InvalidIcon color="error"/>
-      )
-  }
+const ValidFormatter = ({value}) => {
+    if (value) {
+        return (
+            <ValidIcon color="primary"/>
+        )
+    } else {
+        return (
+            <InvalidIcon color="error"/>
+        )
+    }
 };
 
 ValidFormatter.prototype = {
-    value : PropTypes.bool.isRequired
+    value: PropTypes.bool.isRequired
 };
 
 const ValidTypeProvider = props => (
@@ -129,10 +135,52 @@ const ValidTypeProvider = props => (
     />
 );
 
+
 // filters
 const toLowerCase = value => String(value).toLowerCase();
-const milestonePredicate = (value, filter) => toLowerCase(value["mObject"]["title"]).startsWith(toLowerCase(filter.value));
-const prPredicate = (value, filter) => toLowerCase(value["title"]).startsWith(toLowerCase(filter.value));
+const branchPredicate = (value, filter) => toLowerCase(value).includes(toLowerCase(filter.value));
+const prPredicate = (value, filter) => toLowerCase(value["title"]).includes(toLowerCase(filter.value));
+const labelPredicate = (value,filter) => {
+    let val = false;
+    value.forEach(function (label) {
+        if(toLowerCase(label).includes(toLowerCase(filter.value))){
+            val =  true
+        }
+    });
+    return val;
+};
+
+
+
+const UnitsFilterCellBase = ({filter, onFilter, classes}) => (
+    <TableCell className={classes.cell}>
+        <Select
+            className={classes.input}
+            type="number"
+            value={filter ? filter.value : ''}
+            onChange={e => onFilter({value: e.target.value})}
+            placeholder="Filter..."
+            inputProps={{
+                style: {textAlign: 'right', height: 'inherit', width: `100%`},
+            }}
+        >
+            <MenuItem value="">
+                <em>All</em>
+            </MenuItem>
+            <MenuItem value={true}>Valid</MenuItem>
+            <MenuItem value={false}>Invalid</MenuItem>
+        </Select>
+    </TableCell>
+);
+
+const UnitsFilterCell = withStyles(styles, {name: 'SexFilterCell'})(UnitsFilterCellBase);
+
+const FilterCell = (props) => {
+    if (props.column.name === 'valid') {
+        return <UnitsFilterCell {...props} />;
+    }
+    return <TableFilterRow.Cell {...props} />;
+};
 
 
 // sorting function
@@ -160,6 +208,7 @@ function getColumnWidths() {
     return [col1Size, col2Size, col3Size, col4Size, col5Size]
 }
 
+
 class PrList extends React.Component {
     constructor(props) {
         super(props);
@@ -168,13 +217,15 @@ class PrList extends React.Component {
             displayPrList: [],
             integratedFilteringColumnExtensions: [
                 {columnName: 'title', predicate: prPredicate},
+                {columnName: 'branchData', predicate: branchPredicate},
+                {columnName: 'labels', predicate: labelPredicate}
 
             ],
             integratedSortingColumnExtensions: [
                 {columnName: 'title', compare: compareText},
             ],
             issueTitleCol: ["title"],
-            labelColumn : ["labels"],
+            labelColumn: ["labels"],
             validColumn: ["valid"]
         };
 
@@ -197,13 +248,12 @@ class PrList extends React.Component {
     };
 
     processPrList(prList) {
-        console.log(prList);
         let displayArray = [];
         prList.forEach(function (element) {
                 let prTitle = {"html_url": element["url"], "title": element["title"]};
                 let user = element["user"];
                 let valid = element["validMarketing"];
-                let branchData = element["repoName"]+" : "+element["branch"];
+                let branchData = element["repoName"] + " : " + element["branch"];
                 let labels = element["labels"];
 
                 let prData = {
@@ -211,7 +261,7 @@ class PrList extends React.Component {
                     user: user,
                     valid: valid,
                     branchData: branchData,
-                    labels : labels
+                    labels: labels
                 };
                 displayArray.push(prData);
             }
@@ -251,14 +301,14 @@ class PrList extends React.Component {
                         <IntegratedSorting columnExtensions={integratedSortingColumnExtensions}/>
 
                         <VirtualTable height={700}/>
-                        {/*<TableColumnResizing defaultColumnWidths={[*/}
-                            {/*{columnName: 'title', width: columnSizes[0]},*/}
-                            {/*{columnName: 'user', width: columnSizes[1]},*/}
-                            {/*{columnName: 'labels', width: columnSizes[2]},*/}
-                            {/*{columnName: 'valid', width: columnSizes[5]},*/}
-                            {/*{columnName: 'branchData', width: columnSizes[4]},*/}
+                        <TableColumnResizing defaultColumnWidths={[
+                        {columnName: 'title', width: columnSizes[0]},
+                        {columnName: 'user', width: columnSizes[4]},
+                        {columnName: 'labels', width: columnSizes[2]},
+                        {columnName: 'valid', width: columnSizes[3]},
+                        {columnName: 'branchData', width: columnSizes[1]},
 
-                        {/*]}/>*/}
+                        ]}/>
 
                         <PrLinkTypeProvider
                             for={this.state.issueTitleCol}
@@ -272,7 +322,9 @@ class PrList extends React.Component {
                             for={this.state.validColumn}
                         />
                         <TableHeaderRow showSortingControls/>
-                        <TableFilterRow/>
+                        <TableFilterRow
+                            cellComponent={FilterCell}
+                        />
 
                     </Grid>
                 </div>

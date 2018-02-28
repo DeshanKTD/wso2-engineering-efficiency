@@ -50,7 +50,7 @@ class BranchVersionChangeButton extends Component{
 
     render(){
         return (
-            <Button onClick={this.changeBranchVersionOpen}>{this.state.buttonLabel}</Button>
+            <Button color="secondary" onClick={this.changeBranchVersionOpen}>{this.state.buttonLabel}</Button>
         );
     }
 }

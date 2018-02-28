@@ -35,7 +35,7 @@ class VersionDeleteButton extends Component{
 
     render(){
         return (
-            <Button onClick={this.deleteVersion}>Delete</Button>
+            <Button color="secondary" onClick={this.deleteVersion}>Delete</Button>
         );
     }
 }

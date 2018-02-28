@@ -18,7 +18,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
+import {withStyles} from 'material-ui/styles';
 import Modal from 'material-ui/Modal';
 import Button from 'material-ui/Button';
 import FormControl from "material-ui/es/Form/FormControl";
@@ -26,7 +26,12 @@ import InputLabel from "material-ui/es/Input/InputLabel";
 import Input from "material-ui/es/Input/Input";
 import {getServer} from "../../resources/util";
 import axios from "axios/index";
-
+import AppBar from "material-ui/es/AppBar/AppBar";
+import Toolbar from "material-ui/es/Toolbar/Toolbar";
+import Typography from "material-ui/es/Typography/Typography";
+import AddIcon from 'material-ui-icons/Add';
+import IconButton from "material-ui/es/IconButton/IconButton";
+import CloseIcon from 'material-ui-icons/Close';
 
 function getModalStyle() {
 
@@ -42,51 +47,48 @@ const styles = theme => ({
         width: theme.spacing.unit * 60,
         backgroundColor: theme.palette.background.paper,
         boxShadow: theme.shadows[5],
-        padding: theme.spacing.unit * 4,
     },
 
     container: {
         display: 'flex',
         flexWrap: 'wrap',
     },
-    formControl: {
-        margin: theme.spacing.unit,
+    appBar: {
+        marginLeft: 0,
+        marginRight: 0,
+        paddingLeft: 0,
+        paddingRight: 0
     },
+    input: {
+        width: `60%`,
+        marginLeft: `10%`,
+        marginTop: 10,
+        marginBottom: 10
+    },
+    addButton: {
+        width : `20%`,
+        paddingRight: `10%`,
+        marginTop: 15,
+        marginBottom: 5,
+    },
+    flex: {
+        flex: 1
+    }
 });
 
 class VersionAddModal extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            open: false,
-            versionName: "",
-        };
-    }
-
     handleOpen = () => {
-        this.setState({ open: true });
+        this.setState({open: true});
     };
-
     handleClose = () => {
-        this.setState({ open: false });
+        this.setState({open: false});
     };
-
-    componentWillUpdate(nextProps, nextState) {
-        if (nextProps.open !== this.state.open) {
-            this.setState({
-                open : !this.state.open
-            });
-        }
-    }
-
     handleChange = event => {
-        this.setState({ versionName: event.target.value });
+        this.setState({versionName: event.target.value});
     };
-
-
     addVersion = () => {
-        if(this.validateVersion(this.state.versionName,this.props.versionList)) {
+        if (this.validateVersion(this.state.versionName, this.props.versionList)) {
             let data = {
                 productId: this.props.productId,
                 versionName: this.state.versionName
@@ -99,7 +101,7 @@ class VersionAddModal extends React.Component {
                     console.log(datat);
                     this.setState({
                         open: false,
-                        versionName:""
+                        versionName: ""
                     });
                     this.props.fetchVersions(this.props.productId);
                 }
@@ -107,15 +109,31 @@ class VersionAddModal extends React.Component {
         }
     };
 
-    validateVersion(version,versionList){
+    constructor(props) {
+        super(props);
+        this.state = {
+            open: false,
+            versionName: "",
+        };
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        if (nextProps.open !== this.state.open) {
+            this.setState({
+                open: !this.state.open
+            });
+        }
+    }
+
+    validateVersion(version, versionList) {
         let isValid = true;
-        if(version==""){
+        if (version == "") {
             isValid = false;
-        } else{
+        } else {
             versionList.forEach(function (versionExisting) {
-               if( versionExisting["versionName"]==version){
-                   isValid = false;
-               }
+                if (versionExisting["versionName"] == version) {
+                    isValid = false;
+                }
             })
         }
 
@@ -123,7 +141,7 @@ class VersionAddModal extends React.Component {
     }
 
     render() {
-        const { classes } = this.props;
+        const {classes} = this.props;
 
         return (
             <div>
@@ -135,17 +153,26 @@ class VersionAddModal extends React.Component {
                 >
                     <div style={getModalStyle()} className={classes.paper}>
                         <div className={classes.container}>
-                            <FormControl className={classes.formControl}>
+                            <AppBar className={classes.appBar} position="static" color="default">
+                                <Toolbar>
+                                    <Typography variant="title" color="inherit" className={classes.flex}>
+                                        Add Version
+                                    </Typography>
+                                    <IconButton className={classes.closeButton} color="inherit" onClick={this.handleClose} aria-label="Close">
+                                        <CloseIcon/>
+                                    </IconButton>
+                                </Toolbar>
+                            </AppBar>
+                            <FormControl className={classes.input}>
                                 <InputLabel htmlFor="versionName">Version</InputLabel>
-                                <Input id="versionName" value={this.state.versionName} onChange={this.handleChange} />
+                                <Input id="versionName" value={this.state.versionName} onChange={this.handleChange}/>
                             </FormControl>
-                            <FormControl className={classes.formControl}>
-                                <Button onClick={this.addVersion}>Add Version</Button>
+                            <FormControl className={classes.addButton}>
+                                <Button onClick={this.addVersion} variant="fab" color="primary" aria-label="add">
+                                    <AddIcon />
+                                </Button>
                             </FormControl>
                         </div>
-
-
-
                     </div>
                 </Modal>
             </div>

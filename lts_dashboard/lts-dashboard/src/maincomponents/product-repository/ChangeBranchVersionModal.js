@@ -27,6 +27,12 @@ import Input from "material-ui/es/Input/Input";
 import {getServer} from "../../resources/util";
 import axios from "axios/index";
 import Select from "material-ui/es/Select/Select";
+import AppBar from "material-ui/es/AppBar/AppBar";
+import Toolbar from "material-ui/es/Toolbar/Toolbar";
+import Typography from "material-ui/es/Typography/Typography";
+import IconButton from "material-ui/es/IconButton/IconButton";
+import CloseIcon from 'material-ui-icons/Close';
+import MenuItem from "material-ui/es/Menu/MenuItem";
 
 
 function getModalStyle() {
@@ -43,15 +49,35 @@ const styles = theme => ({
         width: theme.spacing.unit * 60,
         backgroundColor: theme.palette.background.paper,
         boxShadow: theme.shadows[5],
-        padding: theme.spacing.unit * 4,
     },
 
     container: {
         display: 'flex',
         flexWrap: 'wrap',
     },
-    formControl: {
-        margin: theme.spacing.unit,
+    inputSelect: {
+        width: `50%`,
+        paddingLeft:`5%`,
+        marginTop: 10,
+        marginBottom: 10
+    },
+    appBar: {
+        marginLeft: 0,
+        marginRight: 0,
+        paddingLeft: 0,
+        paddingRight: 0
+    },
+    buttonList: {
+        width:`40%`,
+        display: 'inline-block',
+        marginTop: 15,
+        marginBottom: 10
+    },
+    closeButton : {
+        float: 'right'
+    },
+    flex: {
+        flex: 1,
     },
 });
 
@@ -214,25 +240,34 @@ class ChangeBranchVersionModal extends React.Component {
                 >
                     <div style={getModalStyle()} className={classes.paper}>
                         <div className={classes.container}>
-                            <FormControl className={classes.formControl}>
+                            <AppBar className={classes.appBar} position="static" color="default">
+                                <Toolbar>
+                                    <Typography variant="title" color="inherit"  className={classes.flex}>
+                                        Select Version
+                                    </Typography>
+                                    <IconButton className={classes.closeButton} color="inherit" onClick={this.handleClose} aria-label="Close">
+                                        <CloseIcon/>
+                                    </IconButton>
+                                </Toolbar>
+                            </AppBar>
+                            <FormControl className={classes.inputSelect}>
                                 <InputLabel htmlFor="age-native-simple">Version</InputLabel>
                                 <Select
-                                    native
                                     value={this.state.versionId}
                                     onChange={this.handleChange("versionId")}
-                                    inputProps={{
-                                        id: 'age-native-simple',
-                                    }}
+                                    input={<Input id='age-native-simple'/>}
+
                                 >
-                                    <option value="" />
+                                    <MenuItem value="">
+                                        <em>None</em>
+                                    </MenuItem>
                                     {this.state.versionList.map((value,index)=>
-                                        <option value={value["versionId"]} key={index}>{value["versionName"]}</option>
+                                        <MenuItem value={value["versionId"]} key={index}>{value["versionName"]}</MenuItem>
                                     )}
                                 </Select>
                             </FormControl>
-                            <FormControl className={classes.formControl}>
-                                <Button onClick={callbackFunc}>{buttonLabel}</Button>
-                                <Button onClick={this.handleClose}>Cancel</Button>
+                            <FormControl className={classes.buttonList}>
+                                <Button color="secondary" onClick={callbackFunc}>{buttonLabel}</Button>
                             </FormControl>
                         </div>
                     </div>

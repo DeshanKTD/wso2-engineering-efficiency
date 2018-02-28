@@ -16,6 +16,7 @@
  * under the License.
  *
  */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
@@ -26,6 +27,11 @@ import InputLabel from "material-ui/es/Input/InputLabel";
 import Input from "material-ui/es/Input/Input";
 import {getServer} from "../../resources/util";
 import axios from "axios/index";
+import AppBar from "material-ui/es/AppBar/AppBar";
+import Toolbar from "material-ui/es/Toolbar/Toolbar";
+import Typography from "material-ui/es/Typography/Typography";
+import IconButton from "material-ui/es/IconButton/IconButton";
+import CloseIcon from 'material-ui-icons/Close';
 
 
 function getModalStyle() {
@@ -42,7 +48,6 @@ const styles = theme => ({
         width: theme.spacing.unit * 60,
         backgroundColor: theme.palette.background.paper,
         boxShadow: theme.shadows[5],
-        padding: theme.spacing.unit * 4,
     },
 
     container: {
@@ -52,6 +57,21 @@ const styles = theme => ({
     formControl: {
         margin: theme.spacing.unit,
     },
+    input: {
+        width: `60%`,
+        marginLeft: `10%`,
+        marginTop: 10,
+        marginBottom: 10
+    },
+    changeButton: {
+        width : `20%`,
+        paddingRight: `10%`,
+        marginTop: 15,
+        marginBottom: 5,
+    },
+    flex: {
+        flex: 1,
+    }
 });
 
 class VersionChangeModal extends React.Component {
@@ -141,23 +161,31 @@ class VersionChangeModal extends React.Component {
                 >
                     <div style={getModalStyle()} className={classes.paper}>
                         <div className={classes.container}>
-                            <FormControl className={classes.formControl}>
-                                <InputLabel htmlFor="versionName">Version</InputLabel>
+                            <AppBar className={classes.appBar} position="static" color="default">
+                                <Toolbar>
+                                    <Typography variant="title" color="inherit" className={classes.flex}>
+                                        Change Version
+                                    </Typography>
+                                    <IconButton className={classes.closeButton} color="inherit" onClick={this.handleClose} aria-label="Close">
+                                        <CloseIcon/>
+                                    </IconButton>
+                                </Toolbar>
+                            </AppBar>
+                            <FormControl className={classes.input}>
+                                <InputLabel htmlFor="versionName">New Version Name</InputLabel>
                                 <Input id="versionName" value={this.state.versionName} onChange={this.handleChange} />
                             </FormControl>
-                            <FormControl className={classes.formControl}>
-                                <Button onClick={this.changeVersion}>Change Version</Button>
+                            <FormControl className={classes.changeButton}>
+                                <Button color="secondary" onClick={this.changeVersion}>Change</Button>
                             </FormControl>
                         </div>
-
-
-
                     </div>
                 </Modal>
             </div>
         );
     }
 }
+
 
 VersionChangeModal.propTypes = {
     classes: PropTypes.object.isRequired,

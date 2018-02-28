@@ -41,16 +41,13 @@ import VersionChangeModal from "./product-version/VersionChangeModal";
 const styles = theme => ({
     root: {
         flexGrow: 1,
-        marginTop: 30,
     },
     paper: {
-        padding: 16,
         textAlign: 'center',
         color: theme.palette.text.secondary,
     },
     productButtons: {
         width: `100%`,
-        maxWidth: 360,
         paddingTop: '20px',
         backgroundColor: theme.palette.background.paper,
     },
@@ -62,6 +59,10 @@ const styles = theme => ({
     },
     appBar : {
         paddingBottom : `20px`
+    },
+    productList : {
+        paddingLeft: `5%`,
+        paddingRight: `5%`
     }
 });
 
@@ -201,7 +202,7 @@ class ProductVersion extends Component {
                                 </AppBar>
                             </div>
                             <div className={classes.productButtons}>
-                                <List component="nav">
+                                <List component="nav" className={classes.productList}>
                                     {
                                         this.state.productList.map((value,index)=>
                                                 <ProductNameItem
@@ -224,7 +225,7 @@ class ProductVersion extends Component {
                                         <Typography type="title" color="inherit" className={classes.flex}>
                                             {this.state.productName}
                                         </Typography>
-                                        <Button onClick={this.openAddProductWindow}>
+                                        <Button raised onClick={this.openAddProductWindow}>
                                             Add Version
                                         </Button>
                                     </Toolbar>

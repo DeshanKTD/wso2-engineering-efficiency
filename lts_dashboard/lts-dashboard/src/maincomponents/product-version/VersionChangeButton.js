@@ -36,7 +36,7 @@ class VersionChangeButton extends Component{
 
     render(){
         return (
-            <Button onClick={this.changeVersionNameOpen}>Change</Button>
+            <Button color="secondary" onClick={this.changeVersionNameOpen}>Change</Button>
         );
     }
 }
