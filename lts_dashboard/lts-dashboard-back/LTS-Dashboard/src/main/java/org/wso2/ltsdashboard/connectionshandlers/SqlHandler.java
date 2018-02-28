@@ -50,7 +50,7 @@ public class SqlHandler {
         this.dssUserName = propertyReader.getDssUser();
         this.dssPassword = propertyReader.getDssPassword();
         this.dssUrl = propertyReader.getDssUrl();
-        this.gitBaseUrl= propertyReader.getGitBaseUrl();
+        this.gitBaseUrl = propertyReader.getGitBaseUrl();
     }
 
     public static void main(String[] args) {
@@ -146,6 +146,7 @@ public class SqlHandler {
             JsonArray productJsonArray = productListObject
                     .get("products").getAsJsonObject().get("product")
                     .getAsJsonArray();
+            // iterate in products
             for (JsonElement product : productJsonArray) {
                 // existing repo list
                 ArrayList<String> existintRepoNames = new ArrayList<>();
@@ -200,22 +201,11 @@ public class SqlHandler {
                                 returnElement = this.post("/repo/add", sendObject, false);
                             }
                         }
-
-
                     }
                 }
-
-            }; // end for loop of product
-
+            } // end for loop of product
         }
-
     }
-
-
-
-
-
-
 
 
     public JsonObject createPostDataObject(String endpoint, JsonObject data) {

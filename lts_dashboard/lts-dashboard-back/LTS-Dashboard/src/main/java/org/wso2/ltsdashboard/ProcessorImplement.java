@@ -29,25 +29,41 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 import org.wso2.ltsdashboard.connectionshandlers.GitHandlerImplement;
+import org.wso2.ltsdashboard.connectionshandlers.PropertyReader;
 import org.wso2.ltsdashboard.connectionshandlers.SqlHandler;
+import org.wso2.ltsdashboard.gitobjects.PullRequest;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class ProcessorImplement {
     private final static Logger logger = Logger.getLogger(ProcessorImplement.class);
-    private String gitBaseUrl = "https://api.github.com/";
+    private String gitBaseUrl;
     private GitHandlerImplement gitHandlerImplement;
-    private String org = "wso2";
+    private String org;
     private SqlHandler sqlHandler = null;
 
 
     ProcessorImplement() {
         this.gitHandlerImplement = new GitHandlerImplement();
+        PropertyReader propertyReader = new PropertyReader();
         sqlHandler = new SqlHandler();
+        this.gitBaseUrl = propertyReader.getGitBaseUrl();
+        this.org = propertyReader.getOrg();
 
     }
 
+    public static void main(String[] args) {
+        ProcessorImplement processorImplement = new ProcessorImplement();
+//        processorImplement.getPrsForVersion(16);
+        JsonArray jsonObject = processorImplement.getQuaterDates();
+        System.out.println("hi");
+
+    }
 
     /**
      * Get the product list
@@ -58,21 +74,11 @@ public class ProcessorImplement {
     JsonArray getProductList() {
         String url = "/product/names";
         JsonElement returnElement = this.sqlHandler.get(url);
-        JsonObject productsBasicObject = returnElement.getAsJsonObject();
         JsonArray productList = new JsonArray();
-
-        if (productsBasicObject.has("products") &&
-                productsBasicObject.get("products").getAsJsonObject().has("product")) {
-            JsonArray productJsonArray = productsBasicObject
-                    .get("products").getAsJsonObject().get("product")
-                    .getAsJsonArray();
-            productList = productJsonArray;
-
-        }
+        this.checkValidResponseAndPopulateArray(returnElement, "products", "product", productList);
 
         return productList;
     }
-
 
     /**
      * Get the versions for particular product
@@ -88,22 +94,12 @@ public class ProcessorImplement {
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_product_version", jsonObject);
 
         JsonElement returnElement = this.sqlHandler.post(url, sendObject, true);
-        JsonObject versionBasicObject = returnElement.getAsJsonObject();
         JsonArray versionJsonArray = new JsonArray();
-
-        if (versionBasicObject.has("versions") &&
-                versionBasicObject.get("versions").getAsJsonObject().has("version")) {
-            JsonArray productJsonArray = versionBasicObject
-                    .get("versions").getAsJsonObject().get("version")
-                    .getAsJsonArray();
-            versionJsonArray = productJsonArray;
-
-        }
+        this.checkValidResponseAndPopulateArray(returnElement, "versions", "version", versionJsonArray);
 
         return versionJsonArray;
 
     }
-
 
     void addVersion(int productId, String versionName) {
         String url = "/version/add";
@@ -113,9 +109,8 @@ public class ProcessorImplement {
         jsonObject.addProperty("versionName", versionName);
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_add", jsonObject);
 
-        JsonElement returnElement = this.sqlHandler.post(url, sendObject, false);
+        this.sqlHandler.post(url, sendObject, false);
     }
-
 
     JsonArray getRepos(int productId) {
         String url = "/product/repos";
@@ -124,17 +119,8 @@ public class ProcessorImplement {
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_add", jsonObject);
 
         JsonElement returnElement = this.sqlHandler.post(url, sendObject, true);
-        JsonObject repoJsonObject = returnElement.getAsJsonObject();
         JsonArray repoJsonArray = new JsonArray();
-
-        if (repoJsonObject.has("repositories") &&
-                repoJsonObject.get("repositories").getAsJsonObject().has("repository")) {
-            JsonArray productJsonArray = repoJsonObject
-                    .get("repositories").getAsJsonObject().get("repository")
-                    .getAsJsonArray();
-            repoJsonArray = productJsonArray;
-
-        }
+        this.checkValidResponseAndPopulateArray(returnElement, "repositories", "repository", repoJsonArray);
 
         return repoJsonArray;
 
@@ -142,6 +128,15 @@ public class ProcessorImplement {
     }
 
 
+    /**
+     * The system checks for the branches of current repo in db. The branches in db are tagged with a version
+     * There can be new branches crated at git remote. So theses branches also needed to be display for tagging with
+     * a version.
+     *
+     * @param repoId   - repo Id
+     * @param repoName - repo name
+     * @return array of prs with features
+     */
     JsonArray getBranchesForRepo(int repoId, String repoName) {
 
         // get version labeled branches from db
@@ -151,15 +146,8 @@ public class ProcessorImplement {
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_repo_branches", jsonObject);
 
         JsonElement returnElement = this.sqlHandler.post(url, sendObject, true);
-        JsonObject branchJsonObject = returnElement.getAsJsonObject();
         JsonArray branchJsonArray = new JsonArray();
-
-        if (branchJsonObject.has("branches") &&
-                branchJsonObject.get("branches").getAsJsonObject().has("branch")) {
-            branchJsonArray = branchJsonObject
-                    .get("branches").getAsJsonObject().get("branch")
-                    .getAsJsonArray();
-        }
+        this.checkValidResponseAndPopulateArray(returnElement, "branches", "branch", branchJsonArray);
 
         // get branch names from db
         ArrayList<String> dbBranchNameArray = new ArrayList<>();
@@ -168,6 +156,7 @@ public class ProcessorImplement {
             dbBranchNameArray.add(this.trimJsonElementString(branchObject.get("branchName")));
         }
 
+        logger.debug("Extracting branch data for " + repoName + "from git");
         // get branches from git
         url = gitBaseUrl + "repos/" + this.org + "/" + repoName + "/branches";
         JsonArray gitBranchArray = this.gitHandlerImplement.getJSONArrayFromGit(url);
@@ -194,25 +183,17 @@ public class ProcessorImplement {
      * @param versionId - version id to extract features
      * @return Feature Set as a json array
      */
-    JsonArray getPrsForVersion(int versionId) {
-        JsonArray issueList = new JsonArray();
+    JsonArray getPrsForVersion(int versionId, String startDate, String endDate) {
+        JsonArray prFeatureArray = new JsonArray();
+        System.out.println(versionId);
         // get branch name repo name
         String url = "/product/repobranches";
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("versionId", versionId);
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_product_repobranches", jsonObject);
         JsonElement returnElement = this.sqlHandler.post(url, sendObject, true);
-        JsonObject repoBranchJsonObject = returnElement.getAsJsonObject();
         JsonArray repoBranchJsonArray = new JsonArray();
-
-        if (repoBranchJsonObject.has("versionDetails") &&
-                repoBranchJsonObject.get("versionDetails").getAsJsonObject().has("versionDetail")) {
-            JsonArray productJsonArray = repoBranchJsonObject
-                    .get("versionDetails").getAsJsonObject().get("versionDetail")
-                    .getAsJsonArray();
-            repoBranchJsonArray.addAll(productJsonArray);
-
-        }
+        this.checkValidResponseAndPopulateArray(returnElement, "versionDetails", "versionDetail", repoBranchJsonArray);
 
         // getting event lists from issue list
         for (JsonElement branchData : repoBranchJsonArray) {
@@ -220,13 +201,16 @@ public class ProcessorImplement {
             String branchName = this.trimJsonElementString(branchObject.get("branchName"));
             String repoName = this.trimJsonElementString(branchObject.get("repoName"));
             // get the last tag date
+            String urlPrs = this.gitBaseUrl + "search/issues?q=type:pr+base:" + branchName + "+repo:" + this.org + "/" + repoName +
+                    "+created:" + startDate + ".." + endDate + "&sort=created&order=desc";
 
-            // search for prs with branch name and date > tag date
-
-//            JsonArray eventTempList = gitHandlerImplement.getJSONArrayFromGit(issueUrl,
-//                    "application/vnd.github.mockingbird-preview");
+            JsonArray prArray = this.gitHandlerImplement.getJSONArrayFromGit(urlPrs);
+            for (JsonElement prElement : prArray) {
+                PullRequest pullRequest = new PullRequest(prElement.getAsJsonObject(), branchName, repoName);
+                prFeatureArray.add(pullRequest.getAsJsonObject());
+            }
         }
-        return issueList;
+        return prFeatureArray;
     }
 
 
@@ -238,7 +222,7 @@ public class ProcessorImplement {
         jsonObject.addProperty("versionId", versionId);
         jsonObject.addProperty("branchName", branchName);
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_branch_add", jsonObject);
-        JsonElement returnElement = this.sqlHandler.post(url, sendObject, false);
+        this.sqlHandler.post(url, sendObject, false);
     }
 
 
@@ -249,7 +233,7 @@ public class ProcessorImplement {
         jsonObject.addProperty("versionId", versionId);
         jsonObject.addProperty("branchId", branchId);
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_branch_change", jsonObject);
-        JsonElement returnElement = this.sqlHandler.post(url, sendObject, false);
+        this.sqlHandler.post(url, sendObject, false);
     }
 
 
@@ -260,7 +244,7 @@ public class ProcessorImplement {
         jsonObject.addProperty("versionId", versionId);
         jsonObject.addProperty("versionName", versionName);
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_change", jsonObject);
-        JsonElement returnElement = this.sqlHandler.post(url, sendObject, false);
+        this.sqlHandler.post(url, sendObject, false);
     }
 
 
@@ -270,12 +254,99 @@ public class ProcessorImplement {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("versionId", versionId);
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_delete", jsonObject);
-        JsonElement returnElement = this.sqlHandler.post(url, sendObject, false);
+        this.sqlHandler.post(url, sendObject, false);
 
     }
 
+
+    JsonArray getQuaterDates() {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        JsonArray quarterArray = new JsonArray();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        int countQuarters = 0;
+
+        // for last year
+        for (int i = 0; i < 4; i++) {
+            Calendar quarter = Calendar.getInstance();
+            quarter.set(Calendar.YEAR, year - 1);
+            quarter.set(Calendar.MONTH, i * 3);
+            quarter.set(Calendar.DAY_OF_MONTH, 1);
+            String startDate = simpleDateFormat.format(quarter.getTime());
+            quarter.set(Calendar.MONTH, i * 3 + 3);
+            quarter.add(Calendar.DAY_OF_MONTH, -1);
+            String endDate = simpleDateFormat.format(quarter.getTime());
+
+            JsonObject quarterSingleObject = new JsonObject();
+            quarterSingleObject.addProperty("quarter", i);
+            quarterSingleObject.addProperty("startDate", startDate);
+            quarterSingleObject.addProperty("endDate", endDate);
+            quarterSingleObject.addProperty("year", year - 1);
+            quarterSingleObject.addProperty("id", countQuarters);
+
+            countQuarters++;
+            quarterArray.add(quarterSingleObject);
+
+        }
+
+        // for this year
+        // number of quarters
+        int month = calendar.get(Calendar.MONTH);
+        int numberQuarters = month / 3;
+        for (int i = 0; i < numberQuarters + 1; i++) {
+            Calendar quarter = Calendar.getInstance();
+            quarter.set(Calendar.YEAR, year);
+            quarter.set(Calendar.MONTH, i * 3);
+            quarter.set(Calendar.DAY_OF_MONTH, 1);
+            String startDate = simpleDateFormat.format(quarter.getTime());
+            quarter.set(Calendar.MONTH, i * 3 + 3);
+            quarter.add(Calendar.DAY_OF_MONTH, -1);
+            String endDate = simpleDateFormat.format(quarter.getTime());
+
+            JsonObject quarterSingleObject = new JsonObject();
+            quarterSingleObject.addProperty("quarter", i);
+            quarterSingleObject.addProperty("startDate", startDate);
+            quarterSingleObject.addProperty("endDate", endDate);
+            quarterSingleObject.addProperty("year", year);
+            quarterSingleObject.addProperty("id", countQuarters);
+
+            countQuarters++;
+            quarterArray.add(quarterSingleObject);
+        }
+
+        return quarterArray;
+
+    }
+
+
+    private void checkValidResponseAndPopulateArray(JsonElement element, String firstKey, String secondKey, JsonArray array) {
+        JsonObject jsonObject = element.getAsJsonObject();
+        if (jsonObject.has(firstKey) &&
+                jsonObject.get(firstKey).getAsJsonObject().has(secondKey)) {
+            JsonArray productJsonArray = jsonObject
+                    .get(firstKey).getAsJsonObject().get(secondKey)
+                    .getAsJsonArray();
+            array.addAll(productJsonArray);
+        }
+    }
+
+
     private String trimJsonElementString(JsonElement text) {
         return text.toString().replace("\"", "");
+    }
+
+    private String generateStartDate() {
+        Calendar calendar = Calendar.getInstance();
+        int month = calendar.get(Calendar.MONTH);
+        month = (month / 3) * 3;
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.MONTH, month);
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        return simpleDateFormat.format(calendar.getTime());
+
+
     }
 
 

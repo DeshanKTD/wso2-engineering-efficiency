@@ -38,6 +38,7 @@ public class PropertyReader {
     private static String dssPassword;
     private static String gitToken;
     private static String gitBaseUrl;
+    private static String org;
 
     public PropertyReader() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE);
@@ -58,7 +59,8 @@ public class PropertyReader {
             dssUser = prop.getProperty("dss_user");
             dssPassword = prop.getProperty("dss_password");
             dssUrl = prop.getProperty("dss_url");
-            gitBaseUrl = prop.getProperty("git_base_ur");
+            gitBaseUrl = prop.getProperty("git_base_url");
+            org = prop.getProperty("organization");
 
         } catch (FileNotFoundException e) {
             logger.error("The configuration file is not found");
@@ -76,25 +78,29 @@ public class PropertyReader {
 
     }
 
-    public String getGitToken(){
+    public String getGitToken() {
         return gitToken;
     }
 
 
-    public String getDssUser(){
+    public String getDssUser() {
         return dssUser;
     }
 
-    public String getDssPassword(){
+    public String getDssPassword() {
         return dssPassword;
     }
 
-    public String getDssUrl(){
+    public String getDssUrl() {
         return dssUrl;
     }
 
-    public String getGitBaseUrl(){
+    public String getGitBaseUrl() {
         return gitBaseUrl;
+    }
+
+    public String getOrg() {
+        return org;
     }
 
 

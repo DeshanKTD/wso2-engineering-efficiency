@@ -53,6 +53,16 @@ public class LtsDashboard {
         return makeResponseWithBody(productList);
     }
 
+    @GET
+    @Path("/release/quarters")
+    public Response getQuarters() {
+        logger.debug("Request to products");
+        ProcessorImplement processorImplement = new ProcessorImplement();
+        JsonArray productList = processorImplement.getQuaterDates();
+
+        return makeResponseWithBody(productList);
+    }
+
 
     @POST
     @Path("/products/versions")
@@ -64,7 +74,6 @@ public class LtsDashboard {
 
         return makeResponseWithBody(productList);
     }
-
 
 
     @POST
@@ -86,7 +95,7 @@ public class LtsDashboard {
         ProcessorImplement processorImplement = new ProcessorImplement();
         int repoId = repoData.get("repoId").getAsInt();
         String repoName = repoData.get("repoName").getAsString();
-        JsonArray branchList = processorImplement.getBranchesForRepo(repoId,repoName);
+        JsonArray branchList = processorImplement.getBranchesForRepo(repoId, repoName);
 
         return makeResponseWithBody(branchList);
     }
@@ -99,7 +108,7 @@ public class LtsDashboard {
         ProcessorImplement processorImplement = new ProcessorImplement();
         int productId = versionData.get("productId").getAsInt();
         String versionName = versionData.get("versionName").getAsString();
-        processorImplement.addVersion(productId,versionName);
+        processorImplement.addVersion(productId, versionName);
 
 
         return makeResponseWithBody(new JsonArray());
@@ -112,7 +121,7 @@ public class LtsDashboard {
         ProcessorImplement processorImplement = new ProcessorImplement();
         int versionId = versionData.get("versionId").getAsInt();
         String versionName = versionData.get("versionName").getAsString();
-        processorImplement.changeVersionName(versionId,versionName);
+        processorImplement.changeVersionName(versionId, versionName);
 
 
         return makeResponseWithBody(new JsonArray());
@@ -139,7 +148,7 @@ public class LtsDashboard {
         int versionId = versionData.get("versionId").getAsInt();
         String branchName = versionData.get("branchName").getAsString();
         int repoId = versionData.get("repoId").getAsInt();
-        processorImplement.addBranchVersion(versionId,branchName,repoId);
+        processorImplement.addBranchVersion(versionId, branchName, repoId);
 
         return makeResponseWithBody(new JsonArray());
     }
@@ -161,13 +170,17 @@ public class LtsDashboard {
     @POST
     @Path("/features")
     @Consumes("application/json")
-    public Response postIssues(JsonArray issueList) {
+    public Response postIssues(JsonObject versionData) {
         logger.debug("Request to features");
+        int versionId = versionData.get("versionId").getAsInt();
+        String startDate = versionData.get("startDate").getAsString();
+        String endDate = versionData.get("endDate").getAsString();
         ProcessorImplement processorImplement = new ProcessorImplement();
-        JsonArray featureList = processorImplement.getAllFeatures(issueList);
+        JsonArray featureList = processorImplement.getPrsForVersion(versionId,startDate,endDate);
 
         return makeResponseWithBody(featureList);
     }
+
 
 
     @OPTIONS
