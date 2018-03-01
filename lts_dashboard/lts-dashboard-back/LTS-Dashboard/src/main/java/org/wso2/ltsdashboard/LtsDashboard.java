@@ -66,10 +66,10 @@ public class LtsDashboard {
 
     @POST
     @Path("/products/versions")
-    public Response getLabels(JsonObject product) {
+    public Response getVersions(JsonObject product) {
         logger.debug("Request to versions");
         ProcessorImplement processorImplement = new ProcessorImplement();
-        int productName = product.get("productId").getAsInt();
+        String productName = product.get("productName").getAsString();
         JsonArray productList = processorImplement.getVersions(productName);
 
         return makeResponseWithBody(productList);
@@ -81,8 +81,8 @@ public class LtsDashboard {
     public Response getRepository(JsonObject product) {
         logger.debug("Request to versions");
         ProcessorImplement processorImplement = new ProcessorImplement();
-        int productId = product.get("productId").getAsInt();
-        JsonArray repoList = processorImplement.getRepos(productId);
+        String productName = product.get("productName").getAsString();
+        JsonArray repoList = processorImplement.getRepos(productName);
 
         return makeResponseWithBody(repoList);
     }
@@ -92,10 +92,11 @@ public class LtsDashboard {
     @Path("/products/repos/branches")
     public Response getRepositoryBranches(JsonObject repoData) {
         logger.debug("Request to versions");
+        System.out.println(repoData);
         ProcessorImplement processorImplement = new ProcessorImplement();
-        int repoId = repoData.get("repoId").getAsInt();
+        String repoUrl = repoData.get("repoUrl").getAsString();
         String repoName = repoData.get("repoName").getAsString();
-        JsonArray branchList = processorImplement.getBranchesForRepo(repoId, repoName);
+        JsonArray branchList = processorImplement.getBranchesForRepo(repoUrl, repoName);
 
         return makeResponseWithBody(branchList);
     }
@@ -106,9 +107,9 @@ public class LtsDashboard {
     public Response addVersion(JsonObject versionData) {
         logger.debug("Request to versions");
         ProcessorImplement processorImplement = new ProcessorImplement();
-        int productId = versionData.get("productId").getAsInt();
+        String productName = versionData.get("productName").getAsString();
         String versionName = versionData.get("versionName").getAsString();
-        processorImplement.addVersion(productId, versionName);
+        processorImplement.addVersion(productName, versionName);
 
 
         return makeResponseWithBody(new JsonArray());
@@ -147,8 +148,8 @@ public class LtsDashboard {
         ProcessorImplement processorImplement = new ProcessorImplement();
         int versionId = versionData.get("versionId").getAsInt();
         String branchName = versionData.get("branchName").getAsString();
-        int repoId = versionData.get("repoId").getAsInt();
-        processorImplement.addBranchVersion(versionId, branchName, repoId);
+        String repoName = versionData.get("repoName").getAsString();
+        processorImplement.addBranchVersion(versionId, branchName, repoName);
 
         return makeResponseWithBody(new JsonArray());
     }

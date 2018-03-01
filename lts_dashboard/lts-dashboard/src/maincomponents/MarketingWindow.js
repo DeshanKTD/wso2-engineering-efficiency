@@ -74,7 +74,7 @@ class MarketingWindow extends Component {
             versionName: "",
         };
 
-        this.setIssues = this.setIssues.bind(this);
+        this.setPrTable = this.setPrTable.bind(this);
         this.modalOpen = this.modalOpen.bind(this);
         this.featureModalOpen = this.featureModalOpen.bind(this);
         this.setProductAndVersionNames = this.setProductAndVersionNames.bind(this);
@@ -87,8 +87,7 @@ class MarketingWindow extends Component {
         })
     }
 
-    setIssues(versionId,startDate,endDate) {
-        console.log(startDate+" "+endDate);
+    setPrTable(versionId, startDate, endDate) {
         if (versionId !== null) {
             let productObject = {};
             productObject["versionId"] = versionId;
@@ -135,7 +134,7 @@ class MarketingWindow extends Component {
             <div>
                 <MenuAppBar
                     productUpdate={this.setProduct}
-                    setissues={this.setIssues}
+                    setprtable={this.setPrTable}
                     setNames={this.setProductAndVersionNames}
                     featureModal={this.featureModalOpen}
                 />

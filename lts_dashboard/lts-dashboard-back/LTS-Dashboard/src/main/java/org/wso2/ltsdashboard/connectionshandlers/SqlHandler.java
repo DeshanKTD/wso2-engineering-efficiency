@@ -19,7 +19,6 @@
 
 package org.wso2.ltsdashboard.connectionshandlers;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -33,7 +32,6 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 
 public class SqlHandler {
@@ -41,8 +39,6 @@ public class SqlHandler {
     private String dssUrl;
     private String dssUserName;
     private String dssPassword;
-    private String gitBaseUrl;
-    // queries
 
 
     public SqlHandler() {
@@ -50,16 +46,8 @@ public class SqlHandler {
         this.dssUserName = propertyReader.getDssUser();
         this.dssPassword = propertyReader.getDssPassword();
         this.dssUrl = propertyReader.getDssUrl();
-        this.gitBaseUrl = propertyReader.getGitBaseUrl();
     }
 
-    public static void main(String[] args) {
-        SqlHandler sqlHandler = new SqlHandler();
-//        JsonElement data = sqlHandler.get("/table/products");
-//        JsonObject jsonObject = data.getAsJsonObject();
-//        System.out.println("hi");
-        sqlHandler.createProductNamesAndRepos();
-    }
 
     public JsonElement get(String uri) {
         String url = this.dssUrl + uri;
@@ -115,107 +103,11 @@ public class SqlHandler {
         return element;
     }
 
-    void createProductNamesAndRepos() {
-
-        // populate product
-        JsonElement productNamesEx = this.get("/table/products");
-        JsonObject productListObject = productNamesEx.getAsJsonObject();
-        if (productListObject.has("products") &&
-                productListObject.get("products").getAsJsonObject().has("product")) {
-            JsonArray productJsonArray = productListObject
-                    .get("products").getAsJsonObject().get("product")
-                    .getAsJsonArray();
-            for (JsonElement productName : productJsonArray) {
-                String pName = productName.getAsJsonObject().get("productName").toString();
-                JsonObject prodNameInsert = new JsonObject();
-                prodNameInsert.addProperty("productName", this.trimString(pName));
-                JsonObject sendObject = createPostDataObject("_post_product_add", prodNameInsert);
-                JsonElement returnElement = this.post("/product/add", sendObject, false);
-            }
-        }
-
-        // populate repos
-        JsonElement productNameObjects = this.get("/product/names");
-        productListObject = productNameObjects.getAsJsonObject();
-
-
-        GitHandler gitHandler = new GitHandlerImplement();
-
-        if (productListObject.has("products") &&
-                productListObject.get("products").getAsJsonObject().has("product")) {
-            JsonArray productJsonArray = productListObject
-                    .get("products").getAsJsonObject().get("product")
-                    .getAsJsonArray();
-            // iterate in products
-            for (JsonElement product : productJsonArray) {
-                // existing repo list
-                ArrayList<String> existintRepoNames = new ArrayList<>();
-
-                // create product repo object
-                int productId = product.getAsJsonObject().get("productId").getAsInt();
-                String productName = this.trimString(product.getAsJsonObject().get("productName").toString());
-
-                // check for duplicates
-                JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("productId", productId);
-                JsonObject sendObject = createPostDataObject("_post_product_repos", jsonObject);
-                JsonElement returnElement = this.post("/product/repos", sendObject, true);
-                JsonObject returnObject = returnElement.getAsJsonObject();
-                if (returnObject.has("repositories") &&
-                        returnObject.get("repositories").getAsJsonObject().has("repository")) {
-                    JsonArray repoArray = returnObject.get("repositories")
-                            .getAsJsonObject()
-                            .get("repository")
-                            .getAsJsonArray();
-
-                    for (JsonElement repo : repoArray) {
-                        existintRepoNames.add(this.trimString(repo.getAsJsonObject().get("repoName").toString()));
-                    }
-                }
-
-                // get repos from jnks_dashboards
-                jsonObject = new JsonObject();
-                jsonObject.addProperty("productName", productName);
-                sendObject = createPostDataObject("_post_table_repos", jsonObject);
-                returnElement = this.post("/table/repos", sendObject, true);
-                returnObject = returnElement.getAsJsonObject();
-
-                if (returnObject.has("repos") &&
-                        returnObject.get("repos").getAsJsonObject().has("repo")) {
-                    JsonArray repoArray = returnObject.get("repos")
-                            .getAsJsonObject()
-                            .get("repo")
-                            .getAsJsonArray();
-
-                    for (JsonElement repo : repoArray) {
-                        String repoName = this.trimString(repo.getAsJsonObject().get("repoName").toString());
-                        JsonArray repoDetail = gitHandler
-                                .getJSONArrayFromGit(gitBaseUrl + "/repos/wso2/" + repoName + "/labels");
-                        if (repoDetail != null && repoDetail.size() > 0) {
-                            if (!existintRepoNames.contains(repoName)) {
-                                // add repo to repo list
-                                jsonObject = new JsonObject();
-                                jsonObject.addProperty("productId", productId);
-                                jsonObject.addProperty("repoName", repoName);
-                                sendObject = createPostDataObject("_post_repo_add", jsonObject);
-                                returnElement = this.post("/repo/add", sendObject, false);
-                            }
-                        }
-                    }
-                }
-            } // end for loop of product
-        }
-    }
-
 
     public JsonObject createPostDataObject(String endpoint, JsonObject data) {
         JsonObject sendObject = new JsonObject();
         sendObject.add(endpoint, data);
         return sendObject;
-    }
-
-    String trimString(String text) {
-        return text.replace("\"", "").replace("\\", "");
     }
 
 

@@ -29,7 +29,6 @@ class ProductNameItem extends Component{
         super(props);
         this.state = {
             productName : this.props.productObject.productName,
-            productId: this.props.productObject.productId
         };
 
         this.getVersions = this.getVersions.bind(this);
@@ -37,8 +36,8 @@ class ProductNameItem extends Component{
 
 
     getVersions(){
-        this.props.setName(this.state.productName,this.state.productId);
-        this.props.getVersionList(this.state.productId);
+        this.props.setName(this.state.productName);
+        this.props.getVersionList(this.state.productName);
     }
 
     render(){

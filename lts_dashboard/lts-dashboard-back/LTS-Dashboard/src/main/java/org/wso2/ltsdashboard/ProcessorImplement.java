@@ -33,8 +33,6 @@ import org.wso2.ltsdashboard.connectionshandlers.PropertyReader;
 import org.wso2.ltsdashboard.connectionshandlers.SqlHandler;
 import org.wso2.ltsdashboard.gitobjects.PullRequest;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -83,14 +81,14 @@ public class ProcessorImplement {
     /**
      * Get the versions for particular product
      *
-     * @param productId - repo name
+     * @param productName - repo name
      * @return - json array of Label names
      */
-    JsonArray getVersions(int productId) {
-        String url = "/product/names";
+    JsonArray getVersions(String productName) {
+        String url = "/product/version";
 
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("productId", productId);
+        jsonObject.addProperty("productName", productName);
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_product_version", jsonObject);
 
         JsonElement returnElement = this.sqlHandler.post(url, sendObject, true);
@@ -98,33 +96,30 @@ public class ProcessorImplement {
         this.checkValidResponseAndPopulateArray(returnElement, "versions", "version", versionJsonArray);
 
         return versionJsonArray;
-
     }
 
-    void addVersion(int productId, String versionName) {
+    void addVersion(String productName, String versionName) {
         String url = "/version/add";
 
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("productId", productId);
+        jsonObject.addProperty("productName", productName);
         jsonObject.addProperty("versionName", versionName);
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_add", jsonObject);
 
         this.sqlHandler.post(url, sendObject, false);
     }
 
-    JsonArray getRepos(int productId) {
+    JsonArray getRepos(String productName) {
         String url = "/product/repos";
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("productId", productId);
-        JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_add", jsonObject);
+        jsonObject.addProperty("productName", productName);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_product_repos", jsonObject);
 
         JsonElement returnElement = this.sqlHandler.post(url, sendObject, true);
         JsonArray repoJsonArray = new JsonArray();
         this.checkValidResponseAndPopulateArray(returnElement, "repositories", "repository", repoJsonArray);
 
         return repoJsonArray;
-
-
     }
 
 
@@ -133,22 +128,21 @@ public class ProcessorImplement {
      * There can be new branches crated at git remote. So theses branches also needed to be display for tagging with
      * a version.
      *
-     * @param repoId   - repo Id
+     * @param repoUrl   - repo Id
      * @param repoName - repo name
      * @return array of prs with features
      */
-    JsonArray getBranchesForRepo(int repoId, String repoName) {
-
+    JsonArray getBranchesForRepo(String repoUrl, String repoName) {
         // get version labeled branches from db
         String url = "/repo/branches";
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("repoId", repoId);
+        jsonObject.addProperty("repoName", repoName);
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_repo_branches", jsonObject);
 
         JsonElement returnElement = this.sqlHandler.post(url, sendObject, true);
+
         JsonArray branchJsonArray = new JsonArray();
         this.checkValidResponseAndPopulateArray(returnElement, "branches", "branch", branchJsonArray);
-
         // get branch names from db
         ArrayList<String> dbBranchNameArray = new ArrayList<>();
         for (JsonElement branch : branchJsonArray) {
@@ -156,9 +150,12 @@ public class ProcessorImplement {
             dbBranchNameArray.add(this.trimJsonElementString(branchObject.get("branchName")));
         }
 
+        String gitRepoName = this.extractRepoName(repoUrl);
+
+
         logger.debug("Extracting branch data for " + repoName + "from git");
         // get branches from git
-        url = gitBaseUrl + "repos/" + this.org + "/" + repoName + "/branches";
+        url = gitBaseUrl + "repos/" + gitRepoName + "/branches";
         JsonArray gitBranchArray = this.gitHandlerImplement.getJSONArrayFromGit(url);
         for (JsonElement branch : gitBranchArray) {
             JsonObject branchObject = branch.getAsJsonObject();
@@ -185,7 +182,6 @@ public class ProcessorImplement {
      */
     JsonArray getPrsForVersion(int versionId, String startDate, String endDate) {
         JsonArray prFeatureArray = new JsonArray();
-        System.out.println(versionId);
         // get branch name repo name
         String url = "/product/repobranches";
         JsonObject jsonObject = new JsonObject();
@@ -199,9 +195,9 @@ public class ProcessorImplement {
         for (JsonElement branchData : repoBranchJsonArray) {
             JsonObject branchObject = branchData.getAsJsonObject();
             String branchName = this.trimJsonElementString(branchObject.get("branchName"));
-            String repoName = this.trimJsonElementString(branchObject.get("repoName"));
-            // get the last tag date
-            String urlPrs = this.gitBaseUrl + "search/issues?q=type:pr+base:" + branchName + "+repo:" + this.org + "/" + repoName +
+            String repoUrl = this.trimJsonElementString(branchObject.get("repoUrl"));
+            String repoName = this.extractRepoName(repoUrl);
+            String urlPrs = this.gitBaseUrl + "search/issues?q=type:pr+base:" + branchName + "+repo:"+ repoName +
                     "+created:" + startDate + ".." + endDate + "&sort=created&order=desc";
 
             JsonArray prArray = this.gitHandlerImplement.getJSONArrayFromGit(urlPrs);
@@ -214,11 +210,11 @@ public class ProcessorImplement {
     }
 
 
-    void addBranchVersion(int versionId, String branchName, int repoId) {
+    void addBranchVersion(int versionId, String branchName, String repoName) {
         String url = "/branch/add";
 
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("repoId", repoId);
+        jsonObject.addProperty("repoName", repoName);
         jsonObject.addProperty("versionId", versionId);
         jsonObject.addProperty("branchName", branchName);
         JsonObject sendObject = sqlHandler.createPostDataObject("_post_branch_add", jsonObject);
@@ -345,8 +341,11 @@ public class ProcessorImplement {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         return simpleDateFormat.format(calendar.getTime());
+    }
 
 
+    private String extractRepoName(String repoUrl){
+        return repoUrl.split("github.com/")[1];
     }
 
 

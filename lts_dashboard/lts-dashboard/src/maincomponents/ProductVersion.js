@@ -109,9 +109,9 @@ class ProductVersion extends Component {
     }
 
 
-    fetchVersionList(productId){
+    fetchVersionList(productName){
         let data = {
-            productId : productId
+            productName : productName
         };
         axios.post('http://'+getServer()+'/lts/products/versions',data
         ).then(
@@ -129,10 +129,9 @@ class ProductVersion extends Component {
         )
     }
 
-    setName(productName,productId){
+    setName(productName){
         this.setState({
             productName : productName,
-            productId : productId,
             addProductOpen : false,
             deleteProductOpen: false,
             changeVersionOpen:false
@@ -151,7 +150,7 @@ class ProductVersion extends Component {
 
     openDeleteWindow(versionId,versionName){
         let data = {
-            productId: this.state.productId,
+            productName: this.state.productName,
             versionId: versionId,
             versionName: versionName
         };
@@ -167,7 +166,7 @@ class ProductVersion extends Component {
 
     openChangeWindow(versionId,versionName){
         let data = {
-            productId: this.state.productId,
+            productName: this.state.productName,
             versionId: versionId,
             versionName: versionName,
         };
@@ -243,7 +242,7 @@ class ProductVersion extends Component {
                 </Grid>
                 <VersionAddModal
                     open = {this.state.addProductOpen}
-                    productId = {this.state.productId}
+                    productName = {this.state.productName}
                     versionList = {this.state.versionList}
                     fetchVersions = {this.fetchVersionList}
 

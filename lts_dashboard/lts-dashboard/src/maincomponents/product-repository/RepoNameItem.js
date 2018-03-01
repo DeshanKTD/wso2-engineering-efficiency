@@ -28,7 +28,7 @@ class RepoNameItem extends Component {
         super(props);
         this.state = {
             repoName: this.props.repoObject.repoName,
-            repoId: this.props.repoObject.repoiId
+            repoUrl: this.props.repoObject.repoUrl
         };
 
         this.getBranches = this.getBranches.bind(this);
@@ -36,7 +36,7 @@ class RepoNameItem extends Component {
 
 
     getBranches() {
-        this.props.fetchBranches(this.state.repoId,this.state.repoName);
+        this.props.fetchBranches(this.state.repoUrl,this.state.repoName);
     }
 
     render() {

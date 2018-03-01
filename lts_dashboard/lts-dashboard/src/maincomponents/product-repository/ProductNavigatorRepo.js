@@ -95,7 +95,7 @@ class ProductNavigatorRepo extends React.Component {
                                 <em>None</em>
                             </MenuItem>
                             {this.state.productList.map((product, index) => (
-                                <MenuItem key={index} value={product.productId}>{product.productName}</MenuItem>
+                                <MenuItem key={index} value={product.productName}>{product.productName}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>

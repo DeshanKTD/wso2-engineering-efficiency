@@ -49,7 +49,6 @@ class MenuAppBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            product: null,
             version: null,
             versionName:null,
             productName:null,
@@ -63,14 +62,13 @@ class MenuAppBar extends React.Component {
         this.setQuarter = this.setQuarter.bind(this);
     }
 
-    setProduct(productId,productName) {
+    setProduct(productName) {
         this.setState({
-                product: productId,
                 productName: productName,
                 version: ""
             },
             () => {
-                this.props.setissues(this.state.version,this.state.startDate,this.state.endDate);
+                this.props.setprtable(this.state.version,this.state.startDate,this.state.endDate);
             });
     }
 
@@ -83,7 +81,7 @@ class MenuAppBar extends React.Component {
             },
             () => {
                 this.props.setNames(this.state.productName,this.state.versionName);
-                this.props.setissues(this.state.version,this.state.startDate,this.state.endDate);
+                this.props.setprtable(this.state.version,this.state.startDate,this.state.endDate);
             });
     }
 
@@ -95,7 +93,7 @@ class MenuAppBar extends React.Component {
             endDate: endDate,
         },
         ()=>{
-            this.props.setissues(this.state.version,this.state.startDate,this.state.endDate);
+            this.props.setprtable(this.state.version,this.state.startDate,this.state.endDate);
         });
     }
 
@@ -118,7 +116,7 @@ class MenuAppBar extends React.Component {
                         </div>
                         <div className={classes.header}>
                             <VersionNavigator
-                                product={this.state.product}
+                                product={this.state.productName}
                                 setVersion={this.setVersion}
                             />
                         </div>

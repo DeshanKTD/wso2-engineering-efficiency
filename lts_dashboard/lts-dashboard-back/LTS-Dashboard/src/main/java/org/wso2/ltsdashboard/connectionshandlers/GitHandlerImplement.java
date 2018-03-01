@@ -116,6 +116,7 @@ public class GitHandlerImplement implements GitHandler {
                 containsNext = linkState.containsKey("next");
                 logger.debug("The request successful for " + nextLink);
             } catch (IOException e) {
+
                 logger.error("The response failed for link " + nextLink);
             }
         }

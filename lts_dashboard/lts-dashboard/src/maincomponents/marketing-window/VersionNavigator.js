@@ -67,11 +67,11 @@ class VersionNavigator extends React.Component {
         };
     }
 
-    fetchVersions(productId) {
+    fetchVersions(productName) {
         let data = {
-            productId : productId
+            productName : productName
         };
-        if (productId !== '') {
+        if (productName !== '') {
             this.setState({
                 issueLoading:true
             },()=>(

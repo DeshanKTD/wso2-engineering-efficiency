@@ -72,8 +72,8 @@ class ProductRepository extends Component {
         super(props);
         this.state = {
             currentRepo: "",
-            currentRepoId:"",
-            productId : "",
+            currentRepoUrl:"",
+            productName : "",
             repoList:[],
             branchList:[],
             branchVersionWindowOpen:false,
@@ -97,16 +97,16 @@ class ProductRepository extends Component {
     }
 
     // set repo list for product
-    setRepoList(id){
+    setRepoList(productName){
         this.setState({
             repoList: [],
             branchList:[],
-            productId:id,
+            productName:productName,
             branchVersionWindowOpen:false
         });
-        if(id!="") {
+        if(productName!="") {
             let data = {
-                productId: id
+                productName: productName
             };
             axios.post('http://' + getServer() + '/lts/products/repos', data
             ).then(
@@ -130,20 +130,19 @@ class ProductRepository extends Component {
 
 
     // fetch branches for repo
-    fetchBranches(repoId,repoName){
-        console.log(repoId,repoName);
+    fetchBranches(repoUrl,repoName){
         this.setState(
             {
                 branchList: [],
                 currentRepo: repoName,
-                currentRepoId: repoId,
+                currentRepoUrl: repoUrl,
                 branchVersionWindowOpen:false
 
             }
         );
 
         let data = {
-            repoId : repoId,
+            repoUrl : repoUrl,
             repoName : repoName
         };
 
@@ -214,10 +213,10 @@ class ProductRepository extends Component {
                 <ChangeBranchVersionModal
                     open={this.state.branchVersionWindowOpen}
                     data={this.state.branchVersionChnageData}
-                    repoId = {this.state.currentRepoId}
+                    repoUrl = {this.state.currentRepoUrl}
                     repoName={this.state.currentRepo}
                     fetchBranches={this.fetchBranches}
-                    productId={this.state.productId}
+                    productName={this.state.productName}
                     branchList={this.state.branchList}
                 />
             </div>
