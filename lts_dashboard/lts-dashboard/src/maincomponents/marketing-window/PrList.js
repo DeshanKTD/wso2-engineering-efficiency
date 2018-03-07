@@ -220,7 +220,6 @@ class PrList extends React.Component {
                 {columnName: 'title', predicate: prPredicate},
                 {columnName: 'branchData', predicate: branchPredicate},
                 {columnName: 'labels', predicate: labelPredicate}
-
             ],
             integratedSortingColumnExtensions: [
                 {columnName: 'title', compare: compareText},
@@ -296,10 +295,7 @@ class PrList extends React.Component {
                         <FilteringState defaultFilters={[]}/>
                         <IntegratedFiltering columnExtensions={integratedFilteringColumnExtensions}/>
 
-                        {/*<SortingState*/}
-                            {/*defaultSorting={[{columnName: 'user', direction: 'desc'}]}*/}
-                        {/*/>*/}
-                        {/*<IntegratedSorting columnExtensions={integratedSortingColumnExtensions}/>*/}
+
 
                         <PrLinkTypeProvider
                             for={this.state.issueTitleCol}
@@ -313,6 +309,9 @@ class PrList extends React.Component {
                             for={this.state.validColumn}
                         />
 
+                        <SortingState/>
+                        <IntegratedSorting columnExtensions={integratedSortingColumnExtensions}/>
+
                         <VirtualTable height={700}/>
                         <TableColumnResizing defaultColumnWidths={[
                         {columnName: 'title', width: columnSizes[0]},
@@ -324,7 +323,7 @@ class PrList extends React.Component {
                         ]}/>
 
 
-                        <TableHeaderRow />
+                        <TableHeaderRow/>
                         <TableFilterRow
                             cellComponent={FilterCell}
                         />

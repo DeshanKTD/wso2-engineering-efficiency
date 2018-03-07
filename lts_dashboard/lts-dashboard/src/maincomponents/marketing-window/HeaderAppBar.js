@@ -78,7 +78,6 @@ class MenuAppBar extends React.Component {
 
 
     setVersion(versionId,versionName) {
-        console.log(this.state.startDate);
         this.setState({
                 version: versionId,
                 versionName: versionName
