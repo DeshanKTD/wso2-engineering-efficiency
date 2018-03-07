@@ -24,7 +24,7 @@ import com.google.gson.JsonElement;
 import org.wso2.ltsdashboard.connectionshandlers.SqlHandler;
 
 /*
- * TODO - comment class work
+ * get product details
  */
 public class ProductProcessor {
     SqlHandler sqlHandler = null;
@@ -40,5 +40,11 @@ public class ProductProcessor {
         ProcessorCommon.checkValidResponseAndPopulateArray(returnElement, "products", "product", productList);
 
         return productList;
+    }
+
+    public static void main(String[] args) {
+        ProductProcessor productProcessor = new ProductProcessor();
+        JsonArray jsonArray = productProcessor.getProductList();
+        System.out.println("sdf");
     }
 }
