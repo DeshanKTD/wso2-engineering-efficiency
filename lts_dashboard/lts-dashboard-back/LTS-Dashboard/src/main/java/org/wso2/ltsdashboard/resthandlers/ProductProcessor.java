@@ -19,8 +19,26 @@
 
 package org.wso2.ltsdashboard.resthandlers;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import org.wso2.ltsdashboard.connectionshandlers.SqlHandler;
+
 /*
  * TODO - comment class work
  */
 public class ProductProcessor {
+    SqlHandler sqlHandler = null;
+
+    public ProductProcessor() {
+        this.sqlHandler = new SqlHandler();
+    }
+
+    public JsonArray getProductList() {
+        String url = "/product/names";
+        JsonElement returnElement = this.sqlHandler.get(url);
+        JsonArray productList = new JsonArray();
+        ProcessorCommon.checkValidResponseAndPopulateArray(returnElement, "products", "product", productList);
+
+        return productList;
+    }
 }

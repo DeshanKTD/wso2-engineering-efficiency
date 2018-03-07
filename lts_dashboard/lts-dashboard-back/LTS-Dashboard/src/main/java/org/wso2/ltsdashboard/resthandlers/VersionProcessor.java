@@ -19,8 +19,82 @@
 
 package org.wso2.ltsdashboard.resthandlers;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import org.wso2.ltsdashboard.connectionshandlers.SqlHandler;
+
 /*
- * TODO - comment class work
+ * Containing support methods for version call from rest
  */
 public class VersionProcessor {
+    private SqlHandler sqlHandler = null;
+
+    public VersionProcessor() {
+        this.sqlHandler = new SqlHandler();
+    }
+
+    /**
+     * Get the versions for particular product
+     *
+     * @param productId - repo name
+     * @return - json array of Label names
+     */
+    public JsonArray getVersions(int productId) {
+        String url = "/product/version";
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("productId", productId);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_product_version", jsonObject);
+
+        JsonElement returnElement = this.sqlHandler.post(url, sendObject);
+        JsonArray versionJsonArray = new JsonArray();
+        ProcessorCommon.checkValidResponseAndPopulateArray(returnElement, "versions", "version", versionJsonArray);
+
+        return versionJsonArray;
+    }
+
+
+    public boolean addVersion(int productId, String versionName) {
+        String url = "/version/add";
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("productId", productId);
+        jsonObject.addProperty("versionName", versionName);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_add", jsonObject);
+
+        JsonElement requestSuccess = this.sqlHandler.post(url, sendObject);
+        return ProcessorCommon.checkValidNoReplyResponse(requestSuccess);
+    }
+
+
+    public boolean changeVersionName(int versionId, String versionName) {
+        String url = "/version/change";
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("versionId", versionId);
+        jsonObject.addProperty("versionName", versionName);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_change", jsonObject);
+
+        JsonElement returnSuccess = this.sqlHandler.post(url, sendObject);
+        return ProcessorCommon.checkValidNoReplyResponse(returnSuccess);
+    }
+
+    public boolean deleteVersionName(int versionId) {
+        String url = "/version/delete";
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("versionId", versionId);
+        JsonObject sendObject = sqlHandler.createPostDataObject("_post_version_delete", jsonObject);
+
+        JsonElement requestSuccess = this.sqlHandler.post(url, sendObject);
+        return ProcessorCommon.checkValidNoReplyResponse(requestSuccess);
+    }
+
+    public static void main(String[] args) {
+        VersionProcessor versionProcessor = new VersionProcessor();
+        versionProcessor.deleteVersionName(18);
+    }
+
+
 }

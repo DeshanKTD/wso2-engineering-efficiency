@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, WSO2 Inc. (http://wso2.com) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://wso2.com) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,12 @@ package org.wso2.ltsdashboard;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
+import org.wso2.ltsdashboard.resthandlers.PrProcessor;
+import org.wso2.ltsdashboard.resthandlers.ProcessorCommon;
+import org.wso2.ltsdashboard.resthandlers.ProductProcessor;
+import org.wso2.ltsdashboard.resthandlers.RepositoryProcessor;
+import org.wso2.ltsdashboard.resthandlers.VersionProcessor;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
@@ -46,9 +50,9 @@ public class LtsDashboard {
     @GET
     @Path("/products/names")
     public Response getProducts() {
-        logger.debug("Request to products");
-        ProcessorImplement processorImplement = new ProcessorImplement();
-        JsonArray productList = processorImplement.getProductList();
+        logger.debug("Request to get product names");
+        ProductProcessor productProcessor = new ProductProcessor();
+        JsonArray productList = productProcessor.getProductList();
 
         return makeResponseWithBody(productList);
     }
@@ -56,9 +60,9 @@ public class LtsDashboard {
     @GET
     @Path("/release/quarters")
     public Response getQuarters() {
-        logger.debug("Request to products");
-        ProcessorImplement processorImplement = new ProcessorImplement();
-        JsonArray productList = processorImplement.getQuaterDates();
+        logger.debug("Request to get quarters from current quarter");
+        ProcessorCommon processorCommon = new ProcessorCommon();
+        JsonArray productList = processorCommon.getQuaterDates();
 
         return makeResponseWithBody(productList);
     }
@@ -68,9 +72,9 @@ public class LtsDashboard {
     @Path("/products/versions")
     public Response getVersions(JsonObject product) {
         logger.debug("Request to versions");
-        ProcessorImplement processorImplement = new ProcessorImplement();
-        String productName = product.get("productName").getAsString();
-        JsonArray productList = processorImplement.getVersions(productName);
+        VersionProcessor versionProcessor = new VersionProcessor();
+        int productId = product.get("productId").getAsInt();
+        JsonArray productList = versionProcessor.getVersions(productId);
 
         return makeResponseWithBody(productList);
     }
@@ -79,10 +83,10 @@ public class LtsDashboard {
     @POST
     @Path("/products/repos")
     public Response getRepository(JsonObject product) {
-        logger.debug("Request to versions");
-        ProcessorImplement processorImplement = new ProcessorImplement();
-        String productName = product.get("productName").getAsString();
-        JsonArray repoList = processorImplement.getRepos(productName);
+        logger.debug("Request to repos for a product");
+        RepositoryProcessor repositoryProcessor = new RepositoryProcessor();
+        int productId = product.get("productId").getAsInt();
+        JsonArray repoList = repositoryProcessor.getRepos(productId);
 
         return makeResponseWithBody(repoList);
     }
@@ -91,12 +95,12 @@ public class LtsDashboard {
     @POST
     @Path("/products/repos/branches")
     public Response getRepositoryBranches(JsonObject repoData) {
-        logger.debug("Request to versions");
-        System.out.println(repoData);
-        ProcessorImplement processorImplement = new ProcessorImplement();
+        logger.debug("Request to get branches for a repo");
+        RepositoryProcessor repositoryProcessor = new RepositoryProcessor();
         String repoUrl = repoData.get("repoUrl").getAsString();
         String repoName = repoData.get("repoName").getAsString();
-        JsonArray branchList = processorImplement.getBranchesForRepo(repoUrl, repoName);
+        int repoId = repoData.get("repoId").getAsInt();
+        JsonArray branchList = repositoryProcessor.getBranchesForRepo(repoUrl, repoName,repoId);
 
         return makeResponseWithBody(branchList);
     }
@@ -105,79 +109,112 @@ public class LtsDashboard {
     @POST
     @Path("/products/versions/add")
     public Response addVersion(JsonObject versionData) {
-        logger.debug("Request to versions");
-        ProcessorImplement processorImplement = new ProcessorImplement();
-        String productName = versionData.get("productName").getAsString();
+        Response response;
+        logger.debug("Request to add a version for a product");
+        VersionProcessor versionProcessor = new VersionProcessor();
+        int productId = versionData.get("productId").getAsInt();
         String versionName = versionData.get("versionName").getAsString();
-        processorImplement.addVersion(productName, versionName);
+        boolean stat = versionProcessor.addVersion(productId, versionName);
 
-
-        return makeResponseWithBody(new JsonArray());
+        if(stat){
+            response = makeResponseWithBody(new JsonArray());
+        }
+        else {
+            response = makeResponseWithBadBody();
+        }
+        return response;
     }
 
 
     @POST
     @Path("/products/versionChange")
     public Response changeVersion(JsonObject versionData) {
-        ProcessorImplement processorImplement = new ProcessorImplement();
+        Response response;
+        logger.debug("Request to change the version name of a product");
+        VersionProcessor versionProcessor = new VersionProcessor();
         int versionId = versionData.get("versionId").getAsInt();
         String versionName = versionData.get("versionName").getAsString();
-        processorImplement.changeVersionName(versionId, versionName);
+        boolean stat = versionProcessor.changeVersionName(versionId, versionName);
 
-
-        return makeResponseWithBody(new JsonArray());
+        if(stat){
+            response = makeResponseWithBody(new JsonArray());
+        }
+        else {
+            response = makeResponseWithBadBody();
+        }
+        return response;
     }
 
 
     @POST
     @Path("/products/deleteVersion")
     public Response deleteVersion(JsonObject versionData) {
-        ProcessorImplement processorImplement = new ProcessorImplement();
+        Response response;
+        logger.debug("Request to delete the version of a product");
+        VersionProcessor versionProcessor = new VersionProcessor();
         int versionId = versionData.get("versionId").getAsInt();
-        processorImplement.deleteVersionName(versionId);
+        boolean stat =versionProcessor.deleteVersionName(versionId);
 
-
-        return makeResponseWithBody(new JsonArray());
+        if(stat){
+            response = makeResponseWithBody(new JsonArray());
+        }
+        else {
+            response = makeResponseWithBadBody();
+        }
+        return response;
     }
 
 
     @POST
     @Path("/branches/versions/add")
     public Response addBranchVersion(JsonObject versionData) {
-        logger.debug("Request to versions");
-        ProcessorImplement processorImplement = new ProcessorImplement();
+        Response response;
+        logger.debug("Request to add version to a branch");
+        RepositoryProcessor repositoryProcessor = new RepositoryProcessor();
         int versionId = versionData.get("versionId").getAsInt();
         String branchName = versionData.get("branchName").getAsString();
-        String repoName = versionData.get("repoName").getAsString();
-        processorImplement.addBranchVersion(versionId, branchName, repoName);
+        int repoId = versionData.get("repoId").getAsInt();
+        boolean stat = repositoryProcessor.addBranchVersion(versionId, branchName, repoId);
 
-        return makeResponseWithBody(new JsonArray());
+        if(stat){
+            response = makeResponseWithBody(new JsonArray());
+        }
+        else {
+            response = makeResponseWithBadBody();
+        }
+        return response;
     }
 
 
     @POST
     @Path("/branches/changeVersion")
     public Response changeBranchVersion(JsonObject versionData) {
-        logger.debug("Request to versions");
-        ProcessorImplement processorImplement = new ProcessorImplement();
+        Response response;
+        logger.debug("Request to change branch version");
+        RepositoryProcessor repositoryProcessor = new RepositoryProcessor();
         int versionId = versionData.get("versionId").getAsInt();
         int branchId = versionData.get("branchId").getAsInt();
-        processorImplement.changeBranchVersion(versionId, branchId);
+        boolean stat = repositoryProcessor.changeBranchVersion(versionId, branchId);
 
-        return makeResponseWithBody(new JsonArray());
+        if(stat){
+            response = makeResponseWithBody(new JsonArray());
+        }
+        else {
+            response = makeResponseWithBadBody();
+        }
+        return response;
     }
 
 
     @POST
     @Path("/features")
-    @Consumes("application/json")
     public Response postIssues(JsonObject versionData) {
-        logger.debug("Request to features");
+        logger.debug("Request to get Prs for the quarter");
         int versionId = versionData.get("versionId").getAsInt();
         String startDate = versionData.get("startDate").getAsString();
         String endDate = versionData.get("endDate").getAsString();
-        ProcessorImplement processorImplement = new ProcessorImplement();
-        JsonArray featureList = processorImplement.getPrsForVersion(versionId,startDate,endDate);
+        PrProcessor prProcessor = new PrProcessor();
+        JsonArray featureList = prProcessor.getPrsForVersion(versionId,startDate,endDate);
 
         return makeResponseWithBody(featureList);
     }
@@ -278,6 +315,15 @@ public class LtsDashboard {
                 .header("Access-Control-Allow-Methods", "POST, GET, PUT,UPDATE, DELETE, OPTIONS, HEAD")
                 .header("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With")
                 .entity(sendingObject)
+                .build();
+    }
+
+    private Response makeResponseWithBadBody() {
+        return Response.serverError()
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Methods", "POST, GET, PUT,UPDATE, DELETE, OPTIONS, HEAD")
+                .header("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With")
                 .build();
     }
 

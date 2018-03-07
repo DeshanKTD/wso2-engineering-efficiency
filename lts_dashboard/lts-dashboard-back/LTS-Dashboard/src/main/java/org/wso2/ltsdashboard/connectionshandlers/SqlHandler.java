@@ -19,6 +19,7 @@
 
 package org.wso2.ltsdashboard.connectionshandlers;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -49,8 +50,13 @@ public class SqlHandler {
     }
 
 
-    public JsonElement get(String uri) {
-        String url = this.dssUrl + uri;
+    public JsonElement get(String uri){
+        return this.get(uri,this.dssUrl);
+    }
+
+
+    public JsonElement get(String uri,String dssUrl) {
+        String url = dssUrl + uri;
         JsonElement element = null;
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(url);
@@ -74,8 +80,13 @@ public class SqlHandler {
         return element;
     }
 
-    public JsonElement post(String uri, JsonObject data, boolean isResponse) {
-        String url = this.dssUrl + uri;
+
+    public JsonElement post(String uri,JsonObject data){
+        return this.post(uri,this.dssUrl,data);
+    }
+
+    public JsonElement post(String uri,String dssUrl, JsonObject data) {
+        String url = dssUrl + uri;
         JsonElement element = null;
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpPost request = new HttpPost(url);
@@ -89,9 +100,8 @@ public class SqlHandler {
             HttpResponse response = httpClient.execute(request);
             logger.debug("Request successful for " + url);
             String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
-            if (isResponse) {
-                element = new JsonParser().parse(responseString);
-            }
+            element = new JsonParser().parse(responseString);
+
         } catch (IllegalStateException e) {
             logger.error("The response is empty ");
         } catch (NullPointerException e) {
