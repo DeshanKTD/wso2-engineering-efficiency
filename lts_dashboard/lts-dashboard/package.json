@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@devexpress/dx-react-core": "^1.0.0-rc.1",
-    "@devexpress/dx-react-grid": "^1.0.0-rc.1",
-    "@devexpress/dx-react-grid-material-ui": "^1.0.0-rc.1",
+    "@devexpress/dx-react-core": "^1.0.3",
+    "@devexpress/dx-react-grid": "^1.0.3",
+    "@devexpress/dx-react-grid-material-ui": "^1.0.3",
     "auth0-js": "^9.2.0",
     "axios": "^0.17.1",
     "jwt-decode": "^2.2.0",
@@ -22,5 +22,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "uglify-js-brunch": "^2.10.0"
   }
 }

@@ -296,7 +296,6 @@ class PrList extends React.Component {
                         <IntegratedFiltering columnExtensions={integratedFilteringColumnExtensions}/>
 
 
-
                         <PrLinkTypeProvider
                             for={this.state.issueTitleCol}
                         />

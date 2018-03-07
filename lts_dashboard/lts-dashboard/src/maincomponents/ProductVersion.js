@@ -230,7 +230,7 @@ class ProductVersion extends Component {
                                         <Typography type="title" color="inherit" className={classes.flex}>
                                             {this.state.productName}
                                         </Typography>
-                                        <Button raised onClick={this.openAddProductWindow}>
+                                        <Button variant="raised" onClick={this.openAddProductWindow}>
                                             Add Version
                                         </Button>
                                     </Toolbar>
