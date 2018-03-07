@@ -17,11 +17,10 @@
  *
  */
 
-import React from 'react';
+package org.wso2.ltsdashboard.resthandlers;
 
-
-let HOST = "10.100.5.173:8080";
-
-export function getServer() {
-   return HOST;
+/*
+ * TODO - comment class work
+ */
+public class ProductProcessor {
 }

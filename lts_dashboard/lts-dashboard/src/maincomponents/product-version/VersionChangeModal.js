@@ -83,7 +83,7 @@ class VersionChangeModal extends React.Component {
             versionName: "",
             versionList:[],
             versionId:"",
-            productName:""
+            productId:""
         };
     }
 
@@ -101,7 +101,7 @@ class VersionChangeModal extends React.Component {
                 open : !this.state.open,
                 versionList:nextProps.versionList,
                 versionId: nextProps.data.versionId,
-                productName:nextProps.data.productName
+                productId:nextProps.data.productId
             });
         }
     }
@@ -121,7 +121,7 @@ class VersionChangeModal extends React.Component {
             axios.post('http://' + getServer() + '/lts/products/versionChange', data
             ).then(
                 (response) => {
-                    this.props.fetchVersions(this.state.productName);
+                    this.props.fetchVersions(this.state.productId);
                     this.setState({
                         open: false,
                         versionName:"",

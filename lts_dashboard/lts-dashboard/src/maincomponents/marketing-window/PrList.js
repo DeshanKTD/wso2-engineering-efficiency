@@ -59,7 +59,7 @@ const styles = theme => ({
     },
     input: {
         width: `100%`,
-    },
+    }
 });
 
 // indicators
@@ -79,7 +79,9 @@ const InvalidIcon = (props) => (
 
 // formatters
 const PrLinkFormatter = ({value}) =>
-    <a href="#" onClick={() => window.open(value["html_url"], '_blank')}>{value["title"]}</a>;
+    <a href="#" style={{
+        color:'#000000'
+    }} onClick={() => window.open(value["html_url"], '_blank')}>{value["title"]}</a>;
 
 PrLinkFormatter.propTypes = {
     value: PropTypes.object.isRequired,
@@ -93,7 +95,7 @@ const PrLinkTypeProvider = props => (
 );
 
 const LabelFormatter = ({value}) =>
-    <div>
+    <div style={{overflow: 'auto'}}>
         {
             value.map(function (label,index) {
                 return (<Chip key={index} label={label}/>);

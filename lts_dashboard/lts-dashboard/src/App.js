@@ -88,7 +88,6 @@ class App extends Component {
     };
 
     render() {
-        const {classes} = this.props;
         const { value } = this.state;
         return (
             <div className="App">

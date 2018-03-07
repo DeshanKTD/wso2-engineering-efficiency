@@ -95,16 +95,17 @@ class ChangeBranchVersionModal extends React.Component {
             versionList:[],
             branchList:[],
             repoUrl:"",
-            repoName:""
+            repoName:"",
+            repoId:""
 
         };
     }
 
 
 
-    fetchVersionList = (productName) => {
+    fetchVersionList = (productId) => {
         let data = {
-            productName : productName
+            productId : productId
         };
         axios.post('http://'+getServer()+'/lts/products/versions',data
         ).then(
@@ -133,12 +134,13 @@ class ChangeBranchVersionModal extends React.Component {
                 branchId: nextProps.data.branchId,
                 branchName: nextProps.data.branchName,
                 versionId: nextProps.data.versionId,
-                productName: nextProps.productName,
+                productId: nextProps.productId,
                 branchList: nextProps.branchList,
                 repoUrl: nextProps.repoUrl,
-                repoName: nextProps.repoName
+                repoName: nextProps.repoName,
+                repoId: nextProps.repoId
             },
-                ()=> this.fetchVersionList(this.state.productName)
+                ()=> this.fetchVersionList(this.state.productId)
             );
         }
     }
@@ -148,14 +150,14 @@ class ChangeBranchVersionModal extends React.Component {
             let data = {
                 branchName: this.state.branchName,
                 versionId: this.state.versionId,
-                repoName: this.state.repoName
+                repoId: this.state.repoId
             };
 
             axios.post('http://' + getServer() + '/lts/branches/versions/add', data
             ).then(
                 (response) => {
                     let datat = response.data;
-                    this.props.fetchBranches(this.state.repoUrl,this.state.repoName);
+                    this.props.fetchBranches(this.state.repoUrl,this.state.repoName,this.state.repoId);
                     this.setState({
                         open: false,
                         branchName:"",
@@ -164,12 +166,14 @@ class ChangeBranchVersionModal extends React.Component {
                         versionList:[],
                         branchList:[],
                         repoUrl:"",
-                        repoName:""
+                        repoName:"",
+                        repoId:""
                     });
                 }
             )
         }
     };
+
 
     changeVersion = () => {
         let data = {
@@ -182,7 +186,7 @@ class ChangeBranchVersionModal extends React.Component {
         ).then(
             (response) => {
                 let datat = response.data;
-                this.props.fetchBranches(this.state.repoUrl,this.state.repoName);
+                this.props.fetchBranches(this.state.repoUrl,this.state.repoName,this.state.repoId);
                 this.setState({
                     open: false,
                     branchName:"",

@@ -41,7 +41,8 @@ const styles = {
     },
     header: {
         paddingRight: 20,
-        paddingLeft: 25
+        paddingLeft: 25,
+        width: `20%`
     },
 };
 
@@ -51,7 +52,8 @@ class MenuAppBar extends React.Component {
         this.state = {
             version: null,
             versionName:null,
-            productName:null,
+            productId:null,
+            productName: null,
             startDate: null,
             endDate: null
         };
@@ -62,10 +64,12 @@ class MenuAppBar extends React.Component {
         this.setQuarter = this.setQuarter.bind(this);
     }
 
-    setProduct(productName) {
+    setProduct(productId,productName) {
         this.setState({
+                productId: productId,
                 productName: productName,
-                version: ""
+                version: "",
+                quarterList:[]
             },
             () => {
                 this.props.setprtable(this.state.version,this.state.startDate,this.state.endDate);
@@ -97,6 +101,7 @@ class MenuAppBar extends React.Component {
         });
     }
 
+
     openModal() {
         this.props.featureModal(this.state.product, this.state.version);
     }
@@ -116,7 +121,7 @@ class MenuAppBar extends React.Component {
                         </div>
                         <div className={classes.header}>
                             <VersionNavigator
-                                product={this.state.productName}
+                                product={this.state.productId}
                                 setVersion={this.setVersion}
                             />
                         </div>

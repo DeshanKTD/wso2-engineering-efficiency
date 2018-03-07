@@ -35,7 +35,7 @@ const styles = theme => ({
     },
     formControl: {
         margin: theme.spacing.unit,
-        width: 200,
+        width: `100%`,
     },
     selectEmpty: {
         marginTop: theme.spacing.unit * 2,
@@ -54,8 +54,6 @@ class VersionNavigator extends React.Component {
                 let versionName = this.getVersionName(event.target.value);
                 this.props.setVersion(this.state.version,versionName);
             });
-
-
     };
 
     constructor(props) {
@@ -67,11 +65,11 @@ class VersionNavigator extends React.Component {
         };
     }
 
-    fetchVersions(productName) {
+    fetchVersions(productId) {
         let data = {
-            productName : productName
+            productId : productId
         };
-        if (productName !== '') {
+        if (productId !== '') {
             this.setState({
                 issueLoading:true
             },()=>(

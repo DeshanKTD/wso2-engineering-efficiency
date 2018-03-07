@@ -35,7 +35,7 @@ const styles = theme => ({
     },
     formControl: {
         margin: theme.spacing.unit,
-        width: 200,
+        width: `100%`,
     },
     selectEmpty: {
         marginTop: theme.spacing.unit * 2,
@@ -51,7 +51,8 @@ class QuarterNavigator extends React.Component {
     handleChange = event => {
         this.setState({[event.target.name]: event.target.value},
             () => {
-                let obj = event.target.value;
+                let id = event.target.value;
+                let obj = this.getObject(id);
                 this.props.setQuarter(obj["startDate"],obj["endDate"]);
             });
 
@@ -61,9 +62,9 @@ class QuarterNavigator extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            quarter: '',
+            quarter:'',
             quarterList: [],
-            issueLoading: false
+            issueLoading: false,
         };
         this.fetchQuarters();
     }
@@ -76,7 +77,8 @@ class QuarterNavigator extends React.Component {
                 this.setState(
                     {
                         quarterList: datat,
-                        issueLoading:false
+                        issueLoading: false,
+                        quarter: datat[0].id
                     }
                 );
                 this.props.setQuarter(datat[0]["startDate"],datat[0]["endDate"])
@@ -87,6 +89,17 @@ class QuarterNavigator extends React.Component {
 
     compareIds(a,b){
         return a - b;
+    }
+
+
+    getObject(id){
+        let quarterObject = null;
+        this.state.quarterList.forEach(function (object) {
+            if(object.id==id){
+                quarterObject = object
+            }
+        });
+        return quarterObject;
     }
 
 
@@ -102,11 +115,11 @@ class QuarterNavigator extends React.Component {
                         <Select
                             value={this.state.quarter}
                             onChange={this.handleChange}
-                            input={<Input name="quarter" id="quarter-simple"/>}
+                            name="quarter"
                         >
                             {
                                 this.state.quarterList.map((quarterData, index) => (
-                                    <MenuItem key={index} value={quarterData}>{"Quarter "+(quarterData["quarter"]+1)+" - "+quarterData["year"]}</MenuItem>
+                                    <MenuItem key={index} value={quarterData.id}>{"Quarter "+(quarterData["quarter"]+1)+" - "+quarterData["year"]}</MenuItem>
                                 ))
                             }
                         </Select>

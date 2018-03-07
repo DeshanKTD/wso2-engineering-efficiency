@@ -80,15 +80,48 @@ export default class BranchTable extends React.PureComponent {
         return newRows;
     };
 
+    compare(a,b) {
+
+        if(a.branchName=='master'|| b.branchName=='master'){
+            return -1;
+        }
+        else if (a.branchName < b.branchName)
+            return -1;
+        else if (a.branchName > b.branchName)
+            return 1;
+
+        return 0;
+    }
 
     componentWillUpdate(nextProps, nextState) {
         if (nextProps.branchList !== this.state.branchList) {
+            let sortedList = this.sortOnMaster(nextProps.branchList).sort(this.compare);
             this.setState({
                 branchList: nextProps.branchList,
-                rows: this.createBranchTableData(nextProps.branchList)
+                rows: this.createBranchTableData(sortedList)
             });
         }
     }
+
+
+    sortOnMaster(branchList){
+        let mainIndex = 0;
+        branchList.forEach(function (val,index) {
+            if(val.branchName=='master'){
+                mainIndex=index
+            }
+        });
+
+        if(mainIndex!=0){
+            let master = branchList[mainIndex];
+            branchList[mainIndex]=branchList[0];
+            branchList[0]=master;
+        }
+
+        return branchList;
+
+    }
+
 
     render() {
 
@@ -98,8 +131,11 @@ export default class BranchTable extends React.PureComponent {
                     rows={this.state.rows}
                     columns={this.state.columns}
                 >
+                    <FilteringState defaultFilters={[]} />
+                    <IntegratedFiltering />
                     <Table />
                     <TableHeaderRow />
+                    <TableFilterRow />
                 </Grid>
             </Paper>
         );

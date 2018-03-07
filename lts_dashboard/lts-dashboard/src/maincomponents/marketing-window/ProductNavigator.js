@@ -34,7 +34,7 @@ const styles = theme => ({
     },
     formControl: {
         margin: theme.spacing.unit,
-        width: 200,
+        width: `100%`,
     },
     selectEmpty: {
         marginTop: theme.spacing.unit * 2,
@@ -54,9 +54,10 @@ class ProductNavigator extends React.Component {
     }
 
     handleChange = event => {
+        let productName = this.getProductName(event.target.value);
         this.setState({[event.target.name]: event.target.value},
             () => {
-                this.props.setProduct(this.state.product);
+                this.props.setProduct(this.state.product,productName);
             });
 
     };
@@ -76,6 +77,17 @@ class ProductNavigator extends React.Component {
     }
 
 
+    getProductName=(id)=> {
+        let productName=null;
+        this.state.productList.forEach(function (product) {
+            if(product.productId==id){
+                productName=product.productName
+            }
+        });
+        return productName;
+    };
+
+
     render() {
         const {classes} = this.props;
 
@@ -93,7 +105,7 @@ class ProductNavigator extends React.Component {
                                 <em>None</em>
                             </MenuItem>
                             {this.state.productList.map((product, index) => (
-                                <MenuItem key={index} value={product.productName}>{product.productName}</MenuItem>
+                                <MenuItem key={index} value={product.productId}>{product.productName}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>

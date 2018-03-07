@@ -90,7 +90,7 @@ class VersionAddModal extends React.Component {
     addVersion = () => {
         if (this.validateVersion(this.state.versionName, this.props.versionList)) {
             let data = {
-                productName: this.props.productName,
+                productId: this.props.productId,
                 versionName: this.state.versionName
             };
 
@@ -103,7 +103,7 @@ class VersionAddModal extends React.Component {
                         open: false,
                         versionName: ""
                     });
-                    this.props.fetchVersions(this.props.productName);
+                    this.props.fetchVersions(this.props.productId);
                 }
             )
         }

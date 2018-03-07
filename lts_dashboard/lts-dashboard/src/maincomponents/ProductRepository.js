@@ -73,7 +73,8 @@ class ProductRepository extends Component {
         this.state = {
             currentRepo: "",
             currentRepoUrl:"",
-            productName : "",
+            currentRepoId:"",
+            productId : "",
             repoList:[],
             branchList:[],
             branchVersionWindowOpen:false,
@@ -97,16 +98,16 @@ class ProductRepository extends Component {
     }
 
     // set repo list for product
-    setRepoList(productName){
+    setRepoList(productId){
         this.setState({
             repoList: [],
             branchList:[],
-            productName:productName,
+            productId:productId,
             branchVersionWindowOpen:false
         });
-        if(productName!="") {
+        if(productId!="") {
             let data = {
-                productName: productName
+                productId: productId
             };
             axios.post('http://' + getServer() + '/lts/products/repos', data
             ).then(
@@ -116,7 +117,8 @@ class ProductRepository extends Component {
                         {
                             repoList: datat,
                             branchVersionWindowOpen:false
-                        }
+                        },
+                        ()=>{this.fetchBranches(datat[0].repoUrl,datat[0].repoName,datat[0].repoId);}
                     );
                 }
             )
@@ -130,11 +132,12 @@ class ProductRepository extends Component {
 
 
     // fetch branches for repo
-    fetchBranches(repoUrl,repoName){
+    fetchBranches(repoUrl,repoName,repoId){
         this.setState(
             {
                 branchList: [],
                 currentRepo: repoName,
+                currentRepoId: repoId,
                 currentRepoUrl: repoUrl,
                 branchVersionWindowOpen:false
 
@@ -143,7 +146,8 @@ class ProductRepository extends Component {
 
         let data = {
             repoUrl : repoUrl,
-            repoName : repoName
+            repoName : repoName,
+            repoId : repoId
         };
 
         axios.post('http://' + getServer() + '/lts/products/repos/branches', data
@@ -215,8 +219,9 @@ class ProductRepository extends Component {
                     data={this.state.branchVersionChnageData}
                     repoUrl = {this.state.currentRepoUrl}
                     repoName={this.state.currentRepo}
+                    repoId={this.state.currentRepoId}
                     fetchBranches={this.fetchBranches}
-                    productName={this.state.productName}
+                    productId={this.state.productId}
                     branchList={this.state.branchList}
                 />
             </div>

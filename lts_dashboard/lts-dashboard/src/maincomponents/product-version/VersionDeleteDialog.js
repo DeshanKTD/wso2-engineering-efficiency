@@ -44,12 +44,12 @@ class VersionDeleteDialog extends React.Component {
         axios.post('http://' + getServer() + '/lts/products/deleteVersion', data
         ).then(
             (response) => {
-                this.props.fetchVersions(this.state.productName);
+                this.props.fetchVersions(this.state.productId);
                 this.setState(
                     {
                         versionId: "",
                         versionName: "",
-                        productName: "",
+                        productId: "",
                         open:false
                     },
                 );
@@ -64,7 +64,7 @@ class VersionDeleteDialog extends React.Component {
             open: false,
             versionName: "",
             versionId: "",
-            productName: ""
+            productId: ""
         }
     }
 
@@ -74,7 +74,7 @@ class VersionDeleteDialog extends React.Component {
                 open: !this.state.open,
                 versionName: nextProps.deleteData.versionName,
                 versionId: nextProps.deleteData.versionId,
-                productName: nextProps.deleteData.productName
+                productId: nextProps.deleteData.productId
             });
         }
     }

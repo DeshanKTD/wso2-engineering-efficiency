@@ -70,7 +70,11 @@ class ProductNavigatorRepo extends React.Component {
                 let datat = response.data;
                 this.setState(
                     {
-                        productList: datat
+                        productList: datat,
+                        product: datat[0].productId
+                    },
+                    () => {
+                        this.props.setRepoList(datat[0].productId);
                     }
                 );
             }
@@ -95,7 +99,7 @@ class ProductNavigatorRepo extends React.Component {
                                 <em>None</em>
                             </MenuItem>
                             {this.state.productList.map((product, index) => (
-                                <MenuItem key={index} value={product.productName}>{product.productName}</MenuItem>
+                                <MenuItem key={index} value={product.productId}>{product.productName}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>
