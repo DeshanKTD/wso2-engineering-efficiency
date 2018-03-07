@@ -131,7 +131,7 @@ class MenuAppBar extends React.Component {
                             />
                         </div>
                         <div className={classes.header}>
-                            <Button raised onClick={this.openModal} className={classes.button}>
+                            <Button raised="true" onClick={this.openModal} className={classes.button}>
                                 Marketing Messages
                             </Button>
                         </div>

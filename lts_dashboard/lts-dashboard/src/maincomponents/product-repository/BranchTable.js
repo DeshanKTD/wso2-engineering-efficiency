@@ -29,7 +29,6 @@ import {
     TableHeaderRow,
     TableFilterRow,
 } from '@devexpress/dx-react-grid-material-ui';
-import Button from "material-ui/es/Button/Button";
 import BranchVersionChangeButton from "./BranchVersionChangeButton";
 
 

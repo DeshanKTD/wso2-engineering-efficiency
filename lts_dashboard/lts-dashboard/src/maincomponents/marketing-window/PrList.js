@@ -31,7 +31,6 @@ import {
     SortingState
 } from "@devexpress/dx-react-grid";
 import {Grid, TableFilterRow, TableHeaderRow} from '@devexpress/dx-react-grid-material-ui'
-import MilestoneCheckButton from "./milestones/MilestoneButton.js"
 import {
     TableColumnResizing,
     VirtualTable
@@ -297,20 +296,10 @@ class PrList extends React.Component {
                         <FilteringState defaultFilters={[]}/>
                         <IntegratedFiltering columnExtensions={integratedFilteringColumnExtensions}/>
 
-                        <SortingState
-                            defaultSorting={[{columnName: 'milestone', direction: 'desc'}]}
-                        />
-                        <IntegratedSorting columnExtensions={integratedSortingColumnExtensions}/>
-
-                        <VirtualTable height={700}/>
-                        <TableColumnResizing defaultColumnWidths={[
-                        {columnName: 'title', width: columnSizes[0]},
-                        {columnName: 'user', width: columnSizes[4]},
-                        {columnName: 'labels', width: columnSizes[2]},
-                        {columnName: 'valid', width: columnSizes[3]},
-                        {columnName: 'branchData', width: columnSizes[1]},
-
-                        ]}/>
+                        {/*<SortingState*/}
+                            {/*defaultSorting={[{columnName: 'user', direction: 'desc'}]}*/}
+                        {/*/>*/}
+                        {/*<IntegratedSorting columnExtensions={integratedSortingColumnExtensions}/>*/}
 
                         <PrLinkTypeProvider
                             for={this.state.issueTitleCol}
@@ -323,7 +312,19 @@ class PrList extends React.Component {
                         <ValidTypeProvider
                             for={this.state.validColumn}
                         />
-                        <TableHeaderRow showSortingControls/>
+
+                        <VirtualTable height={700}/>
+                        <TableColumnResizing defaultColumnWidths={[
+                        {columnName: 'title', width: columnSizes[0]},
+                        {columnName: 'user', width: columnSizes[4]},
+                        {columnName: 'labels', width: columnSizes[2]},
+                        {columnName: 'valid', width: columnSizes[3]},
+                        {columnName: 'branchData', width: columnSizes[1]},
+
+                        ]}/>
+
+
+                        <TableHeaderRow />
                         <TableFilterRow
                             cellComponent={FilterCell}
                         />
