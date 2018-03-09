@@ -19,10 +19,8 @@
 
 
 import React from 'react';
-import Dialog from "material-ui/es/Dialog/Dialog";
-import DialogTitle from "material-ui/es/Dialog/DialogTitle";
-import DialogActions from "material-ui/es/Dialog/DialogActions";
-import Button from "material-ui/es/Button/Button";
+import Dialog, { DialogTitle,DialogActions } from 'material-ui/Dialog';
+import Button from "material-ui/Button";
 import {getServer} from "../../resources/util";
 import axios from "axios/index";
 

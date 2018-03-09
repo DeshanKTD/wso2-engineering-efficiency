@@ -35,10 +35,10 @@ import {
     TableColumnResizing,
     VirtualTable
 } from "@devexpress/dx-react-grid-material-ui/dist/dx-react-grid-material-ui.cjs";
-import Chip from "material-ui/es/Chip/Chip";
-import TableCell from "material-ui/es/Table/TableCell";
-import Select from "material-ui/es/Select/Select";
-import MenuItem from "material-ui/es/Menu/MenuItem";
+import Chip from "material-ui/Chip";
+import {  TableCell } from 'material-ui/Table'
+import Select from 'material-ui/Select';
+import { MenuItem } from 'material-ui/Menu';
 
 const styles = theme => ({
     root: {
@@ -249,6 +249,7 @@ class PrList extends React.Component {
 
     processPrList(prList) {
         let displayArray = [];
+        console.log(prList);
         prList.forEach(function (element) {
                 let prTitle = {"html_url": element["url"], "title": element["title"]};
                 let user = element["user"];

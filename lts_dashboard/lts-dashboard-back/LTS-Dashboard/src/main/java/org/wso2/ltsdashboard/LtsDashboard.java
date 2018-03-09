@@ -100,7 +100,7 @@ public class LtsDashboard {
         String repoUrl = repoData.get("repoUrl").getAsString();
         String repoName = repoData.get("repoName").getAsString();
         int repoId = repoData.get("repoId").getAsInt();
-        JsonArray branchList = repositoryProcessor.getBranchesForRepo(repoUrl, repoName,repoId);
+        JsonArray branchList = repositoryProcessor.getBranchesForRepo(repoUrl, repoName, repoId);
 
         return makeResponseWithBody(branchList);
     }
@@ -116,10 +116,9 @@ public class LtsDashboard {
         String versionName = versionData.get("versionName").getAsString();
         boolean stat = versionProcessor.addVersion(productId, versionName);
 
-        if(stat){
+        if (stat) {
             response = makeResponseWithBody(new JsonArray());
-        }
-        else {
+        } else {
             response = makeResponseWithBadBody();
         }
         return response;
@@ -136,10 +135,9 @@ public class LtsDashboard {
         String versionName = versionData.get("versionName").getAsString();
         boolean stat = versionProcessor.changeVersionName(versionId, versionName);
 
-        if(stat){
+        if (stat) {
             response = makeResponseWithBody(new JsonArray());
-        }
-        else {
+        } else {
             response = makeResponseWithBadBody();
         }
         return response;
@@ -153,12 +151,11 @@ public class LtsDashboard {
         logger.debug("Request to delete the version of a product");
         VersionProcessor versionProcessor = new VersionProcessor();
         int versionId = versionData.get("versionId").getAsInt();
-        boolean stat =versionProcessor.deleteVersionName(versionId);
+        boolean stat = versionProcessor.deleteVersionName(versionId);
 
-        if(stat){
+        if (stat) {
             response = makeResponseWithBody(new JsonArray());
-        }
-        else {
+        } else {
             response = makeResponseWithBadBody();
         }
         return response;
@@ -176,10 +173,9 @@ public class LtsDashboard {
         int repoId = versionData.get("repoId").getAsInt();
         boolean stat = repositoryProcessor.addBranchVersion(versionId, branchName, repoId);
 
-        if(stat){
+        if (stat) {
             response = makeResponseWithBody(new JsonArray());
-        }
-        else {
+        } else {
             response = makeResponseWithBadBody();
         }
         return response;
@@ -196,10 +192,9 @@ public class LtsDashboard {
         int branchId = versionData.get("branchId").getAsInt();
         boolean stat = repositoryProcessor.changeBranchVersion(versionId, branchId);
 
-        if(stat){
+        if (stat) {
             response = makeResponseWithBody(new JsonArray());
-        }
-        else {
+        } else {
             response = makeResponseWithBadBody();
         }
         return response;
@@ -214,11 +209,10 @@ public class LtsDashboard {
         String startDate = versionData.get("startDate").getAsString();
         String endDate = versionData.get("endDate").getAsString();
         PrProcessor prProcessor = new PrProcessor();
-        JsonArray featureList = prProcessor.getPrsForVersion(versionId,startDate,endDate);
+        JsonArray featureList = prProcessor.getPrsForVersion(versionId, startDate, endDate);
 
         return makeResponseWithBody(featureList);
     }
-
 
 
     @OPTIONS

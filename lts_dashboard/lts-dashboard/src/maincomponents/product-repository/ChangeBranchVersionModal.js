@@ -21,18 +21,18 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Modal from 'material-ui/Modal';
 import Button from 'material-ui/Button';
-import FormControl from "material-ui/es/Form/FormControl";
-import InputLabel from "material-ui/es/Input/InputLabel";
-import Input from "material-ui/es/Input/Input";
+import { FormControl } from 'material-ui/Form';
+import Input, { InputLabel } from 'material-ui/Input';
 import {getServer} from "../../resources/util";
 import axios from "axios/index";
-import Select from "material-ui/es/Select/Select";
-import AppBar from "material-ui/es/AppBar/AppBar";
-import Toolbar from "material-ui/es/Toolbar/Toolbar";
-import Typography from "material-ui/es/Typography/Typography";
-import IconButton from "material-ui/es/IconButton/IconButton";
+import Select from 'material-ui/Select';
+import AppBar from "material-ui/AppBar";
+import Toolbar from "material-ui/Toolbar";
+import Typography from "material-ui/Typography";
+import IconButton from 'material-ui/IconButton';
 import CloseIcon from 'material-ui-icons/Close';
-import MenuItem from "material-ui/es/Menu/MenuItem";
+import { MenuItem } from 'material-ui/Menu';
+
 
 
 function getModalStyle() {

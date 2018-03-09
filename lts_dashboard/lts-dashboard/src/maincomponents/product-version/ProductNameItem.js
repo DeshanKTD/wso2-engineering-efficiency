@@ -20,8 +20,8 @@
 
 
 import React, {Component} from 'react';
-import ListItem from "material-ui/es/List/ListItem";
-import ListItemText from "material-ui/es/List/ListItemText";
+import { ListItem, ListItemText } from 'material-ui/List';
+
 
 
 class ProductNameItem extends Component{

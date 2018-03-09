@@ -25,7 +25,7 @@ import '../App.css';
 import PrList from './marketing-window/PrList';
 import MenuAppBar from './marketing-window/HeaderAppBar'
 import axios from "axios/index";
-import LinearProgress from "material-ui/es/Progress/LinearProgress";
+import { LinearProgress } from 'material-ui/Progress';
 import FeatureModal from "./marketing-window/FeatureModal.js";
 import {getServer} from "../resources/util";
 

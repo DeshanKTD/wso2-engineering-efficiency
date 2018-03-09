@@ -21,18 +21,16 @@
 import React from 'react';
 import Typography from 'material-ui/Typography';
 import Modal from 'material-ui/Modal';
-import AppBar from "material-ui/es/AppBar/AppBar";
-import Toolbar from "material-ui/es/Toolbar/Toolbar";
-import Paper from "material-ui/es/Paper/Paper";
+import AppBar from 'material-ui/AppBar';
+import Toolbar from "material-ui/Toolbar";
+import Paper from "material-ui/Paper";
 import PropTypes from "prop-types";
 import {withStyles} from "material-ui/styles/index";
-import Grid from "material-ui/es/Grid/Grid";
+import Grid from 'material-ui/Grid';
 import axios from "axios/index";
-import ListItemText from "material-ui/es/List/ListItemText";
-import CircularProgress from "material-ui/es/Progress/CircularProgress";
-import ListItemIcon from "material-ui/es/List/ListItemIcon";
+import { CircularProgress } from 'material-ui/Progress';
 import StarIcon from 'material-ui-icons/Star';
-import ListItem from "material-ui/es/List/ListItem";
+import { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import purple from "material-ui/colors/purple";
 import {getServer} from "../../resources/util";
 

@@ -1,0 +1,99 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+
+  <servlet>
+    <servlet-name>GetProducts</servlet-name>
+    <servlet-class>org.wso2.deployer.ms4jresources.products.GetProducts</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>GetQuarters</servlet-name>
+    <servlet-class>org.wso2.deployer.ms4jresources.commons.ReleaseQuarters</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>GetVersions</servlet-name>
+    <servlet-class>org.wso2.deployer.ms4jresources.versions.GetVersion</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>GetProductRepos</servlet-name>
+    <servlet-class>org.wso2.deployer.ms4jresources.repobranches.GetProductRepos</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>AddVersion</servlet-name>
+    <servlet-class>org.wso2.deployer.ms4jresources.versions.AddVersion</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>GetRepoBranches</servlet-name>
+    <servlet-class>org.wso2.deployer.ms4jresources.repobranches.GetRepoBranches</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ChangeVersion</servlet-name>
+    <servlet-class>org.wso2.deployer.ms4jresources.versions.ChangeVersion</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>DeleteVersion</servlet-name>
+    <servlet-class>org.wso2.deployer.ms4jresources.versions.DeleteVersion</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>AddBranchVersion</servlet-name>
+    <servlet-class>org.wso2.deployer.ms4jresources.repobranches.AddBranchVersion</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ChangeBranchVersion</servlet-name>
+    <servlet-class>org.wso2.deployer.ms4jresources.repobranches.ChangeBranchVersion</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>GetFeatures</servlet-name>
+    <servlet-class>org.wso2.deployer.ms4jresources.prs.GetFeatures</servlet-class>
+  </servlet>
+
+
+
+  <servlet-mapping>
+    <servlet-name>GetProducts</servlet-name>
+    <url-pattern>/products/names</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GetQuarters</servlet-name>
+    <url-pattern>/release/quarters</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GetVersions</servlet-name>
+    <url-pattern>/products/versions</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GetProductRepos</servlet-name>
+    <url-pattern>/products/repos</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AddVersion</servlet-name>
+    <url-pattern>/products/versions/add</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GetRepoBranches</servlet-name>
+    <url-pattern>/products/repos/branches</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ChangeVersion</servlet-name>
+    <url-pattern>/products/versionChange</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>DeleteVersion</servlet-name>
+    <url-pattern>/products/deleteVersion</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AddBranchVersion</servlet-name>
+    <url-pattern>/branches/versions/add</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ChangeBranchVersion</servlet-name>
+    <url-pattern>/branches/changeVersion</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GetFeatures</servlet-name>
+    <url-pattern>/features</url-pattern>
+  </servlet-mapping>
+</web-app>

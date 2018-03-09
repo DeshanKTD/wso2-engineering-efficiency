@@ -54,7 +54,6 @@ public class VersionProcessor {
         return versionJsonArray;
     }
 
-
     public boolean addVersion(int productId, String versionName) {
         String url = "/version/add";
 
@@ -66,7 +65,6 @@ public class VersionProcessor {
         JsonElement requestSuccess = this.sqlHandler.post(url, sendObject);
         return ProcessorCommon.checkValidNoReplyResponse(requestSuccess);
     }
-
 
     public boolean changeVersionName(int versionId, String versionName) {
         String url = "/version/change";
@@ -89,11 +87,6 @@ public class VersionProcessor {
 
         JsonElement requestSuccess = this.sqlHandler.post(url, sendObject);
         return ProcessorCommon.checkValidNoReplyResponse(requestSuccess);
-    }
-
-    public static void main(String[] args) {
-        VersionProcessor versionProcessor = new VersionProcessor();
-        versionProcessor.deleteVersionName(18);
     }
 
 

@@ -23,11 +23,8 @@ import {withStyles} from 'material-ui/styles';
 import ExpansionPanel, {ExpansionPanelDetails, ExpansionPanelSummary,} from 'material-ui/ExpansionPanel';
 import Typography from 'material-ui/Typography';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
-import List from "material-ui/es/List/List";
-import ListItem from "material-ui/es/List/ListItem";
-import ListItemIcon from "material-ui/es/List/ListItemIcon";
-import ListItemText from "material-ui/es/List/ListItemText";
 import StarIcon from 'material-ui-icons/Star';
+import { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 
 
 const styles = theme => ({

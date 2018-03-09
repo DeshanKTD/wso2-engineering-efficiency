@@ -43,13 +43,13 @@ public class ProcessorCommon {
     }
 
 
-    static boolean checkValidNoReplyResponse(JsonElement reply){
+    static boolean checkValidNoReplyResponse(JsonElement reply) {
         boolean returnBool = false;
         JsonObject requestSuccess = reply.getAsJsonObject();
-        if(requestSuccess.getAsJsonObject()
+        if (requestSuccess.getAsJsonObject()
                 .get("UpdatedRowCount")
                 .getAsJsonObject().get("Value")
-                .getAsInt()>0) {
+                .getAsInt() > 0) {
             returnBool = true;
         }
 
@@ -61,12 +61,13 @@ public class ProcessorCommon {
         return text.toString().replace("\"", "");
     }
 
-    static String extractRepoName(String repoUrl){
+    static String extractRepoName(String repoUrl) {
         return repoUrl.split("github.com/")[1];
     }
 
 
-    public JsonArray getQuaterDates() {        Calendar calendar = Calendar.getInstance();
+    public JsonArray getQuaterDates() {
+        Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         JsonArray quarterArray = new JsonArray();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");

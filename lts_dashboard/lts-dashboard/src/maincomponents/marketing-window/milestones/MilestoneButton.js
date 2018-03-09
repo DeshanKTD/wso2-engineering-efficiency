@@ -19,7 +19,7 @@
 
 
 import React from 'react';
-import Button from "material-ui/es/Button/Button";
+import Button from "material-ui/Button";
 
 class MilestoneCheckButton extends React.Component {
 

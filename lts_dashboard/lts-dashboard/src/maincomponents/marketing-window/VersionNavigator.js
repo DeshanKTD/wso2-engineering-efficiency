@@ -25,7 +25,7 @@ import {MenuItem} from 'material-ui/Menu';
 import {FormControl} from 'material-ui/Form';
 import Select from 'material-ui/Select';
 import axios from "axios/index";
-import CircularProgress from "material-ui/es/Progress/CircularProgress";
+import { CircularProgress } from 'material-ui/Progress';
 import {getServer} from "../../resources/util";
 
 const styles = theme => ({

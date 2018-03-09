@@ -20,7 +20,8 @@
 import React from 'react';
 
 
-let HOST = "localhost:8080";
+let HOST = process.env.REACT_APP_BACKEND;
+console.log(HOST);
 
 export function getServer() {
    return HOST;

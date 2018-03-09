@@ -29,9 +29,7 @@ import {
     TableHeaderRow,
     TableFilterRow,
 } from '@devexpress/dx-react-grid-material-ui';
-import Button from "material-ui/es/Button/Button";
 import VersionChangeButton from "./VersionChangeButton";
-import VersionDeleteDialog from "./VersionDeleteDialog";
 import VersionDeleteButton from "./VersionDeleteButton";
 
 

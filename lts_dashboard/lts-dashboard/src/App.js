@@ -22,10 +22,9 @@ import logo from './img/WSO2_Software_Logo.png'
 import PropTypes from 'prop-types';
 import {withStyles} from 'material-ui/styles';
 import './App.css';
-import AppBar from "material-ui/es/AppBar/AppBar";
-import Tabs from "material-ui/es/Tabs/Tabs";
-import Tab from "material-ui/es/Tabs/Tab";
-import Typography from "material-ui/es/Typography/Typography";
+import AppBar from "material-ui/AppBar";
+import Tabs, { Tab } from 'material-ui/Tabs'
+import Typography from "material-ui/Typography";
 import MarketingWindow from "./maincomponents/MarketingWindow.js";
 import ProductVersion from "./maincomponents/ProductVersion";
 import ProductRepository from "./maincomponents/ProductRepository";

@@ -18,7 +18,7 @@
  */
 
 import React, {Component} from 'react';
-import Button from "material-ui/es/Button/Button";
+import Button from "material-ui/Button";
 
 
 class VersionDeleteButton extends Component{

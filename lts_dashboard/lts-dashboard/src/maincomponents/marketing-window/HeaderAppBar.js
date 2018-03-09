@@ -25,7 +25,7 @@ import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import VersionNavigator from './VersionNavigator.js';
 import ProductNavigator from './ProductNavigator.js';
-import Button from "material-ui/es/Button/Button";
+import Button from "material-ui/Button";
 import QuaterNavigator from "./QuaterNavigator";
 
 const styles = {

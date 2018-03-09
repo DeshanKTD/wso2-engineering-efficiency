@@ -1,0 +1,125 @@
+<data enableBatchRequests="true" name="LTSDashboardGeneric" transports="http https local">
+   <config enableOData="false" id="product_components">
+      <property name="driverClassName">com.mysql.jdbc.Driver</property>
+      <property name="url">jdbc:mysql://localhost:3306/WSO2_PRODUCT_COMPONENTS</property>
+      <property name="username">root</property>
+      <property name="password">1234</property>
+   </config>
+   <query id="getProductNames" useConfig="product_components">
+      <sql>SELECT PRODUCT_ID,PRODUCT_NAME FROM `WSO2_PRODUCT_COMPONENTS`.`PRODUCT`</sql>
+      <result outputType="json">{&#xd; "products": {&#xd; "product": [&#xd; {&#xd; "productId": "$PRODUCT_ID",&#xd; "productName": "$PRODUCT_NAME"&#xd; }&#xd; ]&#xd; }&#xd;}</result>
+   </query>
+   <query id="getReposForProduct" useConfig="product_components">
+      <sql>SELECT REPO_ID,REPO_NAME,REPO_URL FROM `WSO2_PRODUCT_COMPONENTS`.`PRODUCT_REPOS`&#xd;WHERE PRODUCT_ID = (:productId);</sql>
+      <result outputType="json">{&#xd; "repositories": {&#xd; "repository": [&#xd; {&#xd; "repoUrl": "$REPO_URL",&#xd; "repoName": "$REPO_NAME",&#xd; "repoId": "$REPO_ID"&#xd; }&#xd; ]&#xd; }&#xd;}</result>
+      <param name="productId" sqlType="INTEGER"/>
+   </query>
+   <query id="getVersion" useConfig="product_components">
+      <sql>SELECT VERSION_ID,VERSION FROM `WSO2_PRODUCT_COMPONENTS`.`PRODUCT_VERSIONS`&#xd;WHERE PRODUCT_ID=(:productId);</sql>
+      <result outputType="json">{&#xd; "versions": {&#xd; "version": [&#xd; {&#xd; "versionId": "$VERSION_ID",&#xd; "versionName": "$VERSION"&#xd; }&#xd; ]&#xd; }&#xd;}</result>
+      <param name="productId" sqlType="INTEGER"/>
+   </query>
+   <query id="addProductVersion" returnUpdatedRowCount="true" useConfig="product_components">
+      <sql>insert into `WSO2_PRODUCT_COMPONENTS`.`PRODUCT_VERSIONS`&#xd;(VERSION,PRODUCT_ID)&#xd;VALUES&#xd;(:versionName,:productId);</sql>
+      <result element="UpdatedRowCount" rowName="" useColumnNumbers="true">
+         <element column="1" name="Value" xsdType="integer"/>
+      </result>
+      <param name="versionName" sqlType="STRING"/>
+      <param name="productId" sqlType="INTEGER"/>
+   </query>
+   <query id="addBranchWithVersion" returnUpdatedRowCount="true" useConfig="product_components">
+      <sql>insert into `WSO2_PRODUCT_COMPONENTS`.`REPO_BRANCHES`&#xd;(BRANCH_NAME,REPO_ID,VERSION_ID)&#xd;values&#xd;(:branchName,:repoId,:versionId);</sql>
+      <result element="UpdatedRowCount" rowName="" useColumnNumbers="true">
+         <element column="1" name="Value" xsdType="integer"/>
+      </result>
+      <param name="branchName" sqlType="STRING"/>
+      <param name="repoId" sqlType="INTEGER"/>
+      <param name="versionId" sqlType="INTEGER"/>
+   </query>
+   <query id="getBranches" useConfig="product_components">
+      <sql>SELECT &#xd;a.BRANCH_NAME AS BRANCH_NAME,&#xd;a.BRANCH_ID AS BRANCH_ID,&#xd;b.REPO_URL AS REPO_URL,&#xd;a.VERSION_ID AS VERSION_ID,&#xd;c.VERSION AS VERSION_NAME&#xd;FROM `WSO2_PRODUCT_COMPONENTS`.`REPO_BRANCHES` AS a&#xd;INNER JOIN `WSO2_PRODUCT_COMPONENTS`.`PRODUCT_REPOS` AS b&#xd;ON a.REPO_ID=b.REPO_ID&#xd;INNER JOIN `WSO2_PRODUCT_COMPONENTS`.`PRODUCT_VERSIONS` AS c&#xd;ON a.VERSION_ID=c.VERSION_ID&#xd;WHERE a.REPO_ID=(:repoId);</sql>
+      <result outputType="json">{&#xd; "branches": {&#xd; "branch": [&#xd; {&#xd; "branchId": "$BRANCH_ID",&#xd; "branchName": "$BRANCH_NAME",&#xd; "versionId": "$VERSION_ID",&#xd; "versionName": "$VERSION_NAME",&#xd; "repoUrl": "$REPO_URL"&#xd; }&#xd; ]&#xd; }&#xd;}</result>
+      <param name="repoId" sqlType="INTEGER"/>
+   </query>
+   <query id="changeBranchVersion" returnUpdatedRowCount="true" useConfig="product_components">
+      <sql>UPDATE `WSO2_PRODUCT_COMPONENTS`.`REPO_BRANCHES`&#xd;SET VERSION_ID=(:versionId)&#xd;WHERE BRANCH_ID=(:branchId)</sql>
+      <result element="UpdatedRowCount" rowName="" useColumnNumbers="true">
+         <element column="1" name="Value" xsdType="integer"/>
+      </result>
+      <param name="versionId" sqlType="INTEGER"/>
+      <param name="branchId" sqlType="INTEGER"/>
+   </query>
+   <query id="changeVersionName" returnUpdatedRowCount="true" useConfig="product_components">
+      <sql>UPDATE `WSO2_PRODUCT_COMPONENTS`.`PRODUCT_VERSIONS`&#xd;SET VERSION = (:versionName)&#xd;WHERE VERSION_ID=(:versionId);</sql>
+      <result element="UpdatedRowCount" rowName="" useColumnNumbers="true">
+         <element column="1" name="Value" xsdType="integer"/>
+      </result>
+      <param name="versionName" sqlType="STRING"/>
+      <param name="versionId" sqlType="INTEGER"/>
+   </query>
+   <query id="deleteVersion" returnUpdatedRowCount="true" useConfig="product_components">
+      <sql>DELETE FROM `WSO2_PRODUCT_COMPONENTS`.`PRODUCT_VERSIONS`&#xd;WHERE VERSION_ID=(:versionId)</sql>
+      <result element="UpdatedRowCount" rowName="" useColumnNumbers="true">
+         <element column="1" name="Value" xsdType="integer"/>
+      </result>
+      <param name="versionId" sqlType="INTEGER"/>
+   </query>
+   <query id="getRepoAndBranch" useConfig="product_components">
+      <sql>SELECT&#xd;a.BRANCH_NAME AS BRANCH_NAME,&#xd;b.REPO_URL AS REPO_URL&#xd;FROM `WSO2_PRODUCT_COMPONENTS`.`REPO_BRANCHES` AS a&#xd;INNER JOIN `WSO2_PRODUCT_COMPONENTS`.`PRODUCT_REPOS` AS b&#xd;ON a.REPO_ID=b.REPO_ID&#xd;WHERE a.VERSION_ID=(:versionId);</sql>
+      <result outputType="json">{&#xd; "versionDetails": {&#xd; "versionDetail": [&#xd; {&#xd; "branchName": "$BRANCH_NAME",&#xd; "repoUrl": "$REPO_URL"&#xd; }&#xd; ]&#xd; }&#xd;}</result>
+      <param name="versionId" sqlType="INTEGER"/>
+   </query>
+   <resource method="GET" path="/product/names">
+      <call-query href="getProductNames"/>
+   </resource>
+   <resource method="POST" path="/product/repos">
+      <call-query href="getReposForProduct">
+         <with-param name="productId" query-param="productId"/>
+      </call-query>
+   </resource>
+   <resource method="POST" path="/version/add">
+      <call-query href="addProductVersion">
+         <with-param name="versionName" query-param="versionName"/>
+         <with-param name="productId" query-param="productId"/>
+      </call-query>
+   </resource>
+   <resource method="POST" path="/product/version">
+      <call-query href="getVersion">
+         <with-param name="productId" query-param="productId"/>
+      </call-query>
+   </resource>
+   <resource method="POST" path="/branch/add">
+      <call-query href="addBranchWithVersion">
+         <with-param name="branchName" query-param="branchName"/>
+         <with-param name="repoId" query-param="repoId"/>
+         <with-param name="versionId" query-param="versionId"/>
+      </call-query>
+   </resource>
+   <resource method="POST" path="/repo/branches">
+      <call-query href="getBranches">
+         <with-param name="repoId" query-param="repoId"/>
+      </call-query>
+   </resource>
+   <resource method="POST" path="/branch/change">
+      <call-query href="changeBranchVersion">
+         <with-param name="versionId" query-param="versionId"/>
+         <with-param name="branchId" query-param="branchId"/>
+      </call-query>
+   </resource>
+   <resource method="POST" path="/version/change">
+      <call-query href="changeVersionName">
+         <with-param name="versionName" query-param="versionName"/>
+         <with-param name="versionId" query-param="versionId"/>
+      </call-query>
+   </resource>
+   <resource method="POST" path="/version/delete">
+      <call-query href="deleteVersion">
+         <with-param name="versionId" query-param="versionId"/>
+      </call-query>
+   </resource>
+   <resource method="POST" path="/product/repobranches">
+      <call-query href="getRepoAndBranch">
+         <with-param name="versionId" query-param="versionId"/>
+      </call-query>
+   </resource>
+</data>

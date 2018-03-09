@@ -20,20 +20,18 @@
 
 import React from 'react';
 import Typography from 'material-ui/Typography';
-import AppBar from "material-ui/es/AppBar/AppBar";
-import Toolbar from "material-ui/es/Toolbar/Toolbar";
-import Paper from "material-ui/es/Paper/Paper";
+import AppBar from 'material-ui/AppBar';
+import Toolbar from 'material-ui/Toolbar';
+import Paper from 'material-ui/Paper';
 import PropTypes from "prop-types";
 import {withStyles} from "material-ui/styles/index";
-import axios from "axios/index";
-import CircularProgress from "material-ui/es/Progress/CircularProgress";
+import { CircularProgress } from 'material-ui/Progress';
 import ExpansionSummary from './milestones/ExpansionSummary.js';
-import Dialog from "material-ui/es/Dialog/Dialog";
-import Slide from "material-ui/es/transitions/Slide";
-import IconButton from "material-ui/es/IconButton/IconButton";
+import Dialog from "material-ui/Dialog";
+import Slide from 'material-ui/transitions/Slide'
+import IconButton from 'material-ui/IconButton';
 import CloseIcon from 'material-ui-icons/Close';
 import purple from 'material-ui/colors/purple';
-import {getServer} from "../../resources/util";
 
 
 const styles = theme => ({

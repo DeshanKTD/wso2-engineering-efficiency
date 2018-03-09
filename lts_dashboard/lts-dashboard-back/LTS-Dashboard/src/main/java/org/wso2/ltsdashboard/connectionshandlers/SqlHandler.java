@@ -49,12 +49,12 @@ public class SqlHandler {
     }
 
 
-    public JsonElement get(String uri){
-        return this.get(uri,this.dssUrl);
+    public JsonElement get(String uri) {
+        return this.get(uri, this.dssUrl);
     }
 
 
-    public JsonElement get(String uri,String dssUrl) {
+    public JsonElement get(String uri, String dssUrl) {
         String url = dssUrl + uri;
         JsonElement element = null;
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
@@ -80,11 +80,11 @@ public class SqlHandler {
     }
 
 
-    public JsonElement post(String uri,JsonObject data){
-        return this.post(uri,this.dssUrl,data);
+    public JsonElement post(String uri, JsonObject data) {
+        return this.post(uri, this.dssUrl, data);
     }
 
-    public JsonElement post(String uri,String dssUrl, JsonObject data) {
+    public JsonElement post(String uri, String dssUrl, JsonObject data) {
         String url = dssUrl + uri;
         JsonElement element = null;
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();

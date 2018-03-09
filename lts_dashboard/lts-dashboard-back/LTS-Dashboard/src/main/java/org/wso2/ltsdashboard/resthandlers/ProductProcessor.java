@@ -42,9 +42,4 @@ public class ProductProcessor {
         return productList;
     }
 
-    public static void main(String[] args) {
-        ProductProcessor productProcessor = new ProductProcessor();
-        JsonArray jsonArray = productProcessor.getProductList();
-        System.out.println("sdf");
-    }
 }
