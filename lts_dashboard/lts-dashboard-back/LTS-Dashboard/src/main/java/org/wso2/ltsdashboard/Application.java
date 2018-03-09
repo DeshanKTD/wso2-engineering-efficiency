@@ -16,6 +16,7 @@
 
 package org.wso2.ltsdashboard;
 
+import org.wso2.ltsdashboard.interceptors.AuthencateInterceptor;
 import org.wso2.msf4j.MicroservicesRunner;
 
 /**
@@ -26,6 +27,7 @@ import org.wso2.msf4j.MicroservicesRunner;
 public class Application {
     public static void main(String[] args) {
         new MicroservicesRunner()
+                .addGlobalRequestInterceptor(new AuthencateInterceptor())
                 .deploy(new LtsDashboard())
                 .start();
     }
