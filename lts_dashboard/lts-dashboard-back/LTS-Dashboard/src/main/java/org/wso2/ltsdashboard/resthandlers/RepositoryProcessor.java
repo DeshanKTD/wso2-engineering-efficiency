@@ -45,6 +45,7 @@ public class RepositoryProcessor {
 
     /**
      * Returns repos for selected product
+     *
      * @param productId - product name
      * @return json array of repos
      */
@@ -66,11 +67,11 @@ public class RepositoryProcessor {
      * There can be new branches crated at git remote. So theses branches also needed to be display for tagging with
      * a version.
      *
-     * @param repoUrl   - repo Id
+     * @param repoUrl  - repo Id
      * @param repoName - repo name
      * @return array of prs with features
      */
-    public JsonArray getBranchesForRepo(String repoUrl, String repoName,int repoId) {
+    public JsonArray getBranchesForRepo(String repoUrl, String repoName, int repoId) {
         // get version labeled branches from db
         String url = "/repo/branches";
         JsonObject jsonObject = new JsonObject();
@@ -138,11 +139,6 @@ public class RepositoryProcessor {
         JsonElement requsetSuccess = this.sqlHandler.post(url, sendObject);
         return ProcessorCommon.checkValidNoReplyResponse(requsetSuccess);
     }
-
-
-
-
-
 
 
 }

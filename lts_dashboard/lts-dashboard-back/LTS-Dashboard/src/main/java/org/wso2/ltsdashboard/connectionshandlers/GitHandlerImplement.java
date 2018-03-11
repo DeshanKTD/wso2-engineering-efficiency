@@ -119,7 +119,7 @@ public class GitHandlerImplement implements GitHandler {
                 }
                 linkState = this.checkNextHeader(response.getHeaders("Link")[0].getValue());
                 containsNext = linkState.containsKey("next");
-                if(isDebugEnabled) {
+                if (isDebugEnabled) {
                     logger.debug("The request successful for " + nextLink);
                 }
             } catch (IOException e) {

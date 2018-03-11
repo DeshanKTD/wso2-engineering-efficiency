@@ -19,21 +19,25 @@
 
 package org.wso2.ltsdashboard.interceptors;
 
+import org.wso2.ltsdashboard.connectionshandlers.PropertyReader;
 import org.wso2.msf4j.security.basic.AbstractBasicAuthSecurityInterceptor;
 
 /*
  * Filter the incoming requests to the micro service
  */
 public class AuthenticateInterceptor extends AbstractBasicAuthSecurityInterceptor {
+
+    private PropertyReader propertyReader = null;
+
+    public AuthenticateInterceptor() {
+        this.propertyReader = new PropertyReader();
+    }
+
     @Override
     protected boolean authenticate(String username, String password) {
-        String validUsername = "hello";
-        String validPassword = "1234";
+        String validUsername = propertyReader.getAccessUsername();
+        String validPassword = propertyReader.getAccessUserPassword();
 
-        if(username.equals(validUsername) && password.equals(validPassword)){
-            return true;
-        }
-
-        return false;
+        return username.equals(validUsername) && password.equals(validPassword);
     }
 }

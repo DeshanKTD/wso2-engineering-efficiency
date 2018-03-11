@@ -37,7 +37,7 @@ public class PullRequest {
     private String branchName;
 
 
-    public PullRequest(JsonObject prObject,String branchName,String repoName) {
+    public PullRequest(JsonObject prObject, String branchName, String repoName) {
         this.author = this.trimJsonElementString(prObject.get("user").getAsJsonObject().get("login"));
         this.url = this.trimJsonElementString(prObject.get("html_url"));
         this.featureName = this.trimJsonElementString(prObject.get("title"));
@@ -99,15 +99,14 @@ public class PullRequest {
         return jsonArray;
     }
 
-    private JsonArray createLabelArray(JsonArray labels){
+    private JsonArray createLabelArray(JsonArray labels) {
         JsonArray labelArray = new JsonArray();
-        for(JsonElement element:labels){
+        for (JsonElement element : labels) {
             labelArray.add(element.getAsJsonObject().get("name"));
         }
 
         return labelArray;
     }
-
 
 
     public JsonObject getAsJsonObject() {
@@ -117,9 +116,9 @@ public class PullRequest {
         jsonObject.add("features", this.getFeatureList());
         jsonObject.addProperty("validMarketing", this.validMarketingMessage);
         jsonObject.addProperty("url", this.url);
-        jsonObject.add("labels",this.labels);
-        jsonObject.addProperty("repoName",this.repoName);
-        jsonObject.addProperty("branch",this.branchName);
+        jsonObject.add("labels", this.labels);
+        jsonObject.addProperty("repoName", this.repoName);
+        jsonObject.addProperty("branch", this.branchName);
 
         return jsonObject;
 

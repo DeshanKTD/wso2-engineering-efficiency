@@ -36,7 +36,8 @@ public class PropertyReader {
     private static String dssUrl;
     private static String gitToken;
     private static String gitBaseUrl;
-    private static String org;
+    private static String accessUsername;
+    private static String accessUserPassword;
 
     public PropertyReader() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE);
@@ -53,10 +54,11 @@ public class PropertyReader {
         Properties prop = new Properties();
         try {
             prop.load(input);
-            gitToken = prop.getProperty("git_token");
-            dssUrl = prop.getProperty("dss_url");
-            gitBaseUrl = prop.getProperty("git_base_url");
-            org = prop.getProperty("organization");
+            gitToken = getEnvVariable(prop.getProperty("git_token"));
+            dssUrl = getEnvVariable(prop.getProperty("dss_url"));
+            gitBaseUrl = getEnvVariable(prop.getProperty("git_base_url"));
+            accessUsername = getEnvVariable(prop.getProperty("backend_access_user"));
+            accessUserPassword = getEnvVariable(prop.getProperty("backend_access_password"));
 
         } catch (FileNotFoundException e) {
             logger.error("The configuration file is not found");
@@ -74,6 +76,11 @@ public class PropertyReader {
 
     }
 
+
+    private static String getEnvVariable(String envName){
+        return System.getenv(envName);
+    }
+
     String getGitToken() {
         return gitToken;
     }
@@ -86,8 +93,12 @@ public class PropertyReader {
         return gitBaseUrl;
     }
 
-    public String getOrg() {
-        return org;
+    public String getAccessUsername() {
+        return accessUsername;
+    }
+
+    public String getAccessUserPassword() {
+        return accessUserPassword;
     }
 
 }

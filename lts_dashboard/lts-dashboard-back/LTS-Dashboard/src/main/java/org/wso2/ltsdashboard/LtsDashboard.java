@@ -52,7 +52,7 @@ public class LtsDashboard {
     @GET
     @Path("/products/names")
     public Response getProducts() {
-        if(isDebugEnabled) {
+        if (isDebugEnabled) {
             logger.debug("Request to get product names");
         }
         ProductProcessor productProcessor = new ProductProcessor();
@@ -64,7 +64,7 @@ public class LtsDashboard {
     @GET
     @Path("/release/quarters")
     public Response getQuarters() {
-        if(isDebugEnabled) {
+        if (isDebugEnabled) {
             logger.debug("Request to get quarters from current quarter");
         }
         ProcessorCommon processorCommon = new ProcessorCommon();
@@ -77,7 +77,7 @@ public class LtsDashboard {
     @POST
     @Path("/products/versions")
     public Response getVersions(JsonObject product) {
-        if(isDebugEnabled) {
+        if (isDebugEnabled) {
             logger.debug("Request to versions");
         }
         VersionProcessor versionProcessor = new VersionProcessor();
@@ -91,7 +91,7 @@ public class LtsDashboard {
     @POST
     @Path("/products/repos")
     public Response getRepository(JsonObject product) {
-        if(isDebugEnabled) {
+        if (isDebugEnabled) {
             logger.debug("Request to repos for a product");
         }
         RepositoryProcessor repositoryProcessor = new RepositoryProcessor();
@@ -105,7 +105,7 @@ public class LtsDashboard {
     @POST
     @Path("/products/repos/branches")
     public Response getRepositoryBranches(JsonObject repoData) {
-        if(isDebugEnabled) {
+        if (isDebugEnabled) {
             logger.debug("Request to get branches for a repo");
         }
         RepositoryProcessor repositoryProcessor = new RepositoryProcessor();
@@ -122,7 +122,7 @@ public class LtsDashboard {
     @Path("/products/versions/add")
     public Response addVersion(JsonObject versionData) {
         Response response;
-        if(isDebugEnabled) {
+        if (isDebugEnabled) {
             logger.debug("Request to add a version for a product");
         }
         VersionProcessor versionProcessor = new VersionProcessor();
@@ -143,7 +143,7 @@ public class LtsDashboard {
     @Path("/products/versionChange")
     public Response changeVersion(JsonObject versionData) {
         Response response;
-        if(isDebugEnabled) {
+        if (isDebugEnabled) {
             logger.debug("Request to change the version name of a product");
         }
         VersionProcessor versionProcessor = new VersionProcessor();
@@ -164,7 +164,7 @@ public class LtsDashboard {
     @Path("/products/deleteVersion")
     public Response deleteVersion(JsonObject versionData) {
         Response response;
-        if(isDebugEnabled) {
+        if (isDebugEnabled) {
             logger.debug("Request to delete the version of a product");
         }
         VersionProcessor versionProcessor = new VersionProcessor();
@@ -184,7 +184,7 @@ public class LtsDashboard {
     @Path("/branches/versions/add")
     public Response addBranchVersion(JsonObject versionData) {
         Response response;
-        if(isDebugEnabled) {
+        if (isDebugEnabled) {
             logger.debug("Request to add version to a branch");
         }
         RepositoryProcessor repositoryProcessor = new RepositoryProcessor();
@@ -206,7 +206,7 @@ public class LtsDashboard {
     @Path("/branches/changeVersion")
     public Response changeBranchVersion(JsonObject versionData) {
         Response response;
-        if(isDebugEnabled) {
+        if (isDebugEnabled) {
             logger.debug("Request to change branch version");
         }
         RepositoryProcessor repositoryProcessor = new RepositoryProcessor();
