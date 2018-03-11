@@ -35,17 +35,11 @@ import java.io.IOException;
  */
 public class GetFeatures extends HttpServlet {
     private static final Logger logger = Logger.getLogger(GetFeatures.class);
-    private String baseUrl = null;
-
-    public GetFeatures() {
-        PropertyReader propertyReader = new PropertyReader();
-        this.baseUrl = propertyReader.getBackendUrl();
-    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         HttpHandler httpHandler = new HttpHandler();
         String requestBody = RequestHelper.getRequestBody(request);
-        String backResponse = httpHandler.post(this.baseUrl + "/features", requestBody);
+        String backResponse = httpHandler.post("/features", requestBody);
 
         try {
             ServletOutputStream out = response.getOutputStream();

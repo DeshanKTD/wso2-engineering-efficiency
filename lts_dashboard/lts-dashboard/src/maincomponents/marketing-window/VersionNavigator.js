@@ -73,7 +73,7 @@ class VersionNavigator extends React.Component {
             this.setState({
                 issueLoading:true
             },()=>(
-                axios.post('http://'+getServer()+'/lts/products/versions',
+                axios.post(getServer()+'/lts/products/versions',
                     data
                 ).then(
                     (response) => {

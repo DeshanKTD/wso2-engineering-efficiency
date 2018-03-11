@@ -27,6 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
 
@@ -36,12 +37,24 @@ import java.io.IOException;
 public class HttpHandler {
 
     private static final Logger logger = Logger.getLogger(HttpHandler.class);
+    private String backendPassword;
+    private String backendUsername;
+    private String backendUrl;
+
+    public HttpHandler() {
+        PropertyReader propertyReader = new PropertyReader();
+        this.backendPassword = propertyReader.getBackendPassword();
+        this.backendUsername = propertyReader.getBackendUsername();
+        this.backendUrl = propertyReader.getBackendUrl();
+    }
 
     public String get(String url) {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet(url);
+        HttpGet request = new HttpGet(this.backendUrl+url);
         request.addHeader("Accept", "application/json");
-//        request.addHeader("Authorization", dssUserName + ":" + dssPassword);
+        String encodedCredentials = this.encode(this.backendUsername + ":" + this.backendPassword);
+        logger.error(encodedCredentials);
+        request.addHeader("Authorization", "Basic "+encodedCredentials);
         String responseString = null;
 
         try {
@@ -64,9 +77,10 @@ public class HttpHandler {
 
     public String post(String url, String object) {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost request = new HttpPost(url);
+        HttpPost request = new HttpPost(this.backendUrl+url);
         request.addHeader("Accept", "application/json");
-//        request.addHeader("Authorization", dssUserName + ":" + dssPassword);
+        String encodedCredentials = this.encode(this.backendUsername + ":" + this.backendPassword);
+        request.addHeader("Authorization", "Basic "+encodedCredentials);
         request.addHeader("Content-Type", "application/json");
         String responseString = null;
 
@@ -85,5 +99,11 @@ public class HttpHandler {
             logger.error("The request was unsuccessful with dss");
         }
         return responseString;
+    }
+
+
+    private String encode(String text){
+        byte[] encodedBytes = Base64.encodeBase64(text.getBytes());
+        return new String(encodedBytes);
     }
 }

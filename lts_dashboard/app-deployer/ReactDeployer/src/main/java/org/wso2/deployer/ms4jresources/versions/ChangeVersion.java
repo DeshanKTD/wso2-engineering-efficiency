@@ -21,7 +21,6 @@ package org.wso2.deployer.ms4jresources.versions;
 
 import org.apache.log4j.Logger;
 import org.wso2.deployer.msf4jhttp.HttpHandler;
-import org.wso2.deployer.msf4jhttp.PropertyReader;
 import org.wso2.deployer.msf4jhttp.RequestHelper;
 
 import javax.servlet.ServletOutputStream;
@@ -35,18 +34,12 @@ import java.io.IOException;
  */
 public class ChangeVersion extends HttpServlet {
     private static final Logger logger = Logger.getLogger(ChangeVersion.class);
-    private String baseUrl = null;
-
-    public ChangeVersion() {
-        PropertyReader propertyReader = new PropertyReader();
-        this.baseUrl = propertyReader.getBackendUrl();
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         HttpHandler httpHandler = new HttpHandler();
         String requestBody = RequestHelper.getRequestBody(request);
-        String backResponse = httpHandler.post(this.baseUrl + "/products/versionChange", requestBody);
+        String backResponse = httpHandler.post("/products/versionChange", requestBody);
 
         try {
             ServletOutputStream out = response.getOutputStream();

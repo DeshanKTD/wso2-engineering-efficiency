@@ -117,7 +117,7 @@ class VersionChangeModal extends React.Component {
                 versionName: this.state.versionName
             };
 
-            axios.post('http://' + getServer() + '/lts/products/versionChange', data
+            axios.post(getServer() + '/lts/products/versionChange', data
             ).then(
                 (response) => {
                     this.props.fetchVersions(this.state.productId);

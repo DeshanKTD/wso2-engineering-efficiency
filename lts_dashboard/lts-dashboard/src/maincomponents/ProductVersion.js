@@ -92,7 +92,7 @@ class ProductVersion extends Component {
     }
 
     fetchProductList() {
-        axios.get('http://'+getServer()+'/lts/products/names'
+        axios.get(getServer()+'/lts/products/names'
         ).then(
             (response) => {
                 let datat = response.data;
@@ -118,7 +118,7 @@ class ProductVersion extends Component {
         let data = {
             productId : productId
         };
-        axios.post('http://'+getServer()+'/lts/products/versions',data
+        axios.post(getServer()+'/lts/products/versions',data
         ).then(
             (response) => {
                 let datat = response.data;

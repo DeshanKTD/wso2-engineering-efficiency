@@ -101,7 +101,7 @@ class MarketingWindow extends Component {
                     prList: [],
                     openFeatureModal: false
                 }, () => (
-                    axios.post('http://' + getServer() + '/lts/features',
+                    axios.post(getServer() + '/lts/features',
                         productObject
                     ).then(
                         (response) => {

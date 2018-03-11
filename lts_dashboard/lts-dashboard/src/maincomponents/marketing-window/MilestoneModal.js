@@ -110,7 +110,7 @@ class MilestoneModal extends React.Component {
         this.setState({
                 progressState: true
             }, () => (
-                axios.post('http://'+getServer()+'/lts/milestone',
+                axios.post(getServer()+'/lts/milestone',
                     data
                 ).then(
                     (response) => {

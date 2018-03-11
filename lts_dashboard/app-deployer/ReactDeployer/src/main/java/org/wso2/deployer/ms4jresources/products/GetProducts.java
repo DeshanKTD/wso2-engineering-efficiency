@@ -36,17 +36,11 @@ import java.io.IOException;
 
 public class GetProducts extends HttpServlet {
     private static final Logger logger = Logger.getLogger(GetProducts.class);
-    private String baseUrl = null;
-
-    public GetProducts() {
-        PropertyReader propertyReader = new PropertyReader();
-        this.baseUrl = propertyReader.getBackendUrl();
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         HttpHandler httpHandler = new HttpHandler();
-        String backResponse = httpHandler.get(this.baseUrl + "/products/names");
+        String backResponse = httpHandler.get("/products/names");
 
         try {
             ServletOutputStream out = response.getOutputStream();

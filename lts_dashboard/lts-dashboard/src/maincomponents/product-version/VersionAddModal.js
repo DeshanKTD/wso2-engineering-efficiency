@@ -93,7 +93,7 @@ class VersionAddModal extends React.Component {
                 versionName: this.state.versionName
             };
 
-            axios.post('http://' + getServer() + '/lts/products/versions/add', data
+            axios.post(getServer() + '/lts/products/versions/add', data
             ).then(
                 (response) => {
                     let datat = response.data;

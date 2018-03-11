@@ -71,7 +71,7 @@ class QuarterNavigator extends React.Component {
 
 
     fetchQuarters() {
-        axios.get('http://'+getServer()+'/lts/release/quarters').then(
+        axios.get(getServer()+'/lts/release/quarters').then(
             (response) => {
                 let datat = response.data.sort(this.compareIds).reverse();
                 this.setState(

@@ -64,7 +64,7 @@ class ProductNavigatorRepo extends React.Component {
 
 
     fetchProducts() {
-        axios.get('http://'+getServer()+'/lts/products/names'
+        axios.get(getServer()+'/lts/products/names'
         ).then(
             (response) => {
                 let datat = response.data;

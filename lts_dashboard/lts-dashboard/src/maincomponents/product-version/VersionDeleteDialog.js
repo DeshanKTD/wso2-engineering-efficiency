@@ -39,7 +39,7 @@ class VersionDeleteDialog extends React.Component {
         let data = {
             versionId: versionId
         };
-        axios.post('http://' + getServer() + '/lts/products/deleteVersion', data
+        axios.post(getServer() + '/lts/products/deleteVersion', data
         ).then(
             (response) => {
                 this.props.fetchVersions(this.state.productId);

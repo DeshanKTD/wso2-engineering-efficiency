@@ -37,14 +37,10 @@ import java.io.IOException;
 public class SqlHandler {
     private final static Logger logger = Logger.getLogger(SqlHandler.class);
     private String dssUrl;
-    private String dssUserName;
-    private String dssPassword;
 
 
     public SqlHandler() {
         PropertyReader propertyReader = new PropertyReader();
-        this.dssUserName = propertyReader.getDssUser();
-        this.dssPassword = propertyReader.getDssPassword();
         this.dssUrl = propertyReader.getDssUrl();
     }
 
@@ -60,7 +56,6 @@ public class SqlHandler {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(url);
         request.addHeader("Accept", "application/json");
-        request.addHeader("Authorization", dssUserName + ":" + dssPassword);
 
         try {
 
@@ -90,7 +85,6 @@ public class SqlHandler {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpPost request = new HttpPost(url);
         request.addHeader("Accept", "application/json");
-        request.addHeader("Authorization", dssUserName + ":" + dssPassword);
         request.addHeader("Content-Type", "application/json");
 
         try {

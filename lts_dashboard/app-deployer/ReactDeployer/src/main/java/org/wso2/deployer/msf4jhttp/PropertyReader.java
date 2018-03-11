@@ -34,6 +34,8 @@ public class PropertyReader {
     private final static Logger logger = Logger.getLogger(PropertyReader.class);
     private final static String CONFIG_FILE = "config.properties";
     private String backendUrl;
+    private String backendPassword;
+    private String backendUsername;
 
     public PropertyReader() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE);
@@ -51,6 +53,8 @@ public class PropertyReader {
         try {
             prop.load(input);
             this.backendUrl = prop.getProperty("backend_url");
+            this.backendPassword = prop.getProperty("backend_password");
+            this.backendUsername = prop.getProperty("backend_username");
 
 
         } catch (FileNotFoundException e) {
@@ -73,6 +77,12 @@ public class PropertyReader {
         return this.backendUrl;
     }
 
-    ;
+    public String getBackendUsername(){
+        return this.backendUsername;
+    }
+
+    public String getBackendPassword(){
+        return this.backendPassword;
+    }
 
 }

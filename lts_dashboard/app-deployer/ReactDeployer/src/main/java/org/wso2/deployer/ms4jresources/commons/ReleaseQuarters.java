@@ -22,7 +22,6 @@ package org.wso2.deployer.ms4jresources.commons;
 import org.apache.log4j.Logger;
 import org.wso2.deployer.ms4jresources.products.GetProducts;
 import org.wso2.deployer.msf4jhttp.HttpHandler;
-import org.wso2.deployer.msf4jhttp.PropertyReader;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -35,17 +34,11 @@ import java.io.IOException;
  */
 public class ReleaseQuarters extends HttpServlet {
     private static final Logger logger = Logger.getLogger(GetProducts.class);
-    private String baseUrl = null;
-
-    public ReleaseQuarters() {
-        PropertyReader propertyReader = new PropertyReader();
-        this.baseUrl = propertyReader.getBackendUrl();
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         HttpHandler httpHandler = new HttpHandler();
-        String backResponse = httpHandler.get(this.baseUrl + "/release/quarters");
+        String backResponse = httpHandler.get("/release/quarters");
 
         try {
             ServletOutputStream out = response.getOutputStream();
