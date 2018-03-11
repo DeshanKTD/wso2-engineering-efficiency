@@ -34,7 +34,6 @@ public class AuthenticateInterceptor extends AbstractBasicAuthSecurityIntercepto
             return true;
         }
 
-        System.out.println("test");
         return false;
     }
 }

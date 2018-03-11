@@ -66,8 +66,18 @@ public class PrProcessor {
             String branchName = ProcessorCommon.trimJsonElementString(branchObject.get("branchName"));
             String repoUrl = ProcessorCommon.trimJsonElementString(branchObject.get("repoUrl"));
             String repoName = ProcessorCommon.extractRepoName(repoUrl);
-            String urlPrs = this.gitBaseUrl + "search/issues?q=type:pr+base:" + branchName + "+repo:"+ repoName +
-                    "+created:" + startDate + ".." + endDate + "&sort=created&order=desc";
+            StringBuilder urlBuilder = new StringBuilder();
+            urlBuilder.append(this.gitBaseUrl)
+                    .append("search/issues?q=type:pr+base:")
+                    .append(branchName)
+                    .append("+repo:")
+                    .append(repoName)
+                    .append("+created:")
+                    .append(startDate)
+                    .append("..")
+                    .append(endDate)
+                    .append("&sort=created&order=desc");
+            String urlPrs = urlBuilder.toString();
 
             JsonArray prArray = this.gitHandlerImplement.getJSONArrayFromGit(urlPrs);
             for (JsonElement prElement : prArray) {

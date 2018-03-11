@@ -36,10 +36,12 @@ public class GitHandlerImplement implements GitHandler {
 
     private final static Logger logger = Logger.getLogger(GitHandlerImplement.class);
     private String gitToken = null;
+    private boolean isDebugEnabled = false;
 
     public GitHandlerImplement() {
         PropertyReader propertyReader = new PropertyReader();
         this.gitToken = propertyReader.getGitToken();
+        this.isDebugEnabled = logger.isDebugEnabled();
     }
 
 
@@ -65,7 +67,10 @@ public class GitHandlerImplement implements GitHandler {
         try {
             JsonArray firstArray;
             response = httpClient.execute(request);
-            logger.debug("Request successful for " + url);
+            if (isDebugEnabled) {
+                logger.debug("Request successful for " + url);
+            }
+
             responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
             element = new JsonParser().parse(responseString);
             if (element.isJsonArray()) {
@@ -114,7 +119,9 @@ public class GitHandlerImplement implements GitHandler {
                 }
                 linkState = this.checkNextHeader(response.getHeaders("Link")[0].getValue());
                 containsNext = linkState.containsKey("next");
-                logger.debug("The request successful for " + nextLink);
+                if(isDebugEnabled) {
+                    logger.debug("The request successful for " + nextLink);
+                }
             } catch (IOException e) {
 
                 logger.error("The response failed for link " + nextLink);

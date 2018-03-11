@@ -37,11 +37,13 @@ import java.io.IOException;
 public class SqlHandler {
     private final static Logger logger = Logger.getLogger(SqlHandler.class);
     private String dssUrl;
+    private boolean isDebugEnabled = false;
 
 
     public SqlHandler() {
         PropertyReader propertyReader = new PropertyReader();
         this.dssUrl = propertyReader.getDssUrl();
+        this.isDebugEnabled = logger.isDebugEnabled();
     }
 
 
@@ -60,7 +62,10 @@ public class SqlHandler {
         try {
 
             HttpResponse response = httpClient.execute(request);
-            logger.debug("Request successful for " + url);
+            if (isDebugEnabled) {
+                logger.debug("Request successful for " + url);
+            }
+
             String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
             element = new JsonParser().parse(responseString);
         } catch (IllegalStateException e) {
@@ -91,7 +96,10 @@ public class SqlHandler {
             StringEntity entity = new StringEntity(data.toString());
             request.setEntity(entity);
             HttpResponse response = httpClient.execute(request);
-            logger.debug("Request successful for " + url);
+            if (isDebugEnabled) {
+                logger.debug("Request successful for " + url);
+            }
+
             String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
             element = new JsonParser().parse(responseString);
 
