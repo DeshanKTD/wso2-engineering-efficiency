@@ -99,7 +99,7 @@ class FeatureModal extends React.Component {
     // create issue url list belong to the milestone
     createPrListForFeatures(data) {
         let prFeatureData = [];
-        data.forEach(function (prData) {
+        Array.from(data).forEach(function (prData) {
             if(prData["validMarketing"]) {
                 let object = {
                     url: prData["url"],

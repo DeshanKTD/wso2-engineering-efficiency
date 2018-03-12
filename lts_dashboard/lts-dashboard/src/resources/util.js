@@ -19,9 +19,8 @@
 
 import React from 'react';
 
-
-let HOST = process.env.REACT_APP_BACKEND;
-console.log(HOST);
+// add a the msf4j host if not deployed in prod server
+let HOST = "";
 
 export function getServer() {
    return HOST;

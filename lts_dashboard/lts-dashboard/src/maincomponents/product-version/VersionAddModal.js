@@ -28,7 +28,6 @@ import axios from "axios/index";
 import AppBar from "material-ui/AppBar";
 import Toolbar from "material-ui/Toolbar";
 import Typography from "material-ui/Typography";
-import AddIcon from 'material-ui-icons/Add';
 import IconButton from 'material-ui/IconButton';
 import CloseIcon from 'material-ui-icons/Close';
 
@@ -167,8 +166,8 @@ class VersionAddModal extends React.Component {
                                 <Input id="versionName" value={this.state.versionName} onChange={this.handleChange}/>
                             </FormControl>
                             <FormControl className={classes.addButton}>
-                                <Button onClick={this.addVersion} variant="fab" color="primary" aria-label="add">
-                                    <AddIcon />
+                                <Button onClick={this.addVersion} color="secondary">
+                                    Add
                                 </Button>
                             </FormControl>
                         </div>

@@ -105,10 +105,10 @@ class MarketingWindow extends Component {
                         productObject
                     ).then(
                         (response) => {
-                            let datat = response.data;
+                            console.log(response.data);
                             this.setState(
                                 {
-                                    prList: datat,
+                                    prList: response.data,
                                     loadIssue: false,
                                     openModal: false,
                                 }
