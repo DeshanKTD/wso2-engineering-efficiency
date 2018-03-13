@@ -9,4 +9,7 @@
 - [nodejs] - Version 9.6.1
 - [npm] - Version 5.6.0
 - [java] - Version 1.8
+- [maven]
+
+
 

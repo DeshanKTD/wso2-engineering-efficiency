@@ -59,12 +59,16 @@ export default class BranchTable extends React.PureComponent {
         let callback = this.openBranchChangeWindow
         branchList.forEach(function (branch) {
             let change = true;
+            let versionName = "";
             if(branch["branchId"]==-1){
                 change=false;
             }
+            if(branch["versionName"]!="null"){
+                versionName = branch["versionName"]
+            }
             let obj = {
                 branchName : branch["branchName"],
-                version : branch["versionName"],
+                version : versionName,
                 button : <BranchVersionChangeButton
                     change={change}
                     versionId={branch["versionId"]}

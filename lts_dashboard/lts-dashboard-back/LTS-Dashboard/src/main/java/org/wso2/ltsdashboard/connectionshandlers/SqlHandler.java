@@ -56,7 +56,6 @@ public class SqlHandler {
         String url = dssUrl + uri;
         JsonElement element = null;
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        logger.info(url);
         HttpGet request = new HttpGet(url);
         request.addHeader("Accept", "application/json");
 
