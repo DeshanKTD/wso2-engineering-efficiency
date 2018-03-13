@@ -179,7 +179,6 @@ public class GitHandlerImplement implements GitHandler {
         return headerDetail;
     }
 
-
 }
 
 

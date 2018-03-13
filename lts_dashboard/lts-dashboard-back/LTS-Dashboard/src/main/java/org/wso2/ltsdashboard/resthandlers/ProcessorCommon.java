@@ -58,7 +58,7 @@ public class ProcessorCommon {
 
 
     static String trimJsonElementString(JsonElement text) {
-        return text.toString().replace("\"", "");
+        return text.getAsString().replace("\"", "");
     }
 
     static String extractRepoName(String repoUrl) {

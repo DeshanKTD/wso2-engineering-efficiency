@@ -20,7 +20,7 @@
 import React from 'react';
 
 // add a the msf4j host if not deployed in prod server
-let HOST = "";
+let HOST = "http://localhost:8080";
 
 export function getServer() {
    return HOST;

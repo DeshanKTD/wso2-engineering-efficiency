@@ -1,0 +1,9 @@
+listenerConfigurations:
+ -
+  id: "msf4j-https"
+  host: "127.0.0.1"
+  port: 18080
+  scheme: https
+  keyStoreFile: "keystore.jks"
+  keyStorePassword: "123456"
+  certPass: "123456"

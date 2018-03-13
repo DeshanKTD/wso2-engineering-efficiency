@@ -36,6 +36,11 @@ public class PropertyReader {
     private String backendUrl;
     private String backendPassword;
     private String backendUsername;
+    private String ssoKeyStoreName;
+    private String ssoKeyStorePassword;
+    private String ssoCertAlias;
+    private String ssoRedirectUrl;
+
 
     public PropertyReader() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE);
@@ -55,6 +60,10 @@ public class PropertyReader {
             this.backendUrl = prop.getProperty("backend_url");
             this.backendPassword = prop.getProperty("backend_password");
             this.backendUsername = prop.getProperty("backend_username");
+            this.ssoKeyStoreName = prop.getProperty("sso_keystore_file_name");
+            this.ssoKeyStorePassword = prop.getProperty("sso_keystore_password");
+            this.ssoCertAlias = prop.getProperty("sso_certificate_alias");
+            this.ssoRedirectUrl = prop.getProperty("sso_redirect_url");
 
 
         } catch (FileNotFoundException e) {
@@ -73,16 +82,32 @@ public class PropertyReader {
 
     }
 
-    public String getBackendUrl() {
+    String getBackendUrl() {
         return this.backendUrl;
     }
 
-    public String getBackendUsername(){
+    String getBackendUsername() {
         return this.backendUsername;
     }
 
-    public String getBackendPassword(){
+    String getBackendPassword() {
         return this.backendPassword;
+    }
+
+    public String getSsoKeyStoreName(){
+        return this.ssoKeyStoreName;
+    }
+
+    public String getSsoKeyStorePassword(){
+        return this.ssoKeyStorePassword;
+    }
+
+    public String getSsoCertAlias(){
+        return this.ssoCertAlias;
+    }
+
+    public String getSsoRedirectUrl(){
+        return  this.ssoRedirectUrl;
     }
 
 }

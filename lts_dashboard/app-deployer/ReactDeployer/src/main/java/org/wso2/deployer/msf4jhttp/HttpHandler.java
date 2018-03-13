@@ -28,18 +28,19 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.apache.commons.codec.binary.Base64;
-
 import java.io.IOException;
 
+
+
 /*
- * TODO - comment class work
+ * Handle get post request to backend
  */
 public class HttpHandler {
-
     private static final Logger logger = Logger.getLogger(HttpHandler.class);
     private String backendPassword;
     private String backendUsername;
     private String backendUrl;
+
 
     public HttpHandler() {
         PropertyReader propertyReader = new PropertyReader();
@@ -53,14 +54,15 @@ public class HttpHandler {
         HttpGet request = new HttpGet(this.backendUrl+url);
         request.addHeader("Accept", "application/json");
         String encodedCredentials = this.encode(this.backendUsername + ":" + this.backendPassword);
-        logger.error(encodedCredentials);
         request.addHeader("Authorization", "Basic "+encodedCredentials);
         String responseString = null;
 
         try {
 
             HttpResponse response = httpClient.execute(request);
-            logger.debug("Request successful for " + url);
+            if(logger.isDebugEnabled()) {
+                logger.debug("Request successful for " + url);
+            }
             responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
 
         } catch (IllegalStateException e) {
@@ -68,7 +70,7 @@ public class HttpHandler {
         } catch (NullPointerException e) {
             logger.error("Bad request to the URL");
         } catch (IOException e) {
-            logger.error("The request was unsuccessful with dss");
+            logger.error("mke");
         }
 
         return responseString;
@@ -88,7 +90,9 @@ public class HttpHandler {
             StringEntity entity = new StringEntity(object);
             request.setEntity(entity);
             HttpResponse response = httpClient.execute(request);
-            logger.debug("Request successful for " + url);
+            if(logger.isDebugEnabled()) {
+                logger.debug("Request successful for " + url);
+            }
             responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
 
         } catch (IllegalStateException e) {
@@ -106,4 +110,5 @@ public class HttpHandler {
         byte[] encodedBytes = Base64.encodeBase64(text.getBytes());
         return new String(encodedBytes);
     }
+
 }

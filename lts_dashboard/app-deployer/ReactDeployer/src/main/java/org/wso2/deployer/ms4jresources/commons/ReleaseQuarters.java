@@ -20,7 +20,6 @@
 package org.wso2.deployer.ms4jresources.commons;
 
 import org.apache.log4j.Logger;
-import org.wso2.deployer.ms4jresources.products.GetProducts;
 import org.wso2.deployer.msf4jhttp.HttpHandler;
 
 import javax.servlet.ServletOutputStream;
@@ -33,12 +32,14 @@ import java.io.IOException;
  * servlet for getting product quarters
  */
 public class ReleaseQuarters extends HttpServlet {
-    private static final Logger logger = Logger.getLogger(GetProducts.class);
+    private static final Logger logger = Logger.getLogger(ReleaseQuarters.class);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         HttpHandler httpHandler = new HttpHandler();
+        logger.info("getting release quarters");
         String backResponse = httpHandler.get("/release/quarters");
+        logger.info(backResponse);
 
         try {
             ServletOutputStream out = response.getOutputStream();

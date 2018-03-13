@@ -7,7 +7,7 @@
 
   <servlet>
     <servlet-name>GetProducts</servlet-name>
-    <servlet-class>org.wso2.deployer.ms4jresources.products.GetProducts</servlet-class>
+    <servlet-class>org.wso2.deployer.ms4jresources.products.ProductGetter</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>GetQuarters</servlet-name>
@@ -15,7 +15,7 @@
   </servlet>
   <servlet>
     <servlet-name>GetVersions</servlet-name>
-    <servlet-class>org.wso2.deployer.ms4jresources.versions.GetVersion</servlet-class>
+    <servlet-class>org.wso2.deployer.ms4jresources.versions.VersionGetter</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>GetProductRepos</servlet-name>
@@ -23,31 +23,31 @@
   </servlet>
   <servlet>
     <servlet-name>AddVersion</servlet-name>
-    <servlet-class>org.wso2.deployer.ms4jresources.versions.AddVersion</servlet-class>
+    <servlet-class>org.wso2.deployer.ms4jresources.versions.VersionAdder</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>GetRepoBranches</servlet-name>
-    <servlet-class>org.wso2.deployer.ms4jresources.repobranches.GetRepoBranches</servlet-class>
+    <servlet-class>org.wso2.deployer.ms4jresources.repobranches.RepoBranchesGetter</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>ChangeVersion</servlet-name>
-    <servlet-class>org.wso2.deployer.ms4jresources.versions.ChangeVersion</servlet-class>
+    <servlet-class>org.wso2.deployer.ms4jresources.versions.VersionChanger</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>DeleteVersion</servlet-name>
-    <servlet-class>org.wso2.deployer.ms4jresources.versions.DeleteVersion</servlet-class>
+    <servlet-class>org.wso2.deployer.ms4jresources.versions.VersionRemover</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>AddBranchVersion</servlet-name>
-    <servlet-class>org.wso2.deployer.ms4jresources.repobranches.AddBranchVersion</servlet-class>
+    <servlet-class>org.wso2.deployer.ms4jresources.repobranches.BranchVersionAdder</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>ChangeBranchVersion</servlet-name>
-    <servlet-class>org.wso2.deployer.ms4jresources.repobranches.ChangeBranchVersion</servlet-class>
+    <servlet-class>org.wso2.deployer.ms4jresources.repobranches.BranchVersionChanger</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>GetFeatures</servlet-name>
-    <servlet-class>org.wso2.deployer.ms4jresources.prs.GetFeatures</servlet-class>
+    <servlet-class>org.wso2.deployer.ms4jresources.prs.FeatureGetter</servlet-class>
   </servlet>
 
 
@@ -96,4 +96,5 @@
     <servlet-name>GetFeatures</servlet-name>
     <url-pattern>/features</url-pattern>
   </servlet-mapping>
+
 </web-app>

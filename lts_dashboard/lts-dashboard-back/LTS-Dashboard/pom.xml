@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2016, WSO2 Inc. (http://wso2.com) All Rights Reserved.
+  ~ Copyright (c) 2018, WSO2 Inc. (http://wso2.com) All Rights Reserved.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
     <artifactId>LTS-Dashboard</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>WSO2 MSF4J Microservice</name>
+    <packaging>jar</packaging>
 
 
     <dependencies>
@@ -67,20 +68,46 @@
             <artifactId>commons-dbcp2</artifactId>
             <version>2.0.1</version>
         </dependency>
-
-
     </dependencies>
 
     <build>
+        <finalName>lts</finalName>
         <resources>
             <resource>
                 <directory>src/resources</directory>
             </resource>
         </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <!-- here the phase you need -->
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <properties>
         <microservice.mainClass>org.wso2.ltsdashboard.Application</microservice.mainClass>
     </properties>
+
+
 
 </project>

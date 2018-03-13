@@ -25,6 +25,8 @@ package org.wso2.ltsdashboard.gitobjects;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.wso2.ltsdashboard.connectionshandlers.GitHandlerImplement;
+import org.wso2.ltsdashboard.connectionshandlers.SqlHandler;
 
 public class PullRequest {
     private String[] features;
@@ -126,8 +128,9 @@ public class PullRequest {
 
 
     private String trimJsonElementString(JsonElement text) {
-        return text.toString().replace("\"", "");
+        return text.getAsString().replace("\"", "");
     }
+
 
 
 }

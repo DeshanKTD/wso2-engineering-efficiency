@@ -20,7 +20,7 @@
 package org.wso2.deployer.ms4jresources.repobranches;
 
 import org.apache.log4j.Logger;
-import org.wso2.deployer.ms4jresources.versions.GetVersion;
+import org.wso2.deployer.ms4jresources.versions.VersionGetter;
 import org.wso2.deployer.msf4jhttp.HttpHandler;
 import org.wso2.deployer.msf4jhttp.RequestHelper;
 
@@ -34,7 +34,7 @@ import java.io.IOException;
  * servlet for getting repos for a product
  */
 public class GetProductRepos extends HttpServlet {
-    private static final Logger logger = Logger.getLogger(GetVersion.class);
+    private static final Logger logger = Logger.getLogger(VersionGetter.class);
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {

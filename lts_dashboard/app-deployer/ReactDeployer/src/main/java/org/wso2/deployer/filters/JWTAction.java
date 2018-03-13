@@ -4,6 +4,7 @@ import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.SignedJWT;
 import org.apache.log4j.Logger;
+import org.wso2.deployer.msf4jhttp.PropertyReader;
 
 
 import java.io.IOException;
@@ -29,6 +30,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class JWTAction implements Filter {
     private static final Logger logger = Logger.getLogger(JWTAction.class);
+    private static final PropertyReader propertyReader = new PropertyReader();
+
 
     /**
      * This method is for get public key
@@ -42,11 +45,12 @@ public class JWTAction implements Filter {
 
     private static PublicKey getPublicKey() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {
 
-        InputStream file = Thread.currentThread().getContextClassLoader().getResourceAsStream("Constant.KeyStore.KEYSTORE_FILE");
+        InputStream file = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream(propertyReader.getSsoKeyStoreName());
         KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
         //loading key store with password
-        keystore.load(file, "Constant.KeyStore.KEYSTORE_PASSWORD".toCharArray());
-        Certificate cert = keystore.getCertificate(System.getenv("Constant.EnvironmentVariable.KEYSTORE_ALIAS"));
+        keystore.load(file, propertyReader.getSsoKeyStorePassword().toCharArray());
+        Certificate cert = keystore.getCertificate(System.getenv(propertyReader.getSsoCertAlias()));
         return cert.getPublicKey();
     }
 
@@ -55,16 +59,19 @@ public class JWTAction implements Filter {
     }
 
 
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException {
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
+                         FilterChain filterChain) throws IOException {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         String jwt = request.getHeader("X-JWT-Assertion");
-        String ssoRedirectUrl = System.getenv("Constant.EnvironmentVariable.CSE_CLIENT_SSO_URL");
+        String ssoRedirectUrl = propertyReader.getSsoRedirectUrl();
 
         if (jwt == null || "".equals(jwt)) {
-            logger.debug("Redirecting to {}");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Redirecting to {}");
+            }
             response.sendRedirect(ssoRedirectUrl);
             return;
         }
@@ -77,19 +84,21 @@ public class JWTAction implements Filter {
             JWSVerifier verifier = new RSASSAVerifier((RSAPublicKey) getPublicKey());
 
             if (signedJWT.verify(verifier)) {
-                logger.debug("JWT validation success for token: {}");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("JWT validation success for token: {}");
+                }
                 username = signedJWT.getJWTClaimsSet().getClaim("http://wso2.org/claims/emailaddress").toString();
                 roles = signedJWT.getJWTClaimsSet().getClaim("http://wso2.org/claims/role").toString();
-//                logger.debug("User = {} | Roles = ", username, roles);
-                logger.debug("User = {} | Roles = ");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("User = {" + username + "} | Roles = " + roles);
+                }
             } else {
-                logger.error("JWT validation failed for token: {}");
+                logger.error("JWT validation failed for token: {" + jwt + "}");
                 response.sendRedirect(ssoRedirectUrl);
                 return;
             }
         } catch (Exception e) {
-//            logger.error("JWT validation failed for token: {}", jwt, e);
-            logger.error("JWT validation failed for token: {}");
+            logger.error("JWT validation failed for token: {" + jwt + "}");
             response.sendRedirect(ssoRedirectUrl);
             return;
         }

@@ -27,7 +27,7 @@
 target
 *.iml
 node_modules
-<<<<<<< HEAD
+build
 
 *.log
 log/
