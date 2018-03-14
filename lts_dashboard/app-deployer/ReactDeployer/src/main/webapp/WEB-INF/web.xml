@@ -5,6 +5,16 @@
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
 
+
+  <!--<filter>-->
+    <!--<filter-name>AuthenticationFilter</filter-name>-->
+    <!--<filter-class>org.wso2.deployer.filters.JWTAction</filter-class>-->
+  <!--</filter>-->
+  <!--<filter-mapping>-->
+    <!--<filter-name>AuthenticationFilter</filter-name>-->
+    <!--<url-pattern>/*</url-pattern>-->
+  <!--</filter-mapping>-->
+
   <servlet>
     <servlet-name>GetProducts</servlet-name>
     <servlet-class>org.wso2.deployer.ms4jresources.products.ProductGetter</servlet-class>
