@@ -109,7 +109,7 @@ class ProductRepository extends Component {
             let data = {
                 productId: productId
             };
-            axios.post(getServer() + '/lts/products/repos', data
+            axios.post(getServer() + '/products/repos', data
             ).then(
                 (response) => {
                     let datat = response.data;
@@ -150,7 +150,7 @@ class ProductRepository extends Component {
             repoId : repoId
         };
 
-        axios.post(getServer() + '/lts/products/repos/branches', data
+        axios.post(getServer() + '/products/repos/branches', data
         ).then(
             (response) => {
                 let datat = response.data;

@@ -50,7 +50,7 @@ public class JWTAction implements Filter {
         KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
         //loading key store with password
         keystore.load(file, propertyReader.getSsoKeyStorePassword().toCharArray());
-        Certificate cert = keystore.getCertificate(System.getenv(propertyReader.getSsoCertAlias()));
+        Certificate cert = keystore.getCertificate(propertyReader.getSsoCertAlias());
         return cert.getPublicKey();
     }
 

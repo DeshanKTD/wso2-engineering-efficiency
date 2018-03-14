@@ -63,7 +63,7 @@ class ProductNavigator extends React.Component {
     };
 
     fetchVersions() {
-        axios.get(getServer()+'/lts/products/names'
+        axios.get(getServer()+'/products/names'
         ).then(
             (response) => {
                 let datat = response.data;

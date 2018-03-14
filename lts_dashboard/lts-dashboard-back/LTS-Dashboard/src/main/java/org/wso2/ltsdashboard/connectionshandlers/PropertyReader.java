@@ -20,6 +20,7 @@
 package org.wso2.ltsdashboard.connectionshandlers;
 
 import org.apache.log4j.Logger;
+import org.wso2.ltsdashboard.Constants;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,7 +33,6 @@ import java.util.Properties;
 public class PropertyReader {
 
     private final static Logger logger = Logger.getLogger(PropertyReader.class);
-    private final static String CONFIG_FILE = "config.ini";
     private static String dssUrl;
     private static String gitToken;
     private static String gitBaseUrl;
@@ -40,38 +40,23 @@ public class PropertyReader {
     private static String accessUserPassword;
 
     public PropertyReader() {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE);
-        loadConfigs(inputStream);
+        loadConfigs();
     }
 
 
     /**
      * Load configs from the file
-     *
-     * @param input - input stream of the file
      */
-    private static void loadConfigs(InputStream input) {
-        Properties prop = new Properties();
+    private static void loadConfigs() {
         try {
-            prop.load(input);
-            gitToken = prop.getProperty("git_token");
-            dssUrl = prop.getProperty("dss_url");
-            gitBaseUrl = prop.getProperty("git_base_url");
-            accessUsername = prop.getProperty("backend_access_user");
-            accessUserPassword = prop.getProperty("backend_access_password");
+            gitToken = System.getenv(Constants.GIT_TOKEN);
+            dssUrl = System.getenv(Constants.DSS_URL);
+            gitBaseUrl = System.getenv(Constants.GIT_BASE_URL);
+            accessUsername = System.getenv(Constants.BACKEND_ACCESS_USER);
+            accessUserPassword = System.getenv(Constants.BACKEND_ACCESS_PASSWORD);
 
-        } catch (FileNotFoundException e) {
-            logger.error("The configuration file is not found");
-        } catch (IOException e) {
-            logger.error("The File cannot be read");
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    logger.error("The File InputStream is not closed");
-                }
-            }
+        } catch (Exception e){
+            logger.error("Failed to load the environmental variables");
         }
 
     }

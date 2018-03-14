@@ -107,7 +107,7 @@ class ChangeBranchVersionModal extends React.Component {
         let data = {
             productId : productId
         };
-        axios.post(getServer()+'/lts/products/versions',data
+        axios.post(getServer()+'/products/versions',data
         ).then(
             (response) => {
                 let datat = response.data;
@@ -153,7 +153,7 @@ class ChangeBranchVersionModal extends React.Component {
                 repoId: this.state.repoId
             };
 
-            axios.post(getServer() + '/lts/branches/versions/add', data
+            axios.post(getServer() + '/branches/versions/add', data
             ).then(
                 (response) => {
                     let datat = response.data;
@@ -182,7 +182,7 @@ class ChangeBranchVersionModal extends React.Component {
         };
 
         console.log(data);
-        axios.post(getServer() + '/lts/branches/changeVersion', data
+        axios.post(getServer() + '/branches/changeVersion', data
         ).then(
             (response) => {
                 let datat = response.data;

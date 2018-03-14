@@ -17,13 +17,15 @@
  *
  */
 
-import React from 'react';
+package org.wso2.ltsdashboard;
 
-// add a the msf4j host if not deployed in prod server
-let host  = process.env.HOST_NAME;
-console.log(host);
-
-export function getServer() {
-   return host;
+/*
+ * common constants
+ */
+public class Constants {
+    public final static String GIT_TOKEN="GIT_TOKEN";
+    public final static String DSS_URL="DSS_URL";
+    public final static String GIT_BASE_URL="GIT_BASE_URL";
+    public final static String BACKEND_ACCESS_USER="BACKEND_ACCESS_USER";
+    public final static String BACKEND_ACCESS_PASSWORD="BACKEND_ACCESS_PASSWORD";
 }
-

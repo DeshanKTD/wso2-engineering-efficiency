@@ -25,7 +25,6 @@ import {MenuItem} from 'material-ui/Menu';
 import {FormControl} from 'material-ui/Form';
 import Select from 'material-ui/Select';
 import axios from "axios/index";
-import { CircularProgress } from 'material-ui/Progress';
 import {getServer} from "../../resources/util";
 
 const styles = theme => ({
@@ -73,7 +72,7 @@ class VersionNavigator extends React.Component {
             this.setState({
                 issueLoading:true
             },()=>(
-                axios.post(getServer()+'/lts/products/versions',
+                axios.post(getServer()+'/products/versions',
                     data
                 ).then(
                     (response) => {
@@ -129,7 +128,6 @@ class VersionNavigator extends React.Component {
                             }
                         </Select>
                     </FormControl>
-                    {this.state.issueLoading && <CircularProgress className={classes.progress} />}
                 </form>
 
             </div>

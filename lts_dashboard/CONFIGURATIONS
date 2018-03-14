@@ -1,0 +1,31 @@
+#!/bin/bash
+
+BUILD_REACT=false
+BUILD_FRONT_END=true
+BUILD_BACK_END=true
+
+# HOST_URL=
+
+#server configurations
+GIT_TOKEN=c977dd4cdeecd964f9eb9738703a0f34354b8635
+BACKEND_USER=msf4j_lts_dashboard
+BACKEND_PASSWORD=1qaz2wsx3edc
+DSS_URL=https://localhost:9445/services/LTSDashboardGeneric
+GIT_BASE_URL=https://api.github.com
+
+#backend deploy
+BACKEND_HOST=localhost
+BACKEND_HOST_PORT=18080
+
+
+#SSO configurations
+SSO_KEYSTORE_FILE_NAME=test
+SSO_KEYSTORE_PASSWORD=test
+SSO_CERTIFICATE_KEY=test
+SSO_REDERECT_URL=test
+
+#backend keystore
+BACKEND_KEYSOTRE_FILE_NAME=keystore.jks
+BACKEND_KEYSOTRE_PASSWORD=123456
+BACKEND_KEY_PASS=123456
+

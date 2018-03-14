@@ -68,7 +68,7 @@ public class PrProcessor {
             String repoName = ProcessorCommon.extractRepoName(repoUrl);
             StringBuilder urlBuilder = new StringBuilder();
             urlBuilder.append(this.gitBaseUrl)
-                    .append("search/issues?q=type:pr+base:")
+                    .append("/search/issues?q=type:pr+base:")
                     .append(branchName)
                     .append("+repo:")
                     .append(repoName)

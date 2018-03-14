@@ -21,7 +21,7 @@
     "react-dom": "^16.2.0",
     "react-scripts": "1.0.17"
   },
-  "homepage": "http://mywebsite.com/lts",
+  "homepage": "http://mywebsite.com",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
