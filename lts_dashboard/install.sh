@@ -55,6 +55,9 @@ echo "sso_redirect_url=$SSO_REDERECT_URL" >> config.properties
 mv config.properties $LTS_HOME/app-deployer/ReactDeployer/src/main/resources
 echo "## frontend config.properties created"
 
+echo "REACT_APP_HOST_NAME=$HOST_URL" > .env
+mv .env $LTS_HOME/lts-dashboard
+
 echo "###### Generating backend certificate ########"
 keytool -genkeypair -keystore $BACKEND_KEYSOTRE_FILE_NAME \
 -noprompt \
@@ -72,6 +75,9 @@ mv $BACKEND_KEYSOTRE_FILE_NAME $LTS_HOME/deploy-components/backend
 mv lts-backend.cert $LTS_HOME/deploy-components/certificates
 echo "## copying keystore and certificate completed"
 
+if [ -f $SSO_KEYSTORE_FILE_PATH ]; then
+	mv $SSO_KEYSTORE_FILE_PATH $LTS_HOME/app-deployer/ReactDeployer/src/main/resources
+fi
 
 
 if [ $BUILD_REACT = true ]; then
