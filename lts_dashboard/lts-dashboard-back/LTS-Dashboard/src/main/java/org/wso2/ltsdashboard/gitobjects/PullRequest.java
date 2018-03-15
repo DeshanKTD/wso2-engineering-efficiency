@@ -49,7 +49,7 @@ public class PullRequest {
             this.features = this.createFeatures(trimJsonElementString(prObject.get("body")));
             this.validMarketingMessage = this.checkMarketingMessageISValid(trimJsonElementString(prObject.get("body")));
             this.labels = this.createLabelArray(prObject.get("labels").getAsJsonArray());
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             logger.error("Error while reading key value pairs of PR object");
         }
         this.repoName = repoName;
@@ -135,7 +135,6 @@ public class PullRequest {
     private String trimJsonElementString(JsonElement text) {
         return text.getAsString().replace("\"", "");
     }
-
 
 
 }

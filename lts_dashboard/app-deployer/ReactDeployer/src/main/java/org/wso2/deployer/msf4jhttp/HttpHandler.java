@@ -27,6 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
@@ -51,16 +52,16 @@ public class HttpHandler {
 
     public String get(String url) {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet(this.backendUrl+url);
+        HttpGet request = new HttpGet(this.backendUrl + url);
         request.addHeader("Accept", "application/json");
         String encodedCredentials = this.encode(this.backendUsername + ":" + this.backendPassword);
-        request.addHeader("Authorization", "Basic "+encodedCredentials);
+        request.addHeader("Authorization", "Basic " + encodedCredentials);
         String responseString = null;
 
         try {
 
             HttpResponse response = httpClient.execute(request);
-            if(logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Request successful for " + url);
             }
             responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
@@ -79,10 +80,10 @@ public class HttpHandler {
 
     public String post(String url, String object) {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost request = new HttpPost(this.backendUrl+url);
+        HttpPost request = new HttpPost(this.backendUrl + url);
         request.addHeader("Accept", "application/json");
         String encodedCredentials = this.encode(this.backendUsername + ":" + this.backendPassword);
-        request.addHeader("Authorization", "Basic "+encodedCredentials);
+        request.addHeader("Authorization", "Basic " + encodedCredentials);
         request.addHeader("Content-Type", "application/json");
         String responseString = null;
 
@@ -90,7 +91,7 @@ public class HttpHandler {
             StringEntity entity = new StringEntity(object);
             request.setEntity(entity);
             HttpResponse response = httpClient.execute(request);
-            if(logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Request successful for " + url);
             }
             responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
@@ -106,7 +107,7 @@ public class HttpHandler {
     }
 
 
-    private String encode(String text){
+    private String encode(String text) {
         String returnString = null;
         try {
             returnString = Base64.getEncoder().encodeToString(text.getBytes("utf-8"));

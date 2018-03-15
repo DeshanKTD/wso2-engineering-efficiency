@@ -37,7 +37,7 @@ public class RequestHelper {
         try {
             reader = request.getReader();
             if (reader == null) {
-                if(logger.isDebugEnabled()) {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Request body could not be read because it's empty.");
                 }
                 return null;
@@ -54,7 +54,7 @@ public class RequestHelper {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    if(logger.isDebugEnabled()) {
+                    if (logger.isDebugEnabled()) {
                         logger.debug("Failed to close the buffered reader");
                     }
                 }

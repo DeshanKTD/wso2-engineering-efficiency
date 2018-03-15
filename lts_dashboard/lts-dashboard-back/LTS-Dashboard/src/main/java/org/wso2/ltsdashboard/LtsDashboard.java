@@ -110,9 +110,8 @@ public class LtsDashboard {
         }
         RepositoryProcessor repositoryProcessor = new RepositoryProcessor();
         String repoUrl = repoData.get("repoUrl").getAsString();
-        String repoName = repoData.get("repoName").getAsString();
         int repoId = repoData.get("repoId").getAsInt();
-        JsonArray branchList = repositoryProcessor.getBranchesForRepo(repoUrl, repoName, repoId);
+        JsonArray branchList = repositoryProcessor.getBranchesForRepo(repoUrl, repoId);
 
         return makeResponseWithBody(branchList);
     }

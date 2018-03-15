@@ -78,8 +78,8 @@ public class JWTAction implements Filter {
             return;
         }
 
-        String username=null;
-        String roles=null;
+        String username = null;
+        String roles = null;
 
         try {
 
@@ -100,16 +100,15 @@ public class JWTAction implements Filter {
                 response.sendRedirect(ssoRedirectUrl);
                 return;
             }
-        } catch (ParseException e){
+        } catch (ParseException e) {
             logger.error("Parsing JWT token failed");
-        } catch (JOSEException e){
+        } catch (JOSEException e) {
             logger.error("Verification of jwt failed");
-        }
-        catch (Exception e){
-            logger.error("Failed to validate the jwt {"+jwt+"}");
+        } catch (Exception e) {
+            logger.error("Failed to validate the jwt {" + jwt + "}");
         }
 
-        if(username!=null && roles!= null) {
+        if (username != null && roles != null) {
             request.getSession().setAttribute("user", username);
             request.getSession().setAttribute("roles", roles);
         }

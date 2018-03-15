@@ -94,20 +94,20 @@ public class PropertyReader {
         return this.backendPassword;
     }
 
-    public String getSsoKeyStoreName(){
+    public String getSsoKeyStoreName() {
         return this.ssoKeyStoreName;
     }
 
-    public String getSsoKeyStorePassword(){
+    public String getSsoKeyStorePassword() {
         return this.ssoKeyStorePassword;
     }
 
-    public String getSsoCertAlias(){
+    public String getSsoCertAlias() {
         return this.ssoCertAlias;
     }
 
-    public String getSsoRedirectUrl(){
-        return  this.ssoRedirectUrl;
+    public String getSsoRedirectUrl() {
+        return this.ssoRedirectUrl;
     }
 
 }

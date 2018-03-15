@@ -38,7 +38,7 @@ public class VersionRemover extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         HttpHandler httpHandler = new HttpHandler();
         String requestBody = RequestHelper.getRequestBody(request);
-        String backResponse = httpHandler.post( "/products/deleteVersion", requestBody);
+        String backResponse = httpHandler.post("/products/deleteVersion", requestBody);
 
         try {
             ServletOutputStream out = response.getOutputStream();

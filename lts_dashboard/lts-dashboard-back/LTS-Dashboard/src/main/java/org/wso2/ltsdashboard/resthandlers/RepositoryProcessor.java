@@ -67,11 +67,10 @@ public class RepositoryProcessor {
      * There can be new branches crated at git remote. So theses branches also needed to be display for tagging with
      * a version.
      *
-     * @param repoUrl  - repo Id
-     * @param repoName - repo name
+     * @param repoUrl - repo Id
      * @return array of prs with features
      */
-    public JsonArray getBranchesForRepo(String repoUrl, String repoName, int repoId) {
+    public JsonArray getBranchesForRepo(String repoUrl, int repoId) {
         // get version labeled branches from db
         String url = "/repo/branches";
         JsonObject jsonObject = new JsonObject();

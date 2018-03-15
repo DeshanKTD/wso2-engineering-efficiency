@@ -40,7 +40,7 @@ public class GetProductRepos extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         HttpHandler httpHandler = new HttpHandler();
         String requestBody = RequestHelper.getRequestBody(request);
-        String backResponse = httpHandler.post( "/products/repos", requestBody);
+        String backResponse = httpHandler.post("/products/repos", requestBody);
 
         try {
             ServletOutputStream out = response.getOutputStream();

@@ -39,7 +39,7 @@ public class RepoBranchesGetter extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         HttpHandler httpHandler = new HttpHandler();
         String requestBody = RequestHelper.getRequestBody(request);
-        String backResponse = httpHandler.post( "/products/repos/branches", requestBody);
+        String backResponse = httpHandler.post("/products/repos/branches", requestBody);
 
         try {
             ServletOutputStream out = response.getOutputStream();

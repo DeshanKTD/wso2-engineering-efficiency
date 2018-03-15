@@ -52,12 +52,11 @@ public class PropertyReader {
             accessUsername = System.getenv(Constants.BACKEND_ACCESS_USER);
             accessUserPassword = System.getenv(Constants.BACKEND_ACCESS_PASSWORD);
 
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Failed to load the environmental variables");
         }
 
     }
-
 
 
     String getGitToken() {
