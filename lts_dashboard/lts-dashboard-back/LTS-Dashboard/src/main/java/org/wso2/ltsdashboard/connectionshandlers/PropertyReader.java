@@ -22,10 +22,6 @@ package org.wso2.ltsdashboard.connectionshandlers;
 import org.apache.log4j.Logger;
 import org.wso2.ltsdashboard.Constants;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /*
  * Read the properties of the application
@@ -50,6 +46,7 @@ public class PropertyReader {
     private static void loadConfigs() {
         try {
             gitToken = System.getenv(Constants.GIT_TOKEN);
+            logger.info(gitToken);
             dssUrl = System.getenv(Constants.DSS_URL);
             gitBaseUrl = System.getenv(Constants.GIT_BASE_URL);
             accessUsername = System.getenv(Constants.BACKEND_ACCESS_USER);

@@ -39,7 +39,6 @@ public class ReleaseQuarters extends HttpServlet {
         HttpHandler httpHandler = new HttpHandler();
         logger.info("getting release quarters");
         String backResponse = httpHandler.get("/release/quarters");
-        logger.info(backResponse);
 
         try {
             ServletOutputStream out = response.getOutputStream();

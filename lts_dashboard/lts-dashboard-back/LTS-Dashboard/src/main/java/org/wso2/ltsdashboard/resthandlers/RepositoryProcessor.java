@@ -94,7 +94,7 @@ public class RepositoryProcessor {
 
 //        logger.debug("Extracting branch data for " + repoName + "from git");
         // get branches from git
-        url = gitBaseUrl + "repos/" + gitRepoName + "/branches";
+        url = gitBaseUrl + "/repos/" + gitRepoName + "/branches";
         JsonArray gitBranchArray = this.gitHandlerImplement.getJSONArrayFromGit(url);
         for (JsonElement branch : gitBranchArray) {
             JsonObject branchObject = branch.getAsJsonObject();

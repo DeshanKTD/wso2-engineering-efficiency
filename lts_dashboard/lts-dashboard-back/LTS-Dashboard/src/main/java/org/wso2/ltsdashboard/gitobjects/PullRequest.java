@@ -25,10 +25,12 @@ package org.wso2.ltsdashboard.gitobjects;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.wso2.ltsdashboard.connectionshandlers.GitHandlerImplement;
-import org.wso2.ltsdashboard.connectionshandlers.SqlHandler;
+import org.apache.log4j.Logger;
 
 public class PullRequest {
+
+    private final static Logger logger = Logger.getLogger(PullRequest.class);
+
     private String[] features;
     private String author;
     private boolean validMarketingMessage;
@@ -40,12 +42,16 @@ public class PullRequest {
 
 
     public PullRequest(JsonObject prObject, String branchName, String repoName) {
-        this.author = this.trimJsonElementString(prObject.get("user").getAsJsonObject().get("login"));
-        this.url = this.trimJsonElementString(prObject.get("html_url"));
-        this.featureName = this.trimJsonElementString(prObject.get("title"));
-        this.features = this.createFeatures(trimJsonElementString(prObject.get("body")));
-        this.validMarketingMessage = this.checkMarketingMessageISValid(trimJsonElementString(prObject.get("body")));
-        this.labels = this.createLabelArray(prObject.get("labels").getAsJsonArray());
+        try {
+            this.author = this.trimJsonElementString(prObject.get("user").getAsJsonObject().get("login"));
+            this.url = this.trimJsonElementString(prObject.get("html_url"));
+            this.featureName = this.trimJsonElementString(prObject.get("title"));
+            this.features = this.createFeatures(trimJsonElementString(prObject.get("body")));
+            this.validMarketingMessage = this.checkMarketingMessageISValid(trimJsonElementString(prObject.get("body")));
+            this.labels = this.createLabelArray(prObject.get("labels").getAsJsonArray());
+        }catch (NullPointerException e){
+            logger.error("Error while reading key value pairs of PR object");
+        }
         this.repoName = repoName;
         this.branchName = branchName;
     }
@@ -66,8 +72,7 @@ public class PullRequest {
     }
 
     private String[] formatFeatureText(String featureText) {
-        String text = featureText.replace("\\r\\n", "%%%%");
-        return text.split("%%%%");
+        return featureText.split("\\\\r\\\\n");
     }
 
 
