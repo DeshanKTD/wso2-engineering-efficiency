@@ -1,10 +1,10 @@
 #!/bin/bash
 
-BUILD_REACT=false
+BUILD_REACT=true
 BUILD_FRONT_END=true
 BUILD_BACK_END=true
 
-HOST_URL=http://localhost:3000/lts
+HOST_URL=https://identity-gateway.cloud.wso2.com/t/wso2internalstg/lts/
 
 #server configurations
 GIT_TOKEN=c977dd4cdeecd964f9eb9738703a0f34354b8635
@@ -20,10 +20,10 @@ BACKEND_HOST_PORT=18080
 
 #SSO configurations
 SSO_KEYSTORE_FILE_PATH=test
-SSO_KEYSTORE_FILE_NAME=test
-SSO_KEYSTORE_PASSWORD=test
-SSO_CERTIFICATE_KEY=test
-SSO_REDERECT_URL=test
+SSO_KEYSTORE_FILE_NAME=sso_keystore.jks
+SSO_KEYSTORE_PASSWORD=123456
+SSO_CERTIFICATE_KEY=lts-dashboard-sso
+SSO_REDERECT_URL=https://identity.cloud.wso2.com/identity/t/wso2internalstg
 
 #backend keystore
 BACKEND_KEYSOTRE_FILE_NAME=keystore.jks
