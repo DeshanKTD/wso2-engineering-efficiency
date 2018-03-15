@@ -27,9 +27,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import org.apache.commons.codec.binary.Base64;
 import java.io.IOException;
-
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 
 
 /*
@@ -107,8 +107,13 @@ public class HttpHandler {
 
 
     private String encode(String text){
-        byte[] encodedBytes = Base64.encodeBase64(text.getBytes());
-        return new String(encodedBytes);
+        String returnString = null;
+        try {
+            returnString = Base64.getEncoder().encodeToString(text.getBytes("utf-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return returnString;
     }
 
 }

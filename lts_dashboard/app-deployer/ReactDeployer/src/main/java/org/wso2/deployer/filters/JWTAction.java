@@ -1,5 +1,6 @@
 package org.wso2.deployer.filters;
 
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.SignedJWT;
@@ -16,6 +17,7 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPublicKey;
+import java.text.ParseException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -76,10 +78,11 @@ public class JWTAction implements Filter {
             return;
         }
 
-        String username;
-        String roles;
+        String username=null;
+        String roles=null;
 
         try {
+
             SignedJWT signedJWT = SignedJWT.parse(jwt);
             JWSVerifier verifier = new RSASSAVerifier((RSAPublicKey) getPublicKey());
 
@@ -97,14 +100,19 @@ public class JWTAction implements Filter {
                 response.sendRedirect(ssoRedirectUrl);
                 return;
             }
-        } catch (Exception e) {
-            logger.error("JWT validation failed for token: {" + jwt + "}");
-            response.sendRedirect(ssoRedirectUrl);
-            return;
+        } catch (ParseException e){
+            logger.error("Parsing JWT token failed");
+        } catch (JOSEException e){
+            logger.error("Verification of jwt failed");
+        }
+        catch (Exception e){
+            logger.error("Failed to validate the jwt {"+jwt+"}");
         }
 
-        request.getSession().setAttribute("user", username);
-        request.getSession().setAttribute("roles", roles);
+        if(username!=null && roles!= null) {
+            request.getSession().setAttribute("user", username);
+            request.getSession().setAttribute("roles", roles);
+        }
 
         try {
             filterChain.doFilter(servletRequest, servletResponse);

@@ -6,7 +6,8 @@ import junit.framework.TestCase;
 /*
  * TODO - comment class work
  */public class HttpHandlerTest extends TestCase {
-     HttpHandler handler = null;
+
+    HttpHandler handler = null;
     public void setUp() throws Exception {
         handler = new HttpHandler();
     }
@@ -15,5 +16,6 @@ import junit.framework.TestCase;
         String response = handler.get("/release/quarters");
         Assert.assertNotNull(response);
     }
+
 
 }

@@ -6,14 +6,14 @@
   <display-name>Archetype Created Web Application</display-name>
 
 
-  <filter>
-    <filter-name>AuthenticationFilter</filter-name>
-    <filter-class>org.wso2.deployer.filters.JWTAction</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>AuthenticationFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
+  <!--<filter>-->
+    <!--<filter-name>AuthenticationFilter</filter-name>-->
+    <!--<filter-class>org.wso2.deployer.filters.JWTAction</filter-class>-->
+  <!--</filter>-->
+  <!--<filter-mapping>-->
+    <!--<filter-name>AuthenticationFilter</filter-name>-->
+    <!--<url-pattern>/*</url-pattern>-->
+  <!--</filter-mapping>-->
 
   <servlet>
     <servlet-name>GetProducts</servlet-name>
