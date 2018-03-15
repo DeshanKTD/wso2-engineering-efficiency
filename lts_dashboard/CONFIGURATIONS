@@ -1,28 +1,49 @@
 #!/bin/bash
 
-BUILD_REACT=true
-BUILD_FRONT_END=true
-BUILD_BACK_END=true
 
+# Use true or false to Build React app
+BUILD_REACT=true
+# Use true or false to Build servlet frond end which wrapped the react app
+BUILD_FRONT_END=true
+# Use true or false to build backend msf4j service 
+BUILD_BACK_END=true
+# user true or false to generate front end backend https certificate
+CREATE_BACKEND_CERTIFICATE=true
+
+# Front end hosting url to build the react app
 HOST_URL=https://identity-gateway.cloud.wso2.com/t/wso2internalstg/lts/
 
 #server configurations
+
+# GitHub personal access token
 GIT_TOKEN=c977dd4cdeecd964f9eb9738703a0f34354b8635
+# A username and password for basic authentication between frontend and backend
 BACKEND_USER=msf4j_lts_dashboard
 BACKEND_PASSWORD=1qaz2wsx3edc
+# dss url, it can be http or https. If https the certificate should add to 
+# truseted keystore
+# eg:- https://localhost:9445/services/LTSDashboardGeneric
 DSS_URL=https://localhost:9445/services/LTSDashboardGeneric
+# GitHub base url
+# eg:- https://api.github.com
 GIT_BASE_URL=https://api.github.com
 
 #backend deploy
+# backend hosting ip and port
 BACKEND_HOST=localhost
 BACKEND_HOST_PORT=18080
 
 
 #SSO configurations
+# the generated kestore for sso full path
 SSO_KEYSTORE_FILE_PATH=test
+# kestore name
 SSO_KEYSTORE_FILE_NAME=sso_keystore.jks
+# kestore password
 SSO_KEYSTORE_PASSWORD=123456
+# certificate alias
 SSO_CERTIFICATE_KEY=lts-dashboard-sso
+# redirecting url of sso
 SSO_REDERECT_URL=https://identity.cloud.wso2.com/identity/t/wso2internalstg
 
 #backend keystore

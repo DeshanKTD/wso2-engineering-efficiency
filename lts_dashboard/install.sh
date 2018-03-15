@@ -24,11 +24,11 @@ cd $LTS_HOME
 echo "####### Creating config files #######"
 
 # creating file for back end
-echo "GIT_TOKEN=$GIT_TOKEN" > BACKEND_CONFIGURATIONS
-echo "BACKEND_ACCESS_USER=$BACKEND_USER" >> BACKEND_CONFIGURATIONS
-echo "BACKEND_ACCESS_PASSWORD=$BACKEND_PASSWORD" >> BACKEND_CONFIGURATIONS
-echo "DSS_URL=$DSS_URL" >> BACKEND_CONFIGURATIONS
-echo "GIT_BASE_URL=$GIT_BASE_URL" >> BACKEND_CONFIGURATIONS
+echo "export GIT_TOKEN=$GIT_TOKEN" > BACKEND_CONFIGURATIONS
+echo "export BACKEND_ACCESS_USER=$BACKEND_USER" >> BACKEND_CONFIGURATIONS
+echo "export BACKEND_ACCESS_PASSWORD=$BACKEND_PASSWORD" >> BACKEND_CONFIGURATIONS
+echo "export DSS_URL=$DSS_URL" >> BACKEND_CONFIGURATIONS
+echo "export GIT_BASE_URL=$GIT_BASE_URL" >> BACKEND_CONFIGURATIONS
 mv BACKEND_CONFIGURATIONS $LTS_HOME/deploy-components/backend
 echo "## backend config.ini created"
 
@@ -58,22 +58,29 @@ echo "## frontend config.properties created"
 echo "REACT_APP_HOST_NAME=$HOST_URL" > .env
 mv .env $LTS_HOME/lts-dashboard
 
-echo "###### Generating backend certificate ########"
-keytool -genkeypair -keystore $BACKEND_KEYSOTRE_FILE_NAME \
--noprompt \
--dname "CN=OLEKSIYS-W3T, OU=Sun Java System Application Server, O=Sun Microsystems, L=Santa Clara, ST=California, C=US" \
--storepass $BACKEND_KEYSOTRE_PASSWORD \
--keypass $BACKEND_KEY_PASS \
--keyalg RSA \
--keysize 2048 \
--alias lts-micorservice \
--ext SAN=DNS:$BACKEND_HOST \
--validity 9999
 
-keytool -export -alias lts-micorservice -keystore $BACKEND_KEYSOTRE_FILE_NAME -rfc -file lts-backend.cert
-mv $BACKEND_KEYSOTRE_FILE_NAME $LTS_HOME/deploy-components/backend
-mv lts-backend.cert $LTS_HOME/deploy-components/certificates
-echo "## copying keystore and certificate completed"
+if [ $CREATE_BACKEND_CERTIFICATE = true ]; then
+	echo "###### Generating backend certificate ########"
+	echo 
+	echo "Use keystore password : $BACKEND_KEYSOTRE_PASSWORD (same used in configs)"
+	keytool -genkeypair -keystore $BACKEND_KEYSOTRE_FILE_NAME \
+	-noprompt \
+	-dname "CN=OLEKSIYS-W3T, OU=Sun Java System Application Server, O=Sun Microsystems, L=Santa Clara, ST=California, C=US" \
+	-storepass $BACKEND_KEYSOTRE_PASSWORD \
+	-keypass $BACKEND_KEY_PASS \
+	-keyalg RSA \
+	-keysize 2048 \
+	-alias lts-micorservice \
+	-ext SAN=DNS:$BACKEND_HOST \
+	-validity 9999
+
+	
+	keytool -export -alias lts-micorservice -keystore $BACKEND_KEYSOTRE_FILE_NAME -rfc -file lts-backend.cert
+	mv $BACKEND_KEYSOTRE_FILE_NAME $LTS_HOME/deploy-components/backend
+	mv lts-backend.cert $LTS_HOME/deploy-components/certificates
+	echo "## copying keystore and certificate completed"
+fi
+
 
 if [ -f $SSO_KEYSTORE_FILE_PATH ]; then
 	mv $SSO_KEYSTORE_FILE_PATH $LTS_HOME/app-deployer/ReactDeployer/src/main/resources
