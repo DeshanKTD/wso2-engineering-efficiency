@@ -84,7 +84,7 @@ public class SqlHandler {
         return this.post(uri, this.dssUrl, data);
     }
 
-    public JsonElement post(String uri, String dssUrl, JsonObject data) {
+    private JsonElement post(String uri, String dssUrl, JsonObject data) {
         String url = dssUrl + uri;
         JsonElement element = null;
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();

@@ -31,7 +31,7 @@ import java.util.Calendar;
  */
 public class ProcessorCommon {
 
-    public static void checkValidResponseAndPopulateArray(JsonElement element, String firstKey, String secondKey, JsonArray array) {
+    static void checkValidResponseAndPopulateArray(JsonElement element, String firstKey, String secondKey, JsonArray array) {
         JsonObject jsonObject = element.getAsJsonObject();
         if (jsonObject.has(firstKey) &&
                 jsonObject.get(firstKey).getAsJsonObject().has(secondKey)) {

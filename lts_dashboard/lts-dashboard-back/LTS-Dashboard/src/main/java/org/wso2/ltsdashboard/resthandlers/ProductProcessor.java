@@ -27,7 +27,7 @@ import org.wso2.ltsdashboard.connectionshandlers.SqlHandler;
  * get product details
  */
 public class ProductProcessor {
-    SqlHandler sqlHandler = null;
+    private SqlHandler sqlHandler = null;
 
     public ProductProcessor() {
         this.sqlHandler = new SqlHandler();
