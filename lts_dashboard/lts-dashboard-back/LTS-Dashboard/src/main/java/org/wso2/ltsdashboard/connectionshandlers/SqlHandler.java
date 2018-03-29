@@ -37,13 +37,17 @@ import java.io.IOException;
 public class SqlHandler {
     private final static Logger logger = Logger.getLogger(SqlHandler.class);
     private String dssUrl;
+    private String dssAuthEncoded;
     private boolean isDebugEnabled = false;
+    private String jsonFormat;
 
 
     public SqlHandler() {
         PropertyReader propertyReader = new PropertyReader();
         this.dssUrl = propertyReader.getDssUrl();
+        this.dssAuthEncoded = propertyReader.getDssAuthToken();
         this.isDebugEnabled = logger.isDebugEnabled();
+        this.jsonFormat = propertyReader.getJsonAccessFormat();
     }
 
 
@@ -57,8 +61,8 @@ public class SqlHandler {
         JsonElement element = null;
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(url);
-        request.addHeader("Accept", "application/json");
-
+        request.addHeader("Accept", this.jsonFormat);
+        request.addHeader("Authorization", "Basic "+this.dssAuthEncoded);
         try {
 
             HttpResponse response = httpClient.execute(request);
@@ -89,8 +93,9 @@ public class SqlHandler {
         JsonElement element = null;
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpPost request = new HttpPost(url);
-        request.addHeader("Accept", "application/json");
-        request.addHeader("Content-Type", "application/json");
+        request.addHeader("Accept", this.jsonFormat);
+        request.addHeader("Authorization", "Basic "+this.dssAuthEncoded);
+        request.addHeader("Content-Type", this.jsonFormat);
 
         try {
             StringEntity entity = new StringEntity(data.toString());

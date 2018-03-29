@@ -28,4 +28,6 @@ public class Constants {
     public final static String GIT_BASE_URL = "GIT_BASE_URL";
     public final static String BACKEND_ACCESS_USER = "BACKEND_ACCESS_USER";
     public final static String BACKEND_ACCESS_PASSWORD = "BACKEND_ACCESS_PASSWORD";
+    public final static String DSS_AUTH_TOKEN = "DSS_BASIC_AUTH_HEADER";
+    public final static String JSON_ACCEPT_FORMAT = "JSON_ACCEPT_FORMAT";
 }

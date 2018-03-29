@@ -34,6 +34,8 @@ public class PropertyReader {
     private static String gitBaseUrl;
     private static String accessUsername;
     private static String accessUserPassword;
+    private static String dssAuthToken;
+    private static String jsonAccessFormat;
 
     public PropertyReader() {
         loadConfigs();
@@ -46,11 +48,12 @@ public class PropertyReader {
     private static void loadConfigs() {
         try {
             gitToken = System.getenv(Constants.GIT_TOKEN);
-            logger.info(gitToken);
             dssUrl = System.getenv(Constants.DSS_URL);
             gitBaseUrl = System.getenv(Constants.GIT_BASE_URL);
             accessUsername = System.getenv(Constants.BACKEND_ACCESS_USER);
             accessUserPassword = System.getenv(Constants.BACKEND_ACCESS_PASSWORD);
+            dssAuthToken = System.getenv(Constants.DSS_AUTH_TOKEN);
+            jsonAccessFormat = System.getenv(Constants.JSON_ACCEPT_FORMAT);
 
         } catch (Exception e) {
             logger.error("Failed to load the environmental variables");
@@ -78,5 +81,14 @@ public class PropertyReader {
     public String getAccessUserPassword() {
         return accessUserPassword;
     }
+
+    String getDssAuthToken(){
+        return dssAuthToken;
+    }
+
+    String getJsonAccessFormat() {
+        return jsonAccessFormat;
+    }
+
 
 }
