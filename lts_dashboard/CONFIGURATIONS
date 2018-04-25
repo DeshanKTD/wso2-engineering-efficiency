@@ -29,6 +29,8 @@ DSS_URL=https://localhost:9445/services/LTSDashboardGeneric
 GIT_BASE_URL=https://api.github.com
 # Json accept format
 JSON_ACCEPT_FORMAT=application/json2
+# DSS basic authenticator base64 encoded useaname and password
+DSS_AUTH_TOKEN=dkfjsaldkjfjlfjsadjfklkfsdjlkajfdslkjflkdasjflksfntret=
 
 #backend deploy
 # backend hosting ip and port
