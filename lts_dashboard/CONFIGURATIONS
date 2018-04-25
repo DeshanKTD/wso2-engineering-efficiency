@@ -27,6 +27,8 @@ DSS_URL=https://localhost:9445/services/LTSDashboardGeneric
 # GitHub base url
 # eg:- https://api.github.com
 GIT_BASE_URL=https://api.github.com
+# Json accept format
+JSON_ACCEPT_FORMAT=application/json2
 
 #backend deploy
 # backend hosting ip and port
